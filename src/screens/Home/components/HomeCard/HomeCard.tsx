@@ -5,8 +5,8 @@ import { Image as ImageType } from "../../../../data/types";
 export interface Props {
   title: string;
   image?: ImageType;
-  numOfQuestions: number;
-  duration: number;
+  // numOfQuestions: number;
+  // duration: number;
   index: number;
   onPress: () => void;
 }
@@ -14,8 +14,8 @@ export interface Props {
 export function HomeCard({
   title,
   image,
-  numOfQuestions,
-  duration,
+  // numOfQuestions,
+  // duration,
   index,
   onPress,
 }: Props) {
@@ -34,10 +34,10 @@ export function HomeCard({
       </View>
       <View style={homeCard.textContainer}>
         <Heading text={title} fontSize={18} />
-        <View style={homeCard.footer}>
+        {/* <View style={homeCard.footer}>
           <Text style={homeCard.footerText}>{numOfQuestions} Questions</Text>
           <Text style={homeCard.footerText}>{duration} min</Text>
-        </View>
+        </View> */}
       </View>
     </Pressable>
   );

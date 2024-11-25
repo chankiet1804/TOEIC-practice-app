@@ -2,8 +2,8 @@ import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { HomeCard } from "./components";
 import { HomeScreenProps } from "../types";
 import { Heading, SafeAreaBox } from "../../components";
-import { data } from "./data";
-
+import { skills } from "./data";
+import { vocabulary } from "./data";
 export function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <SafeAreaBox>
@@ -16,13 +16,13 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           <FlatList
             scrollEnabled={false}
             numColumns={2}
-            data={data}
+            data={skills}
             renderItem={({ item, index }) => (
               <HomeCard
                 title={item.title}
                 image={item.image}
-                numOfQuestions={item.numOfQuestions}
-                duration={item.duration}
+                // numOfQuestions={item.numOfQuestions}
+                // duration={item.duration}
                 index={index}
                 onPress={() => {
                   navigation.navigate("Test", {
@@ -34,6 +34,29 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             )}
             keyExtractor={(item) => item.id}
           />
+          <Text style={homeScreen.title}>Vocabualry</Text>
+          <FlatList
+            scrollEnabled={false}
+            numColumns={2}
+            data={vocabulary}
+            renderItem={({ item, index }) => (
+              <HomeCard
+                title={item.title}
+                image={item.image}
+                // numOfQuestions={item.numOfQuestions}
+                // duration={item.duration}
+                index={index}
+                onPress={() => {
+                  navigation.navigate("Test", {
+                    title: item.title,
+                    testName: item.testName,
+                  });
+                }}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+          />
+
         </View>
       </ScrollView>
     </SafeAreaBox>
