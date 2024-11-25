@@ -11,7 +11,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         <View style={homeScreen.rootContainer}>
           <WelcomeCard />
 
-          <Text style={homeScreen.title}>Tests</Text>
+          <Text style={homeScreen.title}>Skills</Text>
 
           <FlatList
             scrollEnabled={false}
@@ -43,9 +43,9 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
 function WelcomeCard() {
   return (
     <View style={welcomeCard.root}>
-      <Heading text="Quiz App" fontSize={24} color="#fafafa" />
+      <Heading text="TOEIC Practice App" fontSize={24} color="#fafafa" />
       <Text style={welcomeCard.text}>
-        Welcome to the Quiz App! Get ready to test your knowledge!
+      Welcome to the TOEIC Practice App! Let's achieve your TOEIC goals together!
       </Text>
     </View>
   );
