@@ -19,6 +19,8 @@ export type HomeStackParamList = {
     totalQuestions: number;
     timeTaken: number;
   };
+  Vocabulary: undefined;
+  SpeakingListTest : undefined;
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -32,4 +34,14 @@ export type TestScreenProps = NativeStackScreenProps<
 export type ResultScreenProps = NativeStackScreenProps<
   HomeStackParamList,
   "Result"
+>;
+
+export type VocabularyScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "Vocabulary"
+>;
+
+export type SpeakingScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "SpeakingListTest"
 >;

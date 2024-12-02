@@ -1,6 +1,6 @@
 import { Question, Test } from "./types";
 
-export const SpeakingPratice: Test = {
+export const SpeakingPractice: Test = {
     id: "id:test/speaking",
     title: "Speaking",
     testName: "speaking",

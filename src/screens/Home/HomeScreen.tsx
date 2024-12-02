@@ -4,6 +4,8 @@ import { HomeScreenProps } from "../types";
 import { Heading, SafeAreaBox } from "../../components";
 import { skills } from "./data";
 import { vocabulary } from "./data";
+
+
 export function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <SafeAreaBox>
@@ -21,14 +23,11 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
               <HomeCard
                 title={item.title}
                 image={item.image}
-                // numOfQuestions={item.numOfQuestions}
-                // duration={item.duration}
                 index={index}
                 onPress={() => {
-                  navigation.navigate("Test", {
-                    title: item.title,
-                    testName: item.testName,
-                  });
+                  if(index===0){
+                    navigation.navigate("SpeakingListTest")
+                  }
                 }}
               />
             )}
@@ -38,19 +37,14 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           <FlatList
             scrollEnabled={false}
             numColumns={2}
-            data={vocabulary}
+            data = {vocabulary}
             renderItem={({ item, index }) => (
               <HomeCard
                 title={item.title}
                 image={item.image}
-                // numOfQuestions={item.numOfQuestions}
-                // duration={item.duration}
                 index={index}
                 onPress={() => {
-                  navigation.navigate("Test", {
-                    title: item.title,
-                    testName: item.testName,
-                  });
+                  navigation.navigate("Vocabulary");
                 }}
               />
             )}

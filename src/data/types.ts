@@ -27,7 +27,7 @@ export interface Test {
   duration: number;
 }
 
-export type TestName = "flags" | "solarSystem" | "speaking" | "writing" | "listening" | "reading" | "vocab";
+export type TestName = "flags" | "solarSystem" | "speaking" | "writing" | "listening" | "reading" | "vocab" ;
 
 export interface Vocab {
   id: string;
