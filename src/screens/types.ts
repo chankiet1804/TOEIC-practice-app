@@ -10,26 +10,44 @@ export type BottomTabParamList = {
 
 export type HomeStackParamList = {
   Home: undefined;
-  Test: {
-    title: string;
-    testName: TestName;
-  };
-  Result: {
-    correctAnswers: number;
-    totalQuestions: number;
-    timeTaken: number;
-  };
+  // Test: {
+  //   title: string;
+  //   testName: TestName;
+  // };
+  // Result: {
+  //   correctAnswers: number;
+  //   totalQuestions: number;
+  //   timeTaken: number;
+  // };
+  Speaking: undefined;
+  Writing: undefined;
+  Vocabulary: undefined;
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
   HomeStackParamList,
   "Home"
 >;
-export type TestScreenProps = NativeStackScreenProps<
+// export type TestScreenProps = NativeStackScreenProps<
+//   HomeStackParamList,
+//   "Test"
+// >;
+// export type ResultScreenProps = NativeStackScreenProps<
+//   HomeStackParamList,
+//   "Result"
+// >;
+
+export type SpeakingScreenProps = NativeStackScreenProps<
   HomeStackParamList,
-  "Test"
+  "Speaking"
 >;
-export type ResultScreenProps = NativeStackScreenProps<
+
+export type WritingScreenProps = NativeStackScreenProps<
   HomeStackParamList,
-  "Result"
+  "Writing"
+>;
+
+export type VocabularyScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "Vocabulary"
 >;
