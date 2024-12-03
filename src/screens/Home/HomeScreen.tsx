@@ -1,8 +1,16 @@
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
-import { HomeCard } from "./components";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+} from "react-native";
 import { HomeScreenProps } from "../types";
-import { Heading, SafeAreaBox } from "../../components";
-import { data } from "./data";
+import { SafeAreaBox } from "../../components";
+
+const { width } = Dimensions.get("window");
 
 export function HomeScreen({ navigation }: HomeScreenProps) {
   return (
@@ -11,29 +19,51 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         <View style={homeScreen.rootContainer}>
           <WelcomeCard />
 
-          <Text style={homeScreen.title}>Tests</Text>
-
-          <FlatList
-            scrollEnabled={false}
-            numColumns={2}
-            data={data}
-            renderItem={({ item, index }) => (
-              <HomeCard
-                title={item.title}
-                image={item.image}
-                numOfQuestions={item.numOfQuestions}
-                duration={item.duration}
-                index={index}
-                onPress={() => {
-                  navigation.navigate("Test", {
-                    title: item.title,
-                    testName: item.testName,
-                  });
-                }}
+          <Text style={homeScreen.sectionTitle}>Skills</Text>
+          <TouchableOpacity
+            style={homeScreen.card}
+            onPress={() => navigation.navigate("Speaking")}
+          >
+            <View style={[homeScreen.cardContent, homeScreen.speakingCard]}>
+              <Image
+                source={require("../../../assets/speaking-thumb.png")}
+                style={homeScreen.cardThumb}
+                resizeMode="contain"
               />
-            )}
-            keyExtractor={(item) => item.id}
-          />
+              <Text style={[homeScreen.cardText, { color: "#000" }]}>
+                Speaking
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={homeScreen.card}
+            onPress={() => navigation.navigate("Writing")}
+          >
+            <View style={[homeScreen.cardContent, homeScreen.writingCard]}>
+              <Image
+                source={require("../../../assets/writing-thumb.png")}
+                style={homeScreen.cardThumb}
+                resizeMode="contain"
+              />
+              <Text style={[homeScreen.cardText, { color: "#000" }]}>
+                Writing
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <Text style={homeScreen.sectionTitle}>Vocabulary</Text>
+          <TouchableOpacity
+            style={homeScreen.card}
+            onPress={() => navigation.navigate("Vocabulary")}
+          >
+            <Image
+              source={require("../../../assets/vocabulary-thumb.png")}
+              style={homeScreen.vocabularyImage}
+              resizeMode="cover"
+            />
+            <Text style={homeScreen.cardText}>Learn Vocabulary</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaBox>
@@ -43,9 +73,11 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
 function WelcomeCard() {
   return (
     <View style={welcomeCard.root}>
-      <Heading text="Quiz App" fontSize={24} color="#fafafa" />
+      <Text style={welcomeCard.heading}>
+        Welcome to the TOEIC Practice App!
+      </Text>
       <Text style={welcomeCard.text}>
-        Welcome to the Quiz App! Get ready to test your knowledge!
+        Let's achieve your TOEIC goals together!
       </Text>
     </View>
   );
@@ -54,25 +86,69 @@ function WelcomeCard() {
 const homeScreen = StyleSheet.create({
   rootContainer: {
     padding: 16,
-    gap: 8,
+    gap: 16,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#525252",
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#666",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    marginVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+    overflow: "hidden",
+  },
+  cardContent: {
+    width: "100%",
+    height: 120,
+    padding: 16,
+    position: "relative",
+  },
+  speakingCard: {
+    backgroundColor: "#FFD7CE",
+  },
+  writingCard: {
+    backgroundColor: "#90EE90",
+  },
+  cardThumb: {
+    width: width - 64,
+    height: "100%",
+  },
+  vocabularyImage: {
+    width: "100%",
+    height: 200,
+  },
+  cardText: {
+    fontSize: 18,
+    fontWeight: "500",
+    color: "#333",
+    position: "absolute",
+    bottom: 16,
+    left: 16,
   },
 });
 
 const welcomeCard = StyleSheet.create({
   root: {
-    backgroundColor: "#4B5563",
-    gap: 16,
-    borderRadius: 24,
+    backgroundColor: "#60A5FA",
+    gap: 8,
+    borderRadius: 16,
     padding: 24,
   },
   heading: {
     color: "#fafafa",
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
   },
   text: {
