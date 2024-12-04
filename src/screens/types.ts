@@ -22,6 +22,7 @@ export type HomeStackParamList = {
   Speaking: undefined;
   Writing: undefined;
   Vocabulary: undefined;
+  InforTestScreen: undefined;
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -50,4 +51,9 @@ export type WritingScreenProps = NativeStackScreenProps<
 export type VocabularyScreenProps = NativeStackScreenProps<
   HomeStackParamList,
   "Vocabulary"
+>;
+
+export type InforTestScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "InforTestScreen"
 >;

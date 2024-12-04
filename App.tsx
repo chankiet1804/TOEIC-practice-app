@@ -10,6 +10,7 @@ import { VocabularyScreen } from "./src/screens/Vocabulary";
 import { NoteScreen } from "./src/screens/Note";
 import { SettingsScreen } from "./src/screens/Settings";
 import { Image } from "react-native";
+import { InforTestScreen } from "./src/screens/Speaking/SpeakingSubscreen/InforTestScreen";
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -29,9 +30,38 @@ function MainStack() {
           headerShown: false,
         }}
       />
-      <Stack.Screen name="Speaking" component={SpeakingScreen} />
+      <Stack.Screen 
+        name="Speaking" 
+        component={SpeakingScreen}
+        options={{
+          headerTitle: "Danh sách đề thi Speaking",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: '#5799DB',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
       <Stack.Screen name="Writing" component={WritingScreen} />
       <Stack.Screen name="Vocabulary" component={VocabularyScreen} />
+      <Stack.Screen 
+        name="InforTestScreen" 
+        component={InforTestScreen}
+        options={{
+          headerTitle: "Thông tin bài thi",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: '#5799DB',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
     </Stack.Navigator>
   );
 }
