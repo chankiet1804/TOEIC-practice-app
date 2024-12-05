@@ -15,7 +15,7 @@ const { width } = Dimensions.get("window");
 export function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <SafeAreaBox>
-      <ScrollView>
+      <ScrollView scrollEnabled={false}>
         <View style={homeScreen.rootContainer}>
           <WelcomeCard />
 

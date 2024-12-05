@@ -93,8 +93,8 @@ export const getDBConnection = async () => {
           db.transaction(tx => {
             // Lặp qua 10 bài test
             for (let testId = 1; testId <= 10; testId++) {
-              // Lặp qua 8 phần cho mỗi bài test
-              for (let partNumber = 1; partNumber <= 8; partNumber++) {
+              // Lặp qua 5 phần cho mỗi bài test
+              for (let partNumber = 1; partNumber <= 5; partNumber++) {
                 const partId = `${testId}_${partNumber}`; // Tạo PartID duy nhất
                 tx.executeSql(
                   'INSERT OR IGNORE INTO Parts (PartID, TestID, PartNumber) VALUES (?, ?, ?)',

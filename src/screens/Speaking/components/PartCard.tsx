@@ -4,6 +4,7 @@ import { Heading } from "../../../components/Heading";
 
 export interface Props {
     title: string;
+    //subtitle: string;
     index: number;
     onPress: () => void;
   }
@@ -12,32 +13,34 @@ const img = {
     alt: 'Speaking Test',
   };
 
-  export function TestCard({
+  export function PartCard({
     title,
+    //subtitle,
     index,
     onPress,
   }: Props) {
     return (
       <Pressable
         onPress={onPress}
-        style={[testCard.root, { marginRight: index % 2 === 0 ? 8 : 0 }]}>
-        <View style={testCard.aspectRatio}>
+        style={[partCard.root, { marginRight: index % 2 === 0 ? 8 : 0 }]}>
+        <View style={partCard.aspectRatio}>
         <Image
-          style={testCard.image}
+          style={partCard.image}
           source={{
             uri: img?.uri,
           }}
           alt={img?.alt}
         />
         </View>
-        <View style={testCard.textContainer}>
+        <View style={partCard.textContainer}>
           <Heading text={title} fontSize={18} />
+          {/* <Text style={partCard.subtitle}>{subtitle}</Text> */}
         </View>
       </Pressable>
     );
   }
 
-  const testCard = StyleSheet.create({
+  const partCard = StyleSheet.create({
     root: {
       flex: 1,
       marginVertical: 8,
@@ -64,6 +67,12 @@ const img = {
     footerText: {
       fontSize: 12,
       color: "#718096",
+    },
+    subtitle: {
+      fontSize: 12,
+      color: '#666',
+      textAlign: 'center',
+      marginTop: 2,
     },
   });
   

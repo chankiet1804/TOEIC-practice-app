@@ -1,73 +1,69 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, View, StyleSheet } from 'react-native';
 import { SpeakingScreenProps } from '../types';
-import { TestCard } from './components/TestCard';
+import { PartCard } from './components/PartCard';
 import { SafeAreaBox } from "../../components";
-import { createTables, getDBConnection, insertTests,getAllTests } from '../../database/db-service';
+//import { createTables, getDBConnection, insertTests,getAllTests, insertParts, getPartsForTest } from '../../database/db-service';
 
 
 export function SpeakingScreen({ navigation }: SpeakingScreenProps) {
 
-  // const TestsData = [
-  //   { TestID: '1', Title: 'Speaking Test 1'},
-  //   { TestID: '2', Title: 'Speaking Test 2'},
-  //   { TestID: '3', Title: 'Speaking Test 3'},
-  //   { TestID: '4', Title: 'Speaking Test 4'},
-  //   { TestID: '5', Title: 'Speaking Test 5'},
-  //   { TestID: '6', Title: 'Speaking Test 6'},
-  //   { TestID: '7', Title: 'Speaking Test 7'},
-  //   { TestID: '8', Title: 'Speaking Test 8'},
-  //   // Thêm nhiều bài test khác ở đây
-  // ];
+  const Parts = [
+    { PartNumber: '1', Title: 'Đọc đoạn văn' },
+    { PartNumber: '2', Title: 'Mô tả hình ảnh' },
+    { PartNumber: '3', Title: 'Trả lời câu hỏi với tình huống' },
+    { PartNumber: '4', Title: 'Trả lời câu hỏi với thông tin cho trước' },
+    { PartNumber: '5', Title: 'Bày tỏ quan điểm cá nhân' },
+  ];
 
-  const [testsData, setTestsData] = useState<any>([]);
+  // const [testsData, setTestsData] = useState<any>([]);
 
-  useEffect(() => {
-    const initDatabase = async () => {
-      try {
-        const db = await getDBConnection();
-        await createTables(db);
-        await insertTests(db);
-        //await insertParts(db);
+  // useEffect(() => {
+  //   const initDatabase = async () => {
+  //     try {
+  //       const db = await getDBConnection();
+  //       await createTables(db);
+  //       await insertTests(db);
+  //       await insertParts(db);
         
-        const tests = await getAllTests(db);
-        setTestsData(tests);
-      } catch (error) {
-        console.error('Database initialization error:', error);
-      }
-    };
+  //       const tests = await getAllTests(db);
+        
+  //       setTestsData(tests);
+  //     } catch (error) {
+  //       console.error('Database initialization error:', error);
+  //     }
+  //   };
   
-    initDatabase();
-  }, []);
+  //   initDatabase();
+  // }, []);
 
   return (
     <SafeAreaBox>
-      
-        <View style={speakingScreen.rootContainer}>    
-          <FlatList
-            
-            numColumns={2}
-            data={testsData}
-            renderItem={({ item, index }) => (
-              <TestCard
-                title={item.Title}
-                index={index}
-                onPress={() => {
-                    navigation.navigate("InforTestScreen", { SpeakTestID: item.TestID});
-                }}
-              />
-            )}
-            keyExtractor={(item) => item.TestID}
-          />
-    </View>
-  </SafeAreaBox>
+      <View style={speakingScreen.rootContainer}>    
+        <FlatList
+          numColumns={2}
+          data={Parts}
+          renderItem={({ item, index }) => (
+            <PartCard
+              title={`Part ${item.PartNumber}\n`+item.Title}
+              //subtitle={item.Title}  // Thêm subtitle để hiển thị tiêu đề chi tiết
+              index={index}
+              onPress={() => {  
+                navigation.navigate("InforTestScreen", { SpeakTestID: item.PartNumber});
+              }}
+            />
+          )}
+          keyExtractor={(item) => item.PartNumber}
+        />
+      </View>
+    </SafeAreaBox>
   );
 }
 
 const speakingScreen = StyleSheet.create({
   rootContainer: {
-    padding: 16,
-    gap: 8,
+    padding: 8,
+    // gap: 5,
   },
   title: {
     fontSize: 20,
@@ -78,11 +74,11 @@ const speakingScreen = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
-    paddingTop : 40,
+    paddingTop : 20,
     textAlign: 'center'
   },
   heading: {
-    height: 80,
+    height: 70,
     backgroundColor: '#5799DB',
     borderRadius: 5,   
   },
