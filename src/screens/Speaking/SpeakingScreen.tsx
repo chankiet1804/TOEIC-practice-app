@@ -3,12 +3,8 @@ import { FlatList, View, StyleSheet } from 'react-native';
 import { SpeakingScreenProps } from '../types';
 import { TestCard } from './components/TestCard';
 import { SafeAreaBox } from "../../components";
-import { createTables, getDBConnection, insertTests } from '../../database/db-service';
+import { createTables, getDBConnection, insertTests,getAllTests } from '../../database/db-service';
 
-interface Test {
-  TestID: string;
-  Title: string;
-}
 
 export function SpeakingScreen({ navigation }: SpeakingScreenProps) {
 
@@ -24,48 +20,32 @@ export function SpeakingScreen({ navigation }: SpeakingScreenProps) {
   //   // Thêm nhiều bài test khác ở đây
   // ];
 
-  const [testsData, setTestsData] = useState<Test[]>([]);
+  const [testsData, setTestsData] = useState<any>([]);
 
   useEffect(() => {
-    const initializeDatabase = async () => {
+    const initDatabase = async () => {
       try {
-        console.log('Starting database initialization...');
-        
         const db = await getDBConnection();
-        console.log('Database connection established');
-        
         await createTables(db);
-        console.log('Tables created successfully');
-        
         await insertTests(db);
-        console.log('Initial data inserted');
+        //await insertParts(db);
         
-        const [results] = await db.executeSql('SELECT * FROM Tests ORDER BY TestID');
-        console.log('Query executed, results:', results);
-
-        if (results && results.rows && results.rows.length > 0) {
-          const tests = results.rows.raw() as Test[];
-          console.log('Loaded tests:', tests);
-          setTestsData(tests);
-        } else {
-          console.warn('No tests found in the database.');
-          setTestsData([]);
-        }
+        const tests = await getAllTests(db);
+        setTestsData(tests);
       } catch (error) {
-        console.error('Database initialization error details:', error);
-        setTestsData([]);
+        console.error('Database initialization error:', error);
       }
     };
-
-    initializeDatabase();
-}, []);
+  
+    initDatabase();
+  }, []);
 
   return (
     <SafeAreaBox>
       
         <View style={speakingScreen.rootContainer}>    
           <FlatList
-            scrollEnabled={false}
+            
             numColumns={2}
             data={testsData}
             renderItem={({ item, index }) => (

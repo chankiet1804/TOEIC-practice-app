@@ -1,39 +1,46 @@
-import { enablePromise, openDatabase, SQLiteDatabase} from 'react-native-sqlite-storage';
-
-enablePromise(true);
+import * as SQLite from 'expo-sqlite';
 
 export const getDBConnection = async () => {
     try {
-      return openDatabase({
-        name: 'Toeic-data.db',
-        location: 'default',
-      });
+      return SQLite.openDatabase('Toeic-data.db');
     } catch (error) {
       console.error('Error opening database:', error);
       throw Error('Failed to open database');
     }
   };
 
-export const createTables = async (db: SQLiteDatabase) => {
-    // create table if not exists
-    const createTestsTable = `
-        CREATE TABLE IF NOT EXISTS Tests (
+  export const createTables = async (db: SQLite.SQLiteDatabase) => {
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        // Tạo bảng Tests
+        tx.executeSql(
+          `CREATE TABLE IF NOT EXISTS Tests (
             TestID TEXT PRIMARY KEY,
-            Title TEXT NOT NULL,       
+            Title TEXT NOT NULL
+          );`,
+          [],
+          () => {
+            console.log('Tests table created successfully');
+          }
         );
-    `;
-
-    const createPartsTable = `
-        CREATE TABLE IF NOT EXISTS Parts (
+  
+        // Tạo bảng Parts
+        tx.executeSql(
+          `CREATE TABLE IF NOT EXISTS Parts (
             PartID TEXT PRIMARY KEY,
             TestID TEXT,
             PartNumber INTEGER NOT NULL,
             FOREIGN KEY (TestID) REFERENCES Tests(TestID)
+          );`,
+          [],
+          () => {
+            console.log('Parts table created successfully');
+            resolve(true);
+          }
         );
-    `;
-
-    const createQuestionsTable = `
-        CREATE TABLE IF NOT EXISTS Questions (
+        // Tạo bảng Parts
+        tx.executeSql(
+            `CREATE TABLE IF NOT EXISTS Questions (
             QuestionID TEXT PRIMARY KEY,
             PartID TEXT,
             QuestionNumber INTEGER NOT NULL,
@@ -42,55 +49,112 @@ export const createTables = async (db: SQLiteDatabase) => {
             AudioPath TEXT,
             CorrectAnswer TEXT,
             FOREIGN KEY (PartID) REFERENCES Parts(PartID)
-        );
-    `;
-
-    await db.executeSql(createTestsTable);
-    await db.executeSql(createPartsTable);
-    await db.executeSql(createQuestionsTable);
-  
+            );`,
+            [],
+            () => {
+              console.log('Questions table created successfully');
+              resolve(true);
+            }
+          );
+      });
+    });
   };
   // tao danh sach cac bai test
-    export const insertTests = async (db: SQLiteDatabase) => {
-        try {
-            const queries = [
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('1', 'SpeakingTest1');`,
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('2', 'SpeakingTest2');`,
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('3', 'SpeakingTest3');`,
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('4', 'SpeakingTest4');`,
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('5', 'SpeakingTest5');`,
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('6', 'SpeakingTest6');`,
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('7', 'SpeakingTest7');`,
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('8', 'SpeakingTest8');`,
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('9', 'SpeakingTest9');`,
-                `INSERT OR IGNORE INTO Tests (TestID, Title) VALUES ('10', 'SpeakingTest10);`
-            ];
-
-            for (const query of queries) {
-                await db.executeSql(query);
+  export const insertTests = async (db: SQLite.SQLiteDatabase) => {
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        // Insert 10 bài test
+        for (let i = 1; i <= 10; i++) {
+          tx.executeSql(
+            'INSERT OR IGNORE INTO Tests (TestID, Title) VALUES (?, ?)',
+            [i.toString(), `SpeakingTest${i}`],
+            (_, result) => {
+              if (i === 10) {
+                console.log('All tests inserted successfully');
+              }
             }
-
-            console.log('Inserted tests successfully');
-        } catch (error) {
-            console.error('Error inserting tests:', error);
+          );
         }
-    };
+      }, 
+      (error) => {
+        console.error('Error inserting tests:', error);
+        reject(error);
+      },
+      () => {
+        console.log('Tests transaction completed');
+        resolve(true);
+      });
+    });
+  };
 
     // tao danh sach cac phan trong bai test
-    export const insertParts = async (db: SQLiteDatabase) => {
-        try {
+    export const insertParts = async (db: SQLite.SQLiteDatabase) => {
+        return new Promise((resolve, reject) => {
+          db.transaction(tx => {
             // Lặp qua 10 bài test
             for (let testId = 1; testId <= 10; testId++) {
-                // Lặp qua 8 phần cho mỗi bài test
-                for (let partNumber = 1; partNumber <= 8; partNumber++) {
-                    const partId = `${testId}_${partNumber}`; // Tạo PartID duy nhất bằng cách kết hợp TestID và PartNumber
-                    const query = `INSERT INTO Parts (PartID, TestID, PartNumber) VALUES (?, ?, ?)`;
-                    await db.executeSql(query, [partId, testId.toString(), partNumber]);
-                }
+              // Lặp qua 8 phần cho mỗi bài test
+              for (let partNumber = 1; partNumber <= 8; partNumber++) {
+                const partId = `${testId}_${partNumber}`; // Tạo PartID duy nhất
+                tx.executeSql(
+                  'INSERT OR IGNORE INTO Parts (PartID, TestID, PartNumber) VALUES (?, ?, ?)',
+                  [partId, testId.toString(), partNumber],
+                  (_, result) => {
+                    if (testId === 10 && partNumber === 8) {
+                      console.log('All parts inserted successfully');
+                    }
+                  }
+                );
+              }
             }
-            console.log('Inserted parts for all tests successfully');
-        } catch (error) {
+          },
+          (error) => {
             console.error('Error inserting parts:', error);
-        }
-    };
+            reject(error);
+          },
+          () => {
+            console.log('Parts transaction completed');
+            resolve(true);
+          });
+        });
+      };
 
+    // Hàm để lấy tất cả tests
+export const getAllTests = async (db: SQLite.SQLiteDatabase) => {
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * FROM Tests ORDER BY TestID',
+          [],
+          (_, { rows: { _array } }) => {
+            resolve(_array);
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
+  };
+  
+  // Hàm để lấy tất cả parts của một test
+  export const getPartsForTest = async (db: SQLite.SQLiteDatabase, testId: string) => {
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT * FROM Parts WHERE TestID = ? ORDER BY PartNumber',
+          [testId],
+          (_, { rows: { _array } }) => {
+            resolve(_array);
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
+  };
+
+    
