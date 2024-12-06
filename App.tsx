@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { HomeStackParamList } from "./src/screens/types";
-import { HomeScreen } from "./src/screens";
+import { HomeScreen} from "./src/screens";
 import { SpeakingScreen } from "./src/screens/Speaking";
 import { WritingScreen } from "./src/screens/Writing";
 import { VocabularyScreen } from "./src/screens/Vocabulary";
@@ -11,6 +11,8 @@ import { NoteScreen } from "./src/screens/Note";
 import { SettingsScreen } from "./src/screens/Settings";
 import { Image } from "react-native";
 import { InforTestScreen } from "./src/screens/Speaking/SpeakingSubscreen/InforTestScreen";
+import { DatabaseProvider } from "./src/database/DatabaseContext";
+import { TestScreen } from "./src/screens/Speaking/SpeakingSubscreen/TestScreen";
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -62,14 +64,16 @@ function MainStack() {
           },
         }}
       />
+      <Stack.Screen name="TestScreen" component={TestScreen} />
     </Stack.Navigator>
   );
 }
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator
+    <DatabaseProvider>
+      <NavigationContainer>
+        <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
             let iconSource;
@@ -111,6 +115,7 @@ export default function App() {
           options={{ headerShown: false }}
         />
       </Tab.Navigator>
-    </NavigationContainer>
+      </NavigationContainer>
+    </DatabaseProvider>
   );
 }

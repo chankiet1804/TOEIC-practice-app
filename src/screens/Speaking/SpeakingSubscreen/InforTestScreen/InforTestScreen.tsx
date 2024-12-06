@@ -113,7 +113,7 @@ export function InforTestScreen({ navigation }: InforTestScreenProps) {
       <TouchableOpacity 
         style={styles.button}
         onPress={() => {
-          navigation.navigate('Home');
+          navigation.navigate('TestScreen');
         }}
         activeOpacity={0.8} 
       >

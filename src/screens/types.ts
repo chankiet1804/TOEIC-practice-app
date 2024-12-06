@@ -1,5 +1,4 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { TestName } from "../data/types";
 
 export type BottomTabParamList = {
   HomeTab: undefined;
@@ -23,6 +22,7 @@ export type HomeStackParamList = {
   Writing: undefined;
   Vocabulary: undefined;
   InforTestScreen: { PartNumber: string };
+  TestScreen: undefined;
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -56,4 +56,9 @@ export type VocabularyScreenProps = NativeStackScreenProps<
 export type InforTestScreenProps = NativeStackScreenProps<
   HomeStackParamList,
   "InforTestScreen"
+>;
+
+export type TestScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "TestScreen"
 >;
