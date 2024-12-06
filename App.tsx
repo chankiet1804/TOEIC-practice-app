@@ -11,8 +11,9 @@ import { NoteScreen } from "./src/screens/Note";
 import { SettingsScreen } from "./src/screens/Settings";
 import { Image } from "react-native";
 import { InforTestScreen } from "./src/screens/Speaking/SpeakingSubscreen/InforTestScreen";
-import { DatabaseProvider } from "./src/database/DatabaseContext";
 import { TestScreen } from "./src/screens/Speaking/SpeakingSubscreen/TestScreen";
+import { DatabaseProvider } from "./src/database/DatabaseContext";
+import { DatabaseStateHandler } from "./src/database/DatabaseStateHandler";
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -64,7 +65,19 @@ function MainStack() {
           },
         }}
       />
-      <Stack.Screen name="TestScreen" component={TestScreen} />
+      <Stack.Screen name="TestScreen" component={TestScreen}
+        options={{
+          headerTitle: "Danh sách các bài thi",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: '#5799DB',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -72,50 +85,52 @@ function MainStack() {
 export default function App() {
   return (
     <DatabaseProvider>
-      <NavigationContainer>
-        <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconSource;
-            if (route.name === "Main") {
-              iconSource = require("./assets/main-icon.png");
-            } else if (route.name === "Note") {
-              iconSource = require("./assets/note-icon.png");
-            } else if (route.name === "Settings") {
-              iconSource = require("./assets/settings-icon.png");
-            }
-            return (
-              <Image
-                source={iconSource}
-                style={{
-                  width: size,
-                  height: size,
-                  tintColor: color,
-                }}
-              />
-            );
-          },
-          tabBarActiveTintColor: "#60A5FA",
-          tabBarInactiveTintColor: "gray",
-        })}
-      >
-        <Tab.Screen
-          name="Main"
-          component={MainStack}
-          options={{ headerShown: false }}
-        />
-        <Tab.Screen
-          name="Note"
-          component={NoteScreen}
-          options={{ headerShown: false }}
-        />
-        <Tab.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{ headerShown: false }}
-        />
-      </Tab.Navigator>
-      </NavigationContainer>
+      <DatabaseStateHandler>
+        <NavigationContainer>
+          <Tab.Navigator
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconSource;
+              if (route.name === "Main") {
+                iconSource = require("./assets/main-icon.png");
+              } else if (route.name === "Note") {
+                iconSource = require("./assets/note-icon.png");
+              } else if (route.name === "Settings") {
+                iconSource = require("./assets/settings-icon.png");
+              }
+              return (
+                <Image
+                  source={iconSource}
+                  style={{
+                    width: size,
+                    height: size,
+                    tintColor: color,
+                  }}
+                />
+              );
+            },
+            tabBarActiveTintColor: "#60A5FA",
+            tabBarInactiveTintColor: "gray",
+          })}
+        >
+          <Tab.Screen
+            name="Main"
+            component={MainStack}
+            options={{ headerShown: false }}
+          />
+          <Tab.Screen
+            name="Note"
+            component={NoteScreen}
+            options={{ headerShown: false }}
+          />
+          <Tab.Screen
+            name="Settings"
+            component={SettingsScreen}
+            options={{ headerShown: false }}
+          />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </DatabaseStateHandler>
     </DatabaseProvider>
   );
 }
