@@ -21,7 +21,7 @@ export function TestScreen() {
         try {
           const testsData = await getAllTests(database) as Test[];
           setTests(testsData);
-          console.log('Loaded tests:', testsData);
+          //console.log('Loaded tests:', testsData);
         } catch (err) {
           console.error('Error loading tests:', err);
         }
@@ -41,7 +41,7 @@ export function TestScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Danh sách Tests:</Text>
+      
       {tests.map(test => (
         <View key={test.TestID} style={styles.testCard}>
           <Text style={styles.testId}>Test ID: {test.TestID}</Text>
@@ -57,12 +57,6 @@ const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: '#f5f5f5',
       padding: 16,
-    },
-    header: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      marginBottom: 16,
-      color: '#333',
     },
     testCard: {
       backgroundColor: '#fff',

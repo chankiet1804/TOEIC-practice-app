@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaBox } from "../../../../components";
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { HomeStackParamList, InforTestScreenProps, SpeakingScreenProps } from '../../../types';
+import { useRoute} from '@react-navigation/native';
+import { HomeStackParamList, InforTestScreenProps} from '../../../types';
 import { RouteProp } from '@react-navigation/native';
+import { Modal } from 'react-native';
 
 type InforTestScreenRouteProp = RouteProp<HomeStackParamList, 'InforTestScreen'>;
 
@@ -74,6 +75,21 @@ export function InforTestScreen({ navigation }: InforTestScreenProps) {
   const route = useRoute<InforTestScreenRouteProp>();
   const { PartNumber } = route.params;
   const partInfo = partInstructions[PartNumber as keyof typeof partInstructions];
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [selectedTest, setSelectedTest] = React.useState<number | null>(null);
+
+  const availableTests = [
+    { id: 1, title: 'Bài test 1' },
+    { id: 2, title: 'Bài test 2' },
+    { id: 3, title: 'Bài test 3' },
+    { id: 4, title: 'Bài test 4' },
+    { id: 5, title: 'Bài test 5' },
+    { id: 6, title: 'Bài test 6' },
+    { id: 7, title: 'Bài test 7' },
+    { id: 8, title: 'Bài test 8' },
+    { id: 9, title: 'Bài test 9' },
+    { id: 10, title: 'Bài test 10' },
+  ];
 
   return (
     <SafeAreaBox>
@@ -109,12 +125,66 @@ export function InforTestScreen({ navigation }: InforTestScreenProps) {
         </View>
       </ScrollView>
       
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Chọn bài test</Text>
+              <TouchableOpacity
+                style={styles.closeIcon}
+                onPress={() => {
+                  setModalVisible(false);
+                  setSelectedTest(null);
+                }}
+              >
+                <Text style={styles.closeIconText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.testList}>
+              {availableTests.map((test) => (
+                <TouchableOpacity
+                  key={test.id}
+                  style={[
+                    styles.testItem,
+                    selectedTest === test.id && styles.selectedTest
+                  ]}
+                  onPress={() => setSelectedTest(test.id)}
+                >
+                  <Text style={styles.testItemText}>{test.title}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={[
+                styles.startButton,
+                !selectedTest && styles.startButtonDisabled
+              ]}
+              onPress={() => {
+                if (selectedTest) {
+                  setModalVisible(false);
+                  navigation.navigate('TestScreen');
+                  setSelectedTest(null);
+                }
+              }}
+              disabled={!selectedTest}
+            >
+              <Text style={styles.startButtonText}>Làm bài</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.buttonContainer}>
       <TouchableOpacity 
         style={styles.button}
-        onPress={() => {
-          navigation.navigate('TestScreen');
-        }}
+        onPress={() => setModalVisible(true)}
         activeOpacity={0.8} 
       >
         <Text style={styles.buttonText}>Bắt đầu làm bài</Text>
@@ -224,5 +294,81 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    width: '80%',
+    maxHeight: '80%',
+    alignItems: 'center',
+  },
+  modalHeader: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2C3E50',
+  },
+  closeIcon: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    padding: 5,
+  },
+  closeIconText: {
+    fontSize: 20,
+    color: '#95a5a6',
+    fontWeight: '500',
+  },
+  testItem: {
+    width: '100%',
+    padding: 15,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#f8f9fa',
+  },
+  selectedTest: {
+    borderColor: '#2980B9',
+    backgroundColor: '#ebf5fb',
+  },
+  startButton: {
+    backgroundColor: '#2980B9',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  startButtonDisabled: {
+    backgroundColor: '#bdc3c7',
+  },
+  startButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  testItemText: {
+    fontSize: 16,
+    color: '#2C3E50',
+    textAlign: 'center',
+  },
+  testList: {
+    width: '90%',
+    maxHeight: '70%',
   },
 });
