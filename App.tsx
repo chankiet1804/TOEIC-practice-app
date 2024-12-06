@@ -34,7 +34,7 @@ function MainStack() {
         name="Speaking" 
         component={SpeakingScreen}
         options={{
-          headerTitle: "Danh sách đề thi Speaking",
+          headerTitle: "Các phần trong Speaking",
           headerTitleAlign: 'center',
           headerStyle: {
             backgroundColor: '#5799DB',
