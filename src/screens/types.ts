@@ -22,7 +22,10 @@ export type HomeStackParamList = {
   Writing: undefined;
   Vocabulary: undefined;
   InforTestScreen: { PartNumber: string };
-  TestScreen: undefined;
+  TestScreen: {
+    testId: number;
+    PartNumber: string;
+  };
 };
 
 export type HomeScreenProps = NativeStackScreenProps<

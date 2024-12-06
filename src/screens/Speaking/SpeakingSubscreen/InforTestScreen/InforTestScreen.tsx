@@ -169,7 +169,7 @@ export function InforTestScreen({ navigation }: InforTestScreenProps) {
               onPress={() => {
                 if (selectedTest) {
                   setModalVisible(false);
-                  navigation.navigate('TestScreen');
+                  navigation.navigate('TestScreen', { testId: selectedTest, PartNumber: PartNumber });
                   setSelectedTest(null);
                 }
               }}
@@ -325,13 +325,13 @@ const styles = StyleSheet.create({
   closeIcon: {
     position: 'absolute',
     right: 0,
-    top: 0,
+    top: -5,
     padding: 5,
   },
   closeIconText: {
     fontSize: 20,
     color: '#95a5a6',
-    fontWeight: '500',
+    fontWeight: 'bold',
   },
   testItem: {
     width: '100%',
@@ -349,9 +349,10 @@ const styles = StyleSheet.create({
   startButton: {
     backgroundColor: '#2980B9',
     paddingVertical: 14,
-    paddingHorizontal: 40,
+    paddingHorizontal: 50,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 40,
+    
   },
   startButtonDisabled: {
     backgroundColor: '#bdc3c7',
