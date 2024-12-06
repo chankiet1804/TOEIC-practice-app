@@ -1,21 +1,25 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Heading } from "../../../components/Heading";
 
 
+const windowWidth = Dimensions.get('window').width;
+const cardWidth = (windowWidth - (8 * 2) - 8) / 2;
+
+export interface image {
+    source: any;
+    alt: string;
+  }
 export interface Props {
     title: string;
-    //subtitle: string;
+    image: image;
     index: number;
     onPress: () => void;
-  }
-const img = {
-    uri: 'https://literalni.com/wp-content/uploads/2023/04/podcast-radio.jpg',
-    alt: 'Speaking Test',
-  };
+}
+
 
   export function PartCard({
     title,
-    //subtitle,
+    image ,
     index,
     onPress,
   }: Props) {
@@ -23,18 +27,16 @@ const img = {
       <Pressable
         onPress={onPress}
         style={[partCard.root, { marginRight: index % 2 === 0 ? 8 : 0 }]}>
-        <View style={partCard.aspectRatio}>
+        <View style={partCard.imageContainer}>
         <Image
           style={partCard.image}
-          source={{
-            uri: img?.uri,
-          }}
-          alt={img?.alt}
+          source={image.source}
+          alt={image.alt}
+          resizeMode="cover"
         />
         </View>
         <View style={partCard.textContainer}>
           <Heading text={title} fontSize={18} />
-          {/* <Text style={partCard.subtitle}>{subtitle}</Text> */}
         </View>
       </Pressable>
     );
@@ -43,36 +45,34 @@ const img = {
   const partCard = StyleSheet.create({
     root: {
       flex: 1,
-      marginVertical: 8,
+      maxWidth: cardWidth,
+      backgroundColor: 'white',
       borderRadius: 8,
-      borderColor: "#cbd2d9",
-      borderWidth: 1,
-      overflow: "hidden",
+      marginBottom: 8,
+      elevation: 2, // for Android shadow
+      shadowColor: '#000', // for iOS shadow
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: 0.22,
+      shadowRadius: 2.22,
     },
-    aspectRatio: {
-      aspectRatio: 16 / 7,
+    imageContainer: {
+      width: '100%',
+      height: cardWidth * 0.6, // Tỉ lệ khung hình 3:2
+      borderTopLeftRadius: 8,
+      borderTopRightRadius: 8,
+      overflow: 'hidden',
     },
     image: {
-      flex: 1,
-      resizeMode: "cover",
+      width: '100%',
+      height: '100%',
     },
     textContainer: {
-      padding: 16,
-    },
-    footer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      marginTop: 8,
-    },
-    footerText: {
-      fontSize: 12,
-      color: "#718096",
-    },
-    subtitle: {
-      fontSize: 12,
-      color: '#666',
-      textAlign: 'center',
-      marginTop: 2,
+      padding: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
   });
   

@@ -9,11 +9,36 @@ import { SafeAreaBox } from "../../components";
 export function SpeakingScreen({ navigation }: SpeakingScreenProps) {
 
   const Parts = [
-    { PartNumber: '1', Title: 'Đọc đoạn văn' },
-    { PartNumber: '2', Title: 'Mô tả hình ảnh' },
-    { PartNumber: '3', Title: 'Trả lời câu hỏi với tình huống' },
-    { PartNumber: '4', Title: 'Trả lời câu hỏi với thông tin cho trước' },
-    { PartNumber: '5', Title: 'Bày tỏ quan điểm cá nhân' },
+    { PartNumber: '1', 
+      Title: 'Đọc đoạn văn',
+      image: {
+        source: require('../../../assets/toeic_speaking_part1.jpg'),
+        alt: 'Đọc đoạn văn' },
+    },
+    { PartNumber: '2', 
+      Title: 'Mô tả hình ảnh',
+      image: {
+        source: require('../../../assets/toeic_speaking_part2.jpg'),
+        alt: 'Mô tả hình ảnh' },
+    },
+    { PartNumber: '3', 
+      Title: 'Trả lời câu hỏi với tình huống',
+      image: {
+        source: require('../../../assets/toeic_speaking_part3.jpg'),
+        alt: 'Trả lời câu hỏi với tình huống' },
+    },
+    { PartNumber: '4', 
+      Title: 'Trả lời câu hỏi với thông tin cho trước',
+      image: {
+        source: require('../../../assets/toeic_speaking_part4.jpg'),
+        alt: 'Trả lời câu hỏi với thông tin cho trước' },
+    },
+    { PartNumber: '5', 
+      Title: 'Bày tỏ quan điểm cá nhân',
+      image: {
+        source: require('../../../assets/toeic_speaking_part5.jpg'),
+        alt: 'Bày tỏ quan điểm cá nhân' },
+    },
   ];
 
   // const [testsData, setTestsData] = useState<any>([]);
@@ -46,10 +71,10 @@ export function SpeakingScreen({ navigation }: SpeakingScreenProps) {
           renderItem={({ item, index }) => (
             <PartCard
               title={`Part ${item.PartNumber}\n`+item.Title}
-              //subtitle={item.Title}  // Thêm subtitle để hiển thị tiêu đề chi tiết
+              image={item.image}
               index={index}
               onPress={() => {  
-                navigation.navigate("InforTestScreen", { SpeakTestID: item.PartNumber});
+                navigation.navigate("InforTestScreen", { PartNumber: item.PartNumber});
               }}
             />
           )}
@@ -62,8 +87,9 @@ export function SpeakingScreen({ navigation }: SpeakingScreenProps) {
 
 const speakingScreen = StyleSheet.create({
   rootContainer: {
-    padding: 8,
-    // gap: 5,
+    padding: 16,
+    flex: 1,
+    gap: 8,
   },
   title: {
     fontSize: 20,
@@ -75,7 +101,9 @@ const speakingScreen = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     paddingTop : 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    borderWidth: 1,
+    
   },
   heading: {
     height: 70,
