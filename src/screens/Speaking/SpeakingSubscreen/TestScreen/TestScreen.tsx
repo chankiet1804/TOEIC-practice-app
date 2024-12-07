@@ -1,123 +1,178 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from '../../../types';
 import { RouteProp } from '@react-navigation/native';
+import { getDBConnection, getQuestionById } from '../../../../database/db-service';
+import { CountdownTimer } from '../../../../components/CountdownTimer';
 
 type TestScreenRouteProp = RouteProp<HomeStackParamList, 'TestScreen'>;
 
-// Dữ liệu mẫu cho các câu hỏi theo từng part
-const questionsData = {
-  '1': [
-    {
-      id: 1,
-      text: "Directions: In this part of the test, you will read aloud the text on the screen. You will have 45 seconds to prepare. Then you will have 45 seconds to read the text aloud.",
-      content: "The development of new technology has brought many changes to the workplace. One significant change is the ability to work remotely. Many employees now have the option to work from home or other locations outside the traditional office environment. This flexibility has led to increased productivity and job satisfaction for many workers. However, it also presents new challenges in terms of communication and team collaboration.",
-    }
-  ],
-  '2': [
-    {
-      id: 1,
-      text: "Directions: In this part of the test, you will describe the picture on your screen in as much detail as possible. You will have 30 seconds to prepare your response. Then you will have 45 seconds to speak about the picture.",
-      imageUrl: "path_to_image",
-    }
-  ],
-  '3': [
-    {
-      id: 1,
-      text: "Directions: In this part of the test, you will answer three questions. For each question, begin responding immediately after you hear a beep. No preparation time is provided. You will have 15 seconds to respond to questions 1 and 2, and 30 seconds to respond to question 3.",
-      questions: [
-        "What kind of transportation do you usually use to go to work or school?",
-        "What are some advantages of using public transportation?",
-        "Describe a memorable journey you have taken. What made it special?"
-      ]
-    }
-  ],
-  '4': [
-    {
-      id: 1,
-      text: "Directions: In this part of the test, you will answer three questions based on the information provided. You will have 30 seconds to read the information before the questions begin. For each question, begin responding immediately after you hear a beep. No additional preparation time is provided. You will have 15 seconds to respond to questions 1 and 2, and 30 seconds to respond to question 3.",
-      readingText: "Attention all employees: The company annual meeting will be held next Thursday at 2 PM in the main conference room. All department heads are required to prepare a brief presentation about their team's achievements this year. The meeting is expected to last approximately three hours, and refreshments will be provided.",
-      questions: [
-        "What is the main purpose of the meeting?",
-        "Who needs to prepare presentations?",
-        "What details are provided about the meeting arrangements?"
-      ]
-    }
-  ],
-  '5': [
-    {
-      id: 1,
-      text: "Directions: In this part of the test, you will give your opinion about a specific topic. Be sure to say as much as you can in the time allowed. You will have 15 seconds to prepare. Then you will have 60 seconds to speak.",
-      topic: "Some people prefer to work for large companies, while others prefer to work for small companies. Which would you prefer? Include reasons and specific examples to support your answer."
-    }
-  ]
-};
+interface Question {
+  QuestionID: string;
+  PartID: string;
+  QuestionNumber: number;
+  QuestionType: string;
+  Content: string | null;
+
+  ImagePath1: string | null;
+  ImagePath2: string | null;
+  Question1: string | null;
+  Question2: string | null;
+  Question3: string | null;
+  PreparationTime: number;
+  ResponseTime: number;
+}
+
 
 export function TestScreen({ navigation }: any) {
   const route = useRoute<TestScreenRouteProp>();
   const { testId, PartNumber } = route.params;
-  const questions = questionsData[PartNumber as keyof typeof questionsData];
+  const [question, setQuestion] = useState<Question | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
+
+  useEffect(() => {
+    const loadQuestion = async () => {
+      try {
+        const db = await getDBConnection();
+        // Format questionId: TestID_PartNumber_QuestionNumber
+        const questionId1 = `${testId}_${PartNumber}_1`; // Assuming QuestionNumber is 1
+        const questionId2 = `${testId}_${PartNumber}_2`; // Assuming QuestionNumber is 2
+        const questionData1 = await getQuestionById(db, questionId1);
+        const questionData2 = await getQuestionById(db, questionId2);
+        setQuestion(questionData1 as Question);
+      } catch (error) {
+        console.error('Error loading question:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadQuestion();
+  }, [testId, PartNumber]);
+
+  if (loading) {
+    return (
+      <SafeAreaBox>
+        <View style={styles.container}>
+          <Text>Loading...</Text>
+        </View>
+      </SafeAreaBox>
+    );
+  }
+
+  if (!question) {
+    return (
+      <SafeAreaBox>
+        <View style={styles.container}>
+          <Text>No question found</Text>
+        </View>
+      </SafeAreaBox>
+    );
+  }
+
+  const handleStartRecording = () => {
+    setIsRecording(true);
+    // Thêm logic ghi âm ở đây
+  };
+
+  const handleTimeUp = () => {
+    setIsRecording(false);
+    // Thêm logic dừng ghi âm khi hết giờ
+  };
+
 
   return (
     <SafeAreaBox>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Part {PartNumber} - Test {testId}</Text>
-          <Text style={styles.timer}>00:45</Text>
+          {/* <Text style={styles.timer}>00:45</Text> */}
+          {isRecording && question && (
+            <CountdownTimer 
+              initialMinutes={question.ResponseTime / 60} // Chuyển đổi giây thành phút
+              onTimeUp={handleTimeUp}
+            />
+          )}
         </View>
 
         <View style={styles.questionContainer}>
-          <Text style={styles.directions}>{questions[0].text}</Text>
-          
-          {PartNumber === '1' && 'content' in questions[0] && (
-            <View style={styles.readingBox}>
-              <Text style={styles.readingText}>{questions[0].content}</Text>
-            </View>
-          )}
-
-          {PartNumber === '3' && 'questions' in questions[0] && (
-            <View style={styles.questionsList}>
-              {questions[0].questions.map((question: string, index: number) => (
-                <View key={index} style={styles.questionItem}>
-                  <Text style={styles.questionNumber}>{index + 1}</Text>
-                  <Text style={styles.questionText}>{question}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {PartNumber === '4' && 'readingText' in questions[0] && 'questions' in questions[0] && (
+          {/* Hiển thị nội dung dựa vào QuestionType */}
+          {question.QuestionType === 'text' && (
             <>
+              <Text style={styles.directions}>
+                Directions: In this part of the test, you will read aloud the text on the screen. 
+                You will have {question.PreparationTime} seconds to prepare. 
+                Then you will have {question.ResponseTime} seconds to read the text aloud.
+              </Text>
               <View style={styles.readingBox}>
-                <Text style={styles.readingText}>{questions[0].readingText}</Text>
+                <Text style={styles.readingText}>{question.Content}</Text>
+              </View>
+            </>
+          )}
+
+          {question.QuestionType === 'image' && (
+            <>
+              <Text style={styles.directions}>
+                Directions: In this part of the test, you will describe the picture on your screen in as much detail as possible. 
+                You will have {question.PreparationTime} seconds to prepare your response. 
+                Then you will have {question.ResponseTime} seconds to speak about the picture.
+              </Text>
+              {/* Thêm component hiển thị hình ảnh ở đây */}
+            </>
+          )}
+
+          {question.QuestionType === 'passage' && (
+            <>
+              <Text style={styles.directions}>
+                Directions: In this part of the test, you will answer three questions based on the information provided. 
+                You will have {question.PreparationTime} seconds to read the information before the questions begin.
+              </Text>
+              <View style={styles.readingBox}>
+                <Text style={styles.readingText}>{question.Content}</Text>
               </View>
               <View style={styles.questionsList}>
-                {questions[0].questions.map((question: string, index: number) => (
-                  <View key={index} style={styles.questionItem}>
-                    <Text style={styles.questionNumber}>{index + 1}</Text>
-                    <Text style={styles.questionText}>{question}</Text>
-                  </View>
+                {[question.Question1, question.Question2, question.Question3].map((q, index) => (
+                  q && (
+                    <View key={index} style={styles.questionItem}>
+                      <Text style={styles.questionNumber}>{index + 1}</Text>
+                      <Text style={styles.questionText}>{q}</Text>
+                    </View>
+                  )
                 ))}
               </View>
             </>
           )}
 
-          {PartNumber === '5' && 'topic' in questions[0] && (
-            <View style={styles.topicBox}>
-              <Text style={styles.topicText}>{questions[0].topic}</Text>
-            </View>
+          {question.QuestionType === 'topic' && (
+            <>
+              <Text style={styles.directions}>
+                Directions: In this part of the test, you will give your opinion about a specific topic. 
+                You will have {question.PreparationTime} seconds to prepare. 
+                Then you will have {question.ResponseTime} seconds to speak.
+              </Text>
+              <View style={styles.topicBox}>
+                <Text style={styles.topicText}>{question.Content}</Text>
+              </View>
+            </>
           )}
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
         <TouchableOpacity 
-          style={styles.button}
-          onPress={() => {/* Xử lý logic ghi âm */}}
+          style={[
+            styles.button,
+            isRecording && styles.recordingButton // Thêm style cho trạng thái đang ghi âm
+          ]}
+          onPress={handleStartRecording}
+          disabled={isRecording} // Disable nút khi đang ghi âm
         >
-          <Text style={styles.buttonText}>Bắt đầu ghi âm</Text>
+          <Text style={styles.buttonText}>
+            {isRecording ? 'Đang ghi âm...' : 'Bắt đầu ghi âm'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaBox>
@@ -142,11 +197,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#2C3E50',
-  },
-  timer: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2980B9',
   },
   questionContainer: {
     padding: 16,
@@ -218,5 +268,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  recordingButton: {
+    backgroundColor: '#dc3545', // Màu đỏ khi đang ghi âm
+  },
+  timer: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2980B9',
   },
 });

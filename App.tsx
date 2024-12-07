@@ -67,7 +67,7 @@ function MainStack() {
       />
       <Stack.Screen name="TestScreen" component={TestScreen}
         options={{
-          headerTitle: "Danh sách các bài thi",
+          headerTitle: "Trang bài thi",
           headerTitleAlign: 'center',
           headerStyle: {
             backgroundColor: '#5799DB',
