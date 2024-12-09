@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image } from 'react-native';
 import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from '../../../types';
 import { RouteProp } from '@react-navigation/native';
 import { getDBConnection, getQuestionById } from '../../../../database/db-service';
 import { CountdownTimer } from '../../../../components/CountdownTimer';
-
+import { SPEAKING_IMAGES } from '../../../../database/images';
 type TestScreenRouteProp = RouteProp<HomeStackParamList, 'TestScreen'>;
 
 interface Question {
   QuestionID: string;
   PartID: string;
-  QuestionNumber: number;
   QuestionType: string;
-  Content: string | null;
-
-  ImagePath1: string | null;
-  ImagePath2: string | null;
+  Content1: string | null;
+  Content2: string | null;
+  ImagePath1: keyof typeof SPEAKING_IMAGES;
+  ImagePath2: keyof typeof SPEAKING_IMAGES;
   Question1: string | null;
   Question2: string | null;
   Question3: string | null;
@@ -32,17 +31,18 @@ export function TestScreen({ navigation }: any) {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<1 | 2>(1);
 
   useEffect(() => {
     const loadQuestion = async () => {
       try {
         const db = await getDBConnection();
-        // Format questionId: TestID_PartNumber_QuestionNumber
-        const questionId1 = `${testId}_${PartNumber}_1`; // Assuming QuestionNumber is 1
-        const questionId2 = `${testId}_${PartNumber}_2`; // Assuming QuestionNumber is 2
-        const questionData1 = await getQuestionById(db, questionId1);
-        const questionData2 = await getQuestionById(db, questionId2);
-        setQuestion(questionData1 as Question);
+        // Format questionId: TestID_PartNumber
+        const questionId = `${testId}_${PartNumber}`; 
+        
+        const questionData = await getQuestionById(db, questionId);
+        
+        setQuestion(questionData as Question);
       } catch (error) {
         console.error('Error loading question:', error);
       } finally {
@@ -107,8 +107,39 @@ export function TestScreen({ navigation }: any) {
                 You will have {question.PreparationTime} seconds to prepare. 
                 Then you will have {question.ResponseTime} seconds to read the text aloud.
               </Text>
+
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 1 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(1)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 1 && styles.contentButtonTextActive
+                  ]}>Question 1</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 2 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(2)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 2 && styles.contentButtonTextActive
+                  ]}>Question 2</Text>
+                </TouchableOpacity>
+              </View>
+
               <View style={styles.readingBox}>
-                <Text style={styles.readingText}>{question.Content}</Text>
+                <Text style={styles.readingText}>
+                  {selectedContent === 1 ? question.Content1 : question.Content2}
+                </Text>
               </View>
             </>
           )}
@@ -120,7 +151,54 @@ export function TestScreen({ navigation }: any) {
                 You will have {question.PreparationTime} seconds to prepare your response. 
                 Then you will have {question.ResponseTime} seconds to speak about the picture.
               </Text>
-              {/* Thêm component hiển thị hình ảnh ở đây */}
+
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 1 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(1)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 1 && styles.contentButtonTextActive
+                  ]}>Question 1</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 2 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(2)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 2 && styles.contentButtonTextActive
+                  ]}>Question 2</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.imageContainer}>
+                {selectedContent === 1 ? (
+                  question.ImagePath1 && (
+                    <Image
+                      source={SPEAKING_IMAGES[question.ImagePath1]}
+                      style={styles.image}
+                      resizeMode="contain"
+                    />
+                  )
+                ) : (
+                  question.ImagePath2 && (
+                    <Image
+                      source={SPEAKING_IMAGES[question.ImagePath2]}
+                      style={styles.image}
+                      resizeMode="contain"
+                    />
+                  )
+                )}
+              </View>
             </>
           )}
 
@@ -131,7 +209,7 @@ export function TestScreen({ navigation }: any) {
                 You will have {question.PreparationTime} seconds to read the information before the questions begin.
               </Text>
               <View style={styles.readingBox}>
-                <Text style={styles.readingText}>{question.Content}</Text>
+                <Text style={styles.readingText}>{question.Content1}</Text>
               </View>
               <View style={styles.questionsList}>
                 {[question.Question1, question.Question2, question.Question3].map((q, index) => (
@@ -154,7 +232,7 @@ export function TestScreen({ navigation }: any) {
                 Then you will have {question.ResponseTime} seconds to speak.
               </Text>
               <View style={styles.topicBox}>
-                <Text style={styles.topicText}>{question.Content}</Text>
+                <Text style={styles.topicText}>{question.Content1}</Text>
               </View>
             </>
           )}
@@ -276,5 +354,49 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#2980B9',
+  },
+  imageContainer: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  image: {
+    width: '100%',
+    height: Dimensions.get('window').width * 0.6, // Tỉ lệ 3:5
+    marginBottom: 16,
+    borderRadius: 8,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 16,
+  },
+  contentButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#2980B9',
+    backgroundColor: 'white',
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  contentButtonActive: {
+    backgroundColor: '#2980B9',
+  },
+  contentButtonText: {
+    color: '#2980B9',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  contentButtonTextActive: {
+    color: 'white',
   },
 });

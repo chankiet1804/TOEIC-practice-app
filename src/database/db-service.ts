@@ -56,9 +56,10 @@ export const getDBConnection = async () => {
             `CREATE TABLE IF NOT EXISTS Questions (
               QuestionID TEXT PRIMARY KEY,
               PartID TEXT,
-              QuestionNumber INTEGER NOT NULL,
+              
               QuestionType TEXT, -- 'text', 'image', 'passage', 'topic'
-              Content TEXT, -- Nội dung chính (đoạn văn, topic, etc.)
+              Content1 TEXT, -- Nội dung chính (đoạn văn, topic, etc.)
+              Content2 TEXT, -- Nội dung phụ (cho Part 2)
               ImagePath1 TEXT, -- Đường dẫn hình ảnh 1 (cho Part 2)
               ImagePath2 TEXT, -- Đường dẫn hình ảnh 2 (cho Part 2)
               Question1 TEXT, -- Câu hỏi 1 (cho Part 3, 4)
@@ -148,15 +149,15 @@ export const getDBConnection = async () => {
         part1Questions.forEach(question => {
           tx.executeSql(
             `INSERT OR IGNORE INTO Questions (
-              QuestionID, PartID, QuestionNumber, QuestionType,
-              Content, PreparationTime, ResponseTime
+              QuestionID, PartID, QuestionType,
+              Content1, Content2, PreparationTime, ResponseTime
             ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
               question.questionId,
               question.partId,
-              question.number,
               'text',
-              question.content,
+              question.content1,
+              question.content2,
               45,
               45
             ]
@@ -164,34 +165,34 @@ export const getDBConnection = async () => {
         });
 
         // Part 2: Describe a picture (2 hình ảnh)
+        part2Questions.forEach(question => {
         tx.executeSql(
           `INSERT OR IGNORE INTO Questions (
-            QuestionID, PartID, QuestionNumber, QuestionType,
-            ImagePath1, ImagePath2, PreparationTime, ResponseTime
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            QuestionID, PartID, QuestionType,
+            ImagePath1,ImagePath2,  PreparationTime, ResponseTime
+          ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
           [
-            '1_2_1',
-            '1_2',
-            1,
+            question.questionId,
+            question.partId,
             'image',
-            'path/to/image1.jpg',
-            'path/to/image2.jpg',
+            question.imagePath1,
+            question.imagePath2,
             30,
             45
           ]
         );
+        });
 
         // Part 3: Respond to questions (1 đoạn văn + 3 câu hỏi)
         tx.executeSql(
           `INSERT OR IGNORE INTO Questions (
-            QuestionID, PartID, QuestionNumber, QuestionType,
-            Content, Question1, Question2, Question3,
+            QuestionID, PartID, QuestionType,
+            Content1, Question1, Question2, Question3,
             PreparationTime, ResponseTime
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            '1_3_1',
             '1_3',
-            1,
+            '1_3',
             'passage',
             'Passage about a specific topic...',
             'First question about the passage?',
@@ -205,14 +206,13 @@ export const getDBConnection = async () => {
         // Part 4: Respond to questions with information (1 đoạn thông tin + 3 câu hỏi)
         tx.executeSql(
           `INSERT OR IGNORE INTO Questions (
-            QuestionID, PartID, QuestionNumber, QuestionType,
-            Content, Question1, Question2, Question3,
+            QuestionID, PartID, QuestionType,
+            Content1, Question1, Question2, Question3,
             PreparationTime, ResponseTime
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            '1_4_1',
             '1_4',
-            1,
+            '1_4',
             'passage',
             'Information about a specific situation...',
             'First question about the information?',
@@ -226,13 +226,12 @@ export const getDBConnection = async () => {
         // Part 5: Express an opinion (1 topic)
         tx.executeSql(
           `INSERT OR IGNORE INTO Questions (
-            QuestionID, PartID, QuestionNumber, QuestionType,
-            Content, PreparationTime, ResponseTime
-          ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            QuestionID, PartID, QuestionType,
+            Content1, PreparationTime, ResponseTime
+          ) VALUES (?, ?, ?, ?, ?, ?)`,
           [
-            '1_5_1',
             '1_5',
-            1,
+            '1_5',
             'topic',
             'Do you agree or disagree with the following statement? [Statement]',
             15,
