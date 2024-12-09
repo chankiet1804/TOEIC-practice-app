@@ -31,7 +31,7 @@ export function TestScreen({ navigation }: any) {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedContent, setSelectedContent] = useState<1 | 2>(1);
+  const [selectedContent, setSelectedContent] = useState<1 | 2 | 3>(1);
 
   useEffect(() => {
     const loadQuestion = async () => {
@@ -86,7 +86,7 @@ export function TestScreen({ navigation }: any) {
 
   return (
     <SafeAreaBox>
-      <ScrollView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Part {PartNumber} - Test {testId}</Text>
           {/* <Text style={styles.timer}>00:45</Text> */}
@@ -98,7 +98,7 @@ export function TestScreen({ navigation }: any) {
           )}
         </View>
 
-        <View style={styles.questionContainer}>
+        <ScrollView style={styles.questionContainer}>
           {/* Hiển thị nội dung dựa vào QuestionType */}
           {question.QuestionType === 'text' && (
             <>
@@ -208,21 +208,142 @@ export function TestScreen({ navigation }: any) {
                 Directions: In this part of the test, you will answer three questions based on the information provided. 
                 You will have {question.PreparationTime} seconds to read the information before the questions begin.
               </Text>
+              
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 1 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(1)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 1 && styles.contentButtonTextActive
+                  ]}>Question 1</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 2 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(2)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 2 && styles.contentButtonTextActive
+                  ]}>Question 2</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 3 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(3)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 3 && styles.contentButtonTextActive
+                  ]}>Question 3</Text>
+                </TouchableOpacity>
+              </View>
+
               <View style={styles.readingBox}>
                 <Text style={styles.readingText}>{question.Content1}</Text>
               </View>
-              <View style={styles.questionsList}>
-                {[question.Question1, question.Question2, question.Question3].map((q, index) => (
-                  q && (
-                    <View key={index} style={styles.questionItem}>
-                      <Text style={styles.questionNumber}>{index + 1}</Text>
-                      <Text style={styles.questionText}>{q}</Text>
-                    </View>
-                  )
-                ))}
+              
+              <View style={styles.questionItem}>
+                <Text style={styles.questionNumber}>{selectedContent}</Text>
+                <Text style={styles.questionText}>
+                  {selectedContent === 1 ? question.Question1 : 
+                  selectedContent === 2 ? question.Question2 : 
+                  question.Question3}
+                </Text>
               </View>
             </>
           )}
+
+          {question.QuestionType === 'imageWithQuestion' && (
+            <>
+              <Text style={styles.directions}>
+                Directions: In this part of the test, you will answer three questions based on the table shown. 
+                You will have {question.PreparationTime} seconds to prepare. 
+                Then you will have {question.ResponseTime} seconds to speak about each question.
+              </Text>
+
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 1 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(1)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 1 && styles.contentButtonTextActive
+                  ]}>Question 1</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 2 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(2)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 2 && styles.contentButtonTextActive
+                  ]}>Question 2</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[
+                    styles.contentButton,
+                    selectedContent === 3 && styles.contentButtonActive
+                  ]}
+                  onPress={() => setSelectedContent(3)}
+                >
+                  <Text style={[
+                    styles.contentButtonText,
+                    selectedContent === 3 && styles.contentButtonTextActive
+                  ]}>Question 3</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView 
+              style={styles.part4ImageContainer}
+              contentContainerStyle={styles.part4ImageContentContainer}
+              horizontal={false}
+              maximumZoomScale={3.0}
+              minimumZoomScale={1.0}
+              showsVerticalScrollIndicator={true}
+              scrollEnabled={true}
+              nestedScrollEnabled={true} // Thêm prop này
+            >
+              <View style={styles.part4ImageWrapper}>
+                <Image
+                  source={SPEAKING_IMAGES[question.ImagePath1]}
+                  style={styles.part4Image}
+                  resizeMode="contain"
+                />
+              </View>
+            </ScrollView>
+              
+              <View style={styles.questionItem}>
+                <Text style={styles.questionNumber}>{selectedContent}</Text>
+                <Text style={styles.questionText}>
+                  {selectedContent === 1 ? question.Question1 : 
+                  selectedContent === 2 ? question.Question2 : 
+                  question.Question3}
+                </Text>
+              </View>
+            </>
+          )}
+          
 
           {question.QuestionType === 'topic' && (
             <>
@@ -236,8 +357,8 @@ export function TestScreen({ navigation }: any) {
               </View>
             </>
           )}
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       <View style={styles.footer}>
         <TouchableOpacity 
@@ -278,6 +399,7 @@ const styles = StyleSheet.create({
   },
   questionContainer: {
     padding: 16,
+    flex: 1,
   },
   directions: {
     fontSize: 16,
@@ -306,6 +428,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 10,
     elevation: 2,
+    marginBottom: 25,
+
   },
   questionNumber: {
     fontSize: 16,
@@ -335,6 +459,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
+
   },
   button: {
     backgroundColor: '#2980B9',
@@ -398,5 +523,30 @@ const styles = StyleSheet.create({
   },
   contentButtonTextActive: {
     color: 'white',
+  },
+  part4ImageContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginVertical: 10,
+    height: Dimensions.get('window').height * 0.45,
+    elevation: 2,
+  },
+
+  part4ImageContentContainer: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+
+  part4ImageWrapper: {
+    width: '100%',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+
+  part4Image: {
+    width: '95%',
+    height: Dimensions.get('window').height * 0.7,
+    borderRadius: 8,
   },
 });
