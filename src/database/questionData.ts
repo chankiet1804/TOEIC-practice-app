@@ -153,12 +153,83 @@ export const part3Questions = [
 {
     questionId: '1_3',
     partId: '1_3',
-    content1: 'Passage about business meeting...',
-    question1: 'What is the main purpose of the meeting?',
-    question2: 'Who are the key participants mentioned?',
-    question3: 'What action is required from the attendees?'
+    content1: 'Imagine that a British marketing firm is doing research in your country. You have agreed to participate in a telephone interview about cell phones.',
+    question1: 'How much do you pay for your cell phone, and how old is it?',
+    question2: 'What’s the most important feature you look at when you choose a new cell phone?',
+    question3: 'What do you like or dislike about using your cell phone and why?'
 },
-// Thêm câu hỏi cho các test khác...
+{
+    questionId: '2_3',
+    partId: '2_3',
+    content1: 'Imagine that a Canadian marketing firm is doing research in your area. You have agreed to participate in a telephone interview about amusement parks that have attractions like roller coasters.',
+    question1: 'How often do you visit an amusement park, and who do you usually go there with?',
+    question2: 'What time of the day is best for visiting an amusement park? Why?',
+    question3: 'What could amusement parks in your city do to increase the number of visitors?'
+},
+{
+    questionId: '3_3',
+    partId: '3_3',
+    content1: 'Imagine that a British fitness magazine is preparing an article on exercise habits. You have agreed to participate in a telephone interview about walking.',
+    question1: 'How often do you walk for exercise?',
+    question2: 'If you wanted to go for a walk, where would you go, and why?',
+    question3: ' People exercise in many different ways. What are some advantages of choosing walking instead of other forms of exercise?'
+},
+{
+    questionId: '4_3',
+    partId: '4_3',
+    content1: 'Imagine that your friend is planning to go shopping. You and your friend are having a telephone conversation about shopping for clothes.',
+    question1: 'Do you usually buy clothes before traveling? Why?',
+    question2: 'What kind of clothes do people in your town usually wear these days?',
+    question3: 'Please explain a good place to buy clothes in your city and why.'
+},
+{   
+    questionId: '5_3',
+    partId: '5_3',
+    content1: 'Imagine that a local press is doing research in your country to collect information for an article. You have agreed to participate in a telephone interview about the conversation.',
+    question1: 'When you meet your friends, what do you normally talk about?',
+    question2: 'Where do you usually go when you and your friends want to have a conversation?',
+    question3: 'Who is your favorite person to have a conversation with? Why?'
+},
+{
+    questionId: '6_3',
+    partId: '6_3',
+    content1: 'Imagine that an Australian marketing firm is doing research in your area. You have agreed to participate in a telephone interview about a town you want to live in.',
+    question1: 'Which town do you live in, and how long have you been living there?',
+    question2: 'Do you have a plan to move out in the near future? Why or why not?',
+    question3: 'What are the important things you would consider when moving to a new place?'
+},
+{
+    questionId: '7_3',
+    partId: '7_3',
+    content1: 'Imagine that a British marketing firm is doing research in your country. You have agreed to participate in a telephone interview about food.',
+    question1: 'How often do you eat out in a typical week, and what kinds of restaurants do you go to?',
+    question2: 'What are some advantages of eating out?',
+    question3: 'Think about a memorable meal. What did you like about it and why?'
+},
+{
+    questionId: '8_3',
+    partId: '8_3',
+    content1: 'Imagine that a Canadian marketing firm is doing research in your country. You have agreed to participate in a telephone interview about television viewing.',
+    question1: 'How often do you watch television?',
+    question2: 'What kinds of programs do you usually watch?',
+    question3: 'Describe your favorite television program.'
+},
+{
+    questionId: '9_3',
+    partId: '9_3',
+    content1: 'Imagine that a British marketing firm is doing research in your country. You have agreed to participate in a telephone interview about clothing.',
+    question1: 'What did you wear yesterday?',
+    question2: 'What’s the most expensive piece of clothing you have ever bought?',
+    question3: 'Do you think organizations should have dress codes?'
+},
+{
+    questionId: '10_3',
+    partId: '10_3',
+    content1: 'Imagine that an Australian marketing firm is doing research in your country. You have agreed to participate in a telephone interview about housing.',
+    question1: 'Where do you currently live, and what are the main attractions there? ',
+    question2: 'If you could live anywhere, where would you like to live?',
+    question3: 'Describe the house or apartment you are living in now.'
+},
 ];
 
 // Dữ liệu cho Part 4
@@ -167,12 +238,83 @@ export const part4Questions = [
 {
     questionId: '1_4',
     partId: '1_4',
-    content1: 'Information about company policy...',
-    question1: 'What is the new policy about?',
-    question2: 'When will the changes take effect?',
-    question3: 'How should employees respond to these changes?'
+    imagePath1: '1_4',
+    question1: 'What day is the seminar on, and when does it start?',
+    question2: 'I think I saw that the session on résumé writing was scheduled to start right after lunch. That’s right, isn’t it?',
+    question3: 'I have an important appointment in the morning that day, so I’ll probably only be able to attend in the afternoon. What sessions will I be able to participate in?'
 },
-// Thêm câu hỏi cho các test khác...
+{
+    questionId: '2_4',
+    partId: '2_4',
+    imagePath1: '2_4',
+    question1: 'What date is the orientation scheduled, and what time will it be over?',
+    question2: 'I think we need more time for the resort tour. Do you think it is possible to extend the time?',
+    question3: 'I can’t stay for the whole orientation. Can you give me all the details of what is scheduled after lunch?'
+},
+{
+    questionId: '3_4',
+    partId: '3_4',
+    imagePath1: '3_4',
+    question1: 'How much do the tickets cost?',
+    question2: 'I want to participate in the cooking contest. Can I participate in it without any registration?',
+    question3: 'I’m really interested in the musical concert at the festival. Can you give me the details of the concerts?'
+},
+{
+    questionId: '4_4',
+    partId: '4_4',
+    imagePath1: '4_4',
+    question1: 'Is there a way to participate in the festival at a discounted price?',
+    question2: 'All the performances are scheduled on Saturdays, right?',
+    question3: 'Please give me detailed information about the festivals scheduled in New York City.'
+},
+{
+    questionId: '5_4',
+    partId: '5_4',
+    imagePath1: '5_4',
+    question1: 'When does the first meeting start? And who will I meet?',
+    question2: 'I’m aware that I’m having lunch at noon with Andrew Simmons, is that right?',
+    question3: 'I know I have things to do in the afternoon. Can you tell me the schedule after lunch?'
+},
+{
+    questionId: '6_4',
+    partId: '6_4',
+    imagePath1: '6_4',
+    question1: 'What position is Mr. Geller applying for, and which center does he want to work in?',
+    question2: 'We are thinking of changing our current new employee training program. Do you think he suits that kind of job?',
+    question3: 'Please tell me all the information about his educational background.'
+},
+{
+    questionId: '7_4',
+    partId: '7_4',
+    imagePath1: '7_4',
+    question1: 'Could you tell me what time the conference starts and how long it will last?',
+    question2: 'How much does conference attendance cost?',
+    question3: 'I may not be available for the full day. Could you give me information about the activities in the morning, before lunchtime?'
+},
+{
+    questionId: '8_4',
+    partId: '8_4',
+    imagePath1: '8_4',
+    question1: 'Could you tell me when and where the meeting is being held?',
+    question2: 'I heard that the guest speaker, Chad Lyon, will talk about international issues. Is this correct?',
+    question3: 'Can you tell me more about the speakers in the morning and their presentations?'
+},
+{
+    questionId: '9_4',
+    partId: '9_4',
+    imagePath1: '9_4',
+    question1: 'First of all, I’m taking your international flight to Paris on Nov, 23rd. How long should I check in before my flight?',
+    question2: 'Last time I was at the airport to go to the US, I was supposed to be at the boarding gate 20 minutes before my departure. Does this also apply to Paris?',
+    question3: 'What are the other check-in times and boarding gate deadlines?'
+},
+{
+    questionId: '10_4',
+    partId: '10_4',
+    imagePath1: '10_4',
+    question1: 'When will the main meal begin?',
+    question2: 'Will the Radford Orchestra provide the music?',
+    question3: 'What will happen during the awards ceremony itself?'
+},
 ];
 
 // Dữ liệu cho Part 5
@@ -181,7 +323,60 @@ export const part5Questions = [
 {
     questionId: '1_5',
     partId: '1_5',
-    content1: 'Do you agree or disagree with the following statement? "Working from home is more productive than working in an office." Give specific reasons and examples to support your opinion.'
+    content1: 'Many people argue that students should have to participate in physical activities at school while others feel this is unnecessary for students. Which point of view do you agree with and why?'
 },
-// Thêm câu hỏi cho các test khác...
+// Test 2
+{
+    questionId: '2_5',
+    partId: '2_5',
+    content1: 'During the vacation, what are the advantages of traveling to one country compared to visiting several countries? Use specific reasons and examples to support your opinion.'
+},
+// Test 3
+{
+    questionId: '3_5',
+    partId: '3_5',
+    content1: 'Do you agree or disagree with the following statement? It is more effective for teachers to conduct a class humorously for the student’s education. Use specific reasons and examples to support your opinion.'
+},
+// Test 4
+{
+    questionId: '4_5',
+    partId: '4_5',
+    content1: 'What could be the most challenging part of working on a group project? Choose one of the options below and provide specific reasons or examples. \n 1. Adjusting to different work styles \n 2. Finding a way to resolve disagreements \n 3. Staying focused on the task'
+},
+// Test 5
+{
+    questionId: '5_5',
+    partId: '5_5',
+    content1: 'What are the advantages of living with parents while attending a university? Use specific reasons and examples to support your opinion.'
+},
+// Test 6
+{
+    questionId: '6_5',
+    partId: '6_5',
+    content1: 'Which of the following factors is the most important when deciding to get a job? Choose one of the options below and provide specific reasons or examples. \n 1. Location \n 2. The opportunity to learn various work skills \n 3. The possibility of a long-term career'
+},
+// Test 7
+{
+    questionId: '7_5',
+    partId: '7_5',
+    content1: 'Some people prefer to take a job that does not pay well but does provide a lot of time off from work. What is your opinion about taking a job with a low salary that has a lot of vacation time? Give reasons for your opinion.'
+},
+// Test 8
+{
+    questionId: '8_5',
+    partId: '8_5',
+    content1: 'Some people enjoy cooking and eating most of their meals at home. Other people would rather eat out at a restaurant most of the time. Which do you prefer? Use specific examples to support your answer.'
+},
+// Test 9
+{
+    questionId: '9_5',
+    partId: '9_5',
+    content1: 'Some people enjoy the excitement of city life. Other people prefer the peace and quiet of small-town living. Would you rather live in a big city or a small town? Why? Use specific examples to support your preference.'
+},
+// Test 10
+{
+    questionId: '10_5',
+    partId: '10_5',
+    content1: 'Do you agree or disagree with the following statement? “It’s more important to eat a good diet than to exercise a lot”. Support your choice with reasons and details.'
+},
 ];

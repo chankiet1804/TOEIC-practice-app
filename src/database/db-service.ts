@@ -183,7 +183,9 @@ export const getDBConnection = async () => {
         );
         });
 
+
         // Part 3: Respond to questions (1 đoạn văn + 3 câu hỏi)
+        part3Questions.forEach(question => {
         tx.executeSql(
           `INSERT OR IGNORE INTO Questions (
             QuestionID, PartID, QuestionType,
@@ -191,53 +193,58 @@ export const getDBConnection = async () => {
             PreparationTime, ResponseTime
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            '1_3',
-            '1_3',
+            question.questionId,
+            question.partId,
             'passage',
-            'Passage about a specific topic...',
-            'First question about the passage?',
-            'Second question about the passage?',
-            'Third question about the passage?',
+            question.content1,
+            question.question1,
+            question.question2,
+            question.question3,
             30,
             15 // 15 giây cho mỗi câu hỏi
           ]
         );
+        });
 
         // Part 4: Respond to questions with information (1 đoạn thông tin + 3 câu hỏi)
+        part4Questions.forEach(question => {
         tx.executeSql(
           `INSERT OR IGNORE INTO Questions (
             QuestionID, PartID, QuestionType,
-            Content1, Question1, Question2, Question3,
+            ImagePath1, Question1, Question2, Question3,
             PreparationTime, ResponseTime
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            '1_4',
-            '1_4',
-            'passage',
-            'Information about a specific situation...',
-            'First question about the information?',
-            'Second question about the information?',
-            'Third question about the information?',
+            question.questionId,
+            question.partId,
+            'imageWithQuestion',
+            question.imagePath1,
+            question.question1,
+            question.question2,
+            question.question3,
             30,
             15
           ]
         );
+        });
 
         // Part 5: Express an opinion (1 topic)
+        part5Questions.forEach(question => {
         tx.executeSql(
           `INSERT OR IGNORE INTO Questions (
             QuestionID, PartID, QuestionType,
             Content1, PreparationTime, ResponseTime
           ) VALUES (?, ?, ?, ?, ?, ?)`,
           [
-            '1_5',
-            '1_5',
+            question.questionId,
+            question.partId,
             'topic',
-            'Do you agree or disagree with the following statement? [Statement]',
+            question.content1,
             15,
             60
           ]
-        );
+        );  
+        });
       }, 
       (error) => {
         console.error('Error inserting questions:', error);

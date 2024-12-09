@@ -26,6 +26,7 @@ export type HomeStackParamList = {
     testId: number;
     PartNumber: string;
   };
+  MyLibraryScreen: undefined;
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -65,3 +66,9 @@ export type TestScreenProps = NativeStackScreenProps<
   HomeStackParamList,
   "TestScreen"
 >;
+
+export type MyLibraryScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "MyLibraryScreen"
+>;
+

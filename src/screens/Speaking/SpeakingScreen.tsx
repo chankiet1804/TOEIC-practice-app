@@ -41,27 +41,6 @@ export function SpeakingScreen({ navigation }: SpeakingScreenProps) {
     },
   ];
 
-  // const [testsData, setTestsData] = useState<any>([]);
-
-  // useEffect(() => {
-  //   const initDatabase = async () => {
-  //     try {
-  //       const db = await getDBConnection();
-  //       await createTables(db);
-  //       await insertTests(db);
-  //       await insertParts(db);
-        
-  //       const tests = await getAllTests(db);
-        
-  //       setTestsData(tests);
-  //     } catch (error) {
-  //       console.error('Database initialization error:', error);
-  //     }
-  //   };
-  
-  //   initDatabase();
-  // }, []);
-
   return (
     <SafeAreaBox>
       <View style={speakingScreen.rootContainer}>    
