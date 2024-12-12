@@ -1,0 +1,1 @@
+{"ast":null,"code":"export { SafeAreaBox } from \"./SafeAreaBox\";","map":{"version":3,"names":["SafeAreaBox"],"sources":["D:/Loc2023-2024/Mobile App/TOEIC-practice-app/src/components/SafeAreaBox/index.ts"],"sourcesContent":["export { SafeAreaBox } from './SafeAreaBox';\r\n"],"mappings":"AAAA,SAASA,WAAW"},"metadata":{},"sourceType":"module","externalDependencies":[]}

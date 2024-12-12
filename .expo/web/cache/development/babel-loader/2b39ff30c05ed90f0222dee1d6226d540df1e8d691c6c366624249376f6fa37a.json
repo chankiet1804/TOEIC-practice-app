@@ -1,0 +1,1 @@
+{"ast":null,"code":"export { Heading } from \"./Heading\";","map":{"version":3,"names":["Heading"],"sources":["D:/Loc2023-2024/Mobile App/TOEIC-practice-app/src/components/Heading/index.ts"],"sourcesContent":["export { Heading } from \"./Heading\";\r\n"],"mappings":"AAAA,SAASA,OAAO"},"metadata":{},"sourceType":"module","externalDependencies":[]}

@@ -1,0 +1,1 @@
+{"ast":null,"code":"export { WritingScreen } from \"./WritingScreen\";","map":{"version":3,"names":["WritingScreen"],"sources":["D:/Loc2023-2024/Mobile App/TOEIC-practice-app/src/screens/Writing/index.ts"],"sourcesContent":["export { WritingScreen } from \"./WritingScreen\";\r\n"],"mappings":"AAAA,SAASA,aAAa"},"metadata":{},"sourceType":"module","externalDependencies":[]}

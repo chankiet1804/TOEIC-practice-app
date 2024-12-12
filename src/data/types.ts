@@ -28,3 +28,19 @@ export interface Test {
 }
 
 export type TestName = "flags" | "solarSystem";
+
+export type TopicImage = {
+  source: any;
+  alt: string;
+};
+
+export interface Topic {
+  TopicID: string;
+  TopicName: string;
+  Description: string;
+  ImagePath?: string;
+}
+
+export interface TopicWithImage extends Topic {
+  image: TopicImage;
+}

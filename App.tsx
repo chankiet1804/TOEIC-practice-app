@@ -9,11 +9,13 @@ import { WritingScreen } from "./src/screens/Writing";
 import { VocabularyScreen } from "./src/screens/Vocabulary";
 import { NoteScreen } from "./src/screens/Note";
 import { SettingsScreen } from "./src/screens/Settings";
-import { Image } from "react-native";
+import { Image, TouchableOpacity } from "react-native";
 import { InforTestScreen } from "./src/screens/Speaking/SpeakingSubscreen/InforTestScreen";
 import { TestScreen } from "./src/screens/Speaking/SpeakingSubscreen/TestScreen";
 import { DatabaseProvider } from "./src/database/DatabaseContext";
 import { DatabaseStateHandler } from "./src/database/DatabaseStateHandler";
+import { MyLibraryScreen } from './src/screens/Vocabulary/VocabularySubscreen/MyLibraryScreen/MyLibraryScreen';
+import { TopicsScreen } from "./src/screens/Vocabulary/TopicsScreen/TopicsScreen";
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -24,6 +26,7 @@ function MainStack() {
       screenOptions={{
         headerShown: true,
         animation: "slide_from_right",
+        headerTintColor: '#fff',
       }}
     >
       <Stack.Screen
@@ -49,7 +52,23 @@ function MainStack() {
         }}
       />
       <Stack.Screen name="Writing" component={WritingScreen} />
-      <Stack.Screen name="Vocabulary" component={VocabularyScreen} />
+      <Stack.Screen 
+        name="Vocabulary" 
+        component={VocabularyScreen}
+        options={{ 
+          headerTitle: 'Thư viện của tôi',
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: "#4A90E2"
+          },
+          headerTitleStyle: {
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: "bold"
+          },
+          headerTintColor: '#fff'
+        }}
+      />
       <Stack.Screen 
         name="InforTestScreen" 
         component={InforTestScreen}
@@ -76,6 +95,48 @@ function MainStack() {
           headerTitleStyle: {
             fontWeight: 'bold',
           },
+        }}
+      />
+      <Stack.Screen 
+        name="MyLibraryScreen" 
+        component={MyLibraryScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Thêm chủ đề mới",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: "#4A90E2"
+          },
+          headerTitleStyle: {
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: "bold"
+          },
+          headerTintColor: '#fff',
+          headerRight: () => (
+            <TouchableOpacity onPress={() => {/* Add your tick action here */}}>
+              <Image
+                source={require("./assets/tick-icon.png")}
+                style={{ width: 24, height: 24, tintColor: '#fff', marginRight: 10 }}
+              />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <Stack.Screen 
+        name="TopicsScreen" 
+        component={TopicsScreen} 
+        options={{
+          headerTitle: "Từ Vựng",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: "#4A90E2"
+          },
+          headerTitleStyle: {
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: "bold"
+          },
+          headerTintColor: '#fff'
         }}
       />
     </Stack.Navigator>

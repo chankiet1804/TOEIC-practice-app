@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { getDBConnection, createTables, insertTests, insertParts } from './db-service';
 
 interface DatabaseContextType {
@@ -17,13 +18,32 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initDatabase = async () => {
       try {
+        setIsLoading(true);
+        
+        // Nếu là web platform, tạo mock database
+        if (Platform.OS === 'web') {
+          // Mock database object với các phương thức cần thiết
+          const mockDb = {
+            transaction: () => {},
+            // Thêm các phương thức mock khác nếu cần
+          };
+          setDatabase(mockDb);
+          return;
+        }
+
         const db = await getDBConnection();
-        await createTables(db);
-        await insertTests(db);
-        await insertParts(db);
+        try {
+          await createTables(db);
+          await insertTests(db);
+          await insertParts(db);
+        } catch (err) {
+          console.error('Error initializing database tables:', err);
+          throw err;
+        }
         
         setDatabase(db);
       } catch (err) {
+        console.error('Database initialization failed:', err);
         setError(err as Error);
       } finally {
         setIsLoading(false);

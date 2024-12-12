@@ -1,0 +1,1 @@
+{"ast":null,"code":"export { TabIcon } from \"./TabIcon\";","map":{"version":3,"names":["TabIcon"],"sources":["D:/Loc2023-2024/Mobile App/TOEIC-practice-app/src/components/TabIcon/index.ts"],"sourcesContent":["export { TabIcon } from './TabIcon';\r\n"],"mappings":"AAAA,SAASA,OAAO"},"metadata":{},"sourceType":"module","externalDependencies":[]}

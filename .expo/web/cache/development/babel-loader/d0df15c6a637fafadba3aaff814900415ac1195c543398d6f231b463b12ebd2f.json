@@ -1,0 +1,1 @@
+{"ast":null,"code":"export { SettingsIcon } from \"./SettingsIcon\";","map":{"version":3,"names":["SettingsIcon"],"sources":["D:/Loc2023-2024/Mobile App/TOEIC-practice-app/src/components/Icons/SettingsIcon/index.ts"],"sourcesContent":["export { SettingsIcon } from './SettingsIcon';\r\n"],"mappings":"AAAA,SAASA,YAAY"},"metadata":{},"sourceType":"module","externalDependencies":[]}

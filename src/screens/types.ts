@@ -26,6 +26,10 @@ export type HomeStackParamList = {
     testId: number;
     PartNumber: string;
   };
+  MyLibraryScreen: undefined;
+  TopicsScreen: {
+    topicId: string;
+  };
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -65,3 +69,24 @@ export type TestScreenProps = NativeStackScreenProps<
   HomeStackParamList,
   "TestScreen"
 >;
+
+export type MyLibraryScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "MyLibraryScreen"
+>;
+
+export type TopicsScreenRouteProp = NativeStackScreenProps<
+  HomeStackParamList,
+  "TopicsScreen"
+>;
+
+export type Topic = {
+  TopicID: string;
+  TopicName: string;
+  wordCount: number;
+};
+
+export type TopicImage = {
+  source: any;
+  alt: string;
+};

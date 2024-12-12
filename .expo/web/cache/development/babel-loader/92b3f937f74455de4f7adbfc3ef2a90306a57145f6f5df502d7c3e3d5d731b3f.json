@@ -1,0 +1,1 @@
+{"ast":null,"code":"export { BookmarkIcon } from \"./BookmarkIcon\";","map":{"version":3,"names":["BookmarkIcon"],"sources":["D:/Loc2023-2024/Mobile App/TOEIC-practice-app/src/components/Icons/BookmarkIcon/index.ts"],"sourcesContent":["export { BookmarkIcon } from './BookmarkIcon';\r\n"],"mappings":"AAAA,SAASA,YAAY"},"metadata":{},"sourceType":"module","externalDependencies":[]}
