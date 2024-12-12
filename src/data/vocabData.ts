@@ -511,7 +511,7 @@ export const vocabTopics: VocabTopic[] = [
         ]
       },
       {
-        id: 'salaries_and_benefits',
+        id: 'salaries-and-benefits',
         name: 'Salaries and Benefits',
         description: 'Vocabulary related to salary and employee benefits',
         words: [

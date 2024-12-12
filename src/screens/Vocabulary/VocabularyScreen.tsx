@@ -32,7 +32,7 @@ export function VocabularyScreen() {
     {
       TopicID: 'salaries-and-benefits',
       TopicName: 'Salaries and Benefits',
-      wordCount: 20,
+      wordCount: 19,
     },
   ]);
 
