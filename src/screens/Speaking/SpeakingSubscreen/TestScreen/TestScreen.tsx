@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import * as SQLite from 'expo-sqlite';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image } from 'react-native';
 import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from '../../../types';
 import { RouteProp } from '@react-navigation/native';
-import { getDBConnection, getQuestionById } from '../../../../database/db-service';
+import { getDBConnection, getQuestionById, getRecording } from '../../../../database/db-service';
 import { CountdownTimer } from '../../../../components/CountdownTimer';
 import { SPEAKING_IMAGES } from '../../../../database/images';
+import { saveRecordingInfo } from '../../../../database/db-service';
+import { Audio } from 'expo-av';
+
 type TestScreenRouteProp = RouteProp<HomeStackParamList, 'TestScreen'>;
 
 interface Question {
@@ -24,24 +28,32 @@ interface Question {
   ResponseTime: number;
 }
 
+interface RecordingPath {
+  filePath: string;
+}
 
 export function TestScreen({ navigation }: any) {
   const route = useRoute<TestScreenRouteProp>();
   const { testId, PartNumber } = route.params;
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isRecording, setIsRecording] = useState(false);
   const [selectedContent, setSelectedContent] = useState<1 | 2 | 3>(1);
+  const [dbConnection, setDbConnection] = useState<SQLite.SQLiteDatabase | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recording, setRecording] = useState<Audio.Recording | undefined>();
+  const [recordingPath, setRecordingPath] = useState<string>('');
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [sound, setSound] = useState<Audio.Sound | undefined>(undefined);
 
   useEffect(() => {
     const loadQuestion = async () => {
       try {
         const db = await getDBConnection();
+        setDbConnection(db);
         // Format questionId: TestID_PartNumber
         const questionId = `${testId}_${PartNumber}`; 
-        
         const questionData = await getQuestionById(db, questionId);
-        
         setQuestion(questionData as Question);
       } catch (error) {
         console.error('Error loading question:', error);
@@ -49,9 +61,31 @@ export function TestScreen({ navigation }: any) {
         setLoading(false);
       }
     };
-
     loadQuestion();
   }, [testId, PartNumber]);
+
+  const loadRecordings = async () => {
+    if (dbConnection) {     
+        const Paths = await getRecording(dbConnection, testId.toString(), Number(PartNumber), selectedContent) as RecordingPath[]; 
+        if(Paths.length > 0){
+          const path = Paths[0].filePath;
+          console.log('Loaded recording successfully:', path);
+          setRecordingPath(path);
+        }
+        else{
+          console.log('No recordings available to play.');
+          setRecordingPath('');
+        }
+      } 
+      else {
+        console.log('Fail to load recording');
+      }
+  };
+
+  useEffect(() => {
+    loadRecordings();
+  },[selectedContent]);
+
 
   if (loading) {
     return (
@@ -73,27 +107,96 @@ export function TestScreen({ navigation }: any) {
     );
   }
 
-  const handleStartRecording = () => {
-    setIsRecording(true);
-    // Thêm logic ghi âm ở đây
+  const handleStartRecording = async () => {
+    try {
+      const perm = await Audio.requestPermissionsAsync();
+      if (perm.status === "granted") {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true
+        });
+        const { recording } = await Audio.Recording.createAsync(
+          Audio.RecordingOptionsPresets.HIGH_QUALITY
+        );
+        setRecording(recording);
+        setIsRecording(true);
+        setIsDisabled(true);
+      }
+    } catch (err) {
+      console.error('Error starting recording:', err);
+    }
   };
 
-  const handleTimeUp = () => {
+  const handleStopRecording = async () => {
+    if (!recording) return;
+
     setIsRecording(false);
-    // Thêm logic dừng ghi âm khi hết giờ
-  };
+    await recording.stopAndUnloadAsync();
 
+    const uri = recording.getURI();
+    if (!uri) return;
+
+    // Lưu thông tin ghi âm vào cơ sở dữ liệu
+    const createdAt = new Date().toISOString(); // Lấy thời gian hiện tại
+    const questionNumber = selectedContent; // Sử dụng selectedContent làm questionNumber
+
+    // Tạo tên file theo định dạng testId_partNumber_questionNumber
+    const fileName = `${testId}_${PartNumber}_${questionNumber}.m4a`; // Định dạng tên file
+
+    if (dbConnection) {
+      await saveRecordingInfo(dbConnection, {
+        testId: Number(testId),
+        partNumber: Number(PartNumber),
+        questionNumber: questionNumber,
+        fileName: fileName,
+        filePath: uri,
+        createdAt: createdAt
+      });
+    }
+    console.log('Recording saved successfully:', fileName);   
+    setRecording(undefined);
+    
+    setIsDisabled(false); // cho phep su dung cac nut khi dung ghi am
+    loadRecordings(); // Load lai moi khi ghi am xong
+};
+
+  const playRecording = async (filePath: string) => {
+    if (!filePath) {
+      console.error('No file path provided for playback.');
+      return;
+    }
+
+  try {
+    const { sound } = await Audio.Sound.createAsync(
+      { uri: filePath }
+    );
+    setSound(sound);
+    await sound.playAsync();
+    setIsDisabled(true);
+    setIsPlaying(true);
+  } catch (error) {
+    console.error('Error playing sound:', error);
+  }
+};
+
+  const handleStopPlaying = async () => {
+    if (sound) {
+      await sound.stopAsync();
+      setIsDisabled(false);
+      setIsPlaying(false);
+      setSound(undefined);
+    }
+  };
 
   return (
     <SafeAreaBox>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Part {PartNumber} - Test {testId}</Text>
-          {/* <Text style={styles.timer}>00:45</Text> */}
           {isRecording && question && (
             <CountdownTimer 
               initialMinutes={question.ResponseTime / 60} // Chuyển đổi giây thành phút
-              onTimeUp={handleTimeUp}
+              onTimeUp={handleStopRecording}
             />
           )}
         </View>
@@ -103,9 +206,8 @@ export function TestScreen({ navigation }: any) {
           {question.QuestionType === 'text' && (
             <>
               <Text style={styles.directions}>
-                Directions: In this part of the test, you will read aloud the text on the screen. 
-                You will have {question.PreparationTime} seconds to prepare. 
-                Then you will have {question.ResponseTime} seconds to read the text aloud.
+              Bạn sẽ đọc to và rõ ràng 2 đoạn văn bản trên màn hình.              
+              Khi sẵn sàng, nhấn nút "Bắt đầu ghi âm" và bạn có {question.ResponseTime} giây cho mỗi đoạn văn. 
               </Text>
 
               <View style={styles.buttonContainer}>
@@ -115,6 +217,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 1 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(1)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -128,6 +231,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 2 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(2)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -147,9 +251,8 @@ export function TestScreen({ navigation }: any) {
           {question.QuestionType === 'image' && (
             <>
               <Text style={styles.directions}>
-                Directions: In this part of the test, you will describe the picture on your screen in as much detail as possible. 
-                You will have {question.PreparationTime} seconds to prepare your response. 
-                Then you will have {question.ResponseTime} seconds to speak about the picture.
+                Bạn sẽ mô tả 2 bức ảnh trên màn hình chi tiết nhất có thể.              
+                Khi sẵn sàng, nhấn nút "Bắt đầu ghi âm" và bạn có {question.ResponseTime} giây cho mỗi bức ảnh. 
               </Text>
 
               <View style={styles.buttonContainer}>
@@ -159,6 +262,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 1 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(1)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -172,6 +276,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 2 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(2)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -205,8 +310,8 @@ export function TestScreen({ navigation }: any) {
           {question.QuestionType === 'passage' && (
             <>
               <Text style={styles.directions}>
-                Directions: In this part of the test, you will answer three questions based on the information provided. 
-                You will have {question.PreparationTime} seconds to read the information before the questions begin.
+              Bạn sẽ trả lời 3 câu hỏi dựa trên thông tin cho trước.              
+              Khi sẵn sàng, nhấn nút "Bắt đầu ghi âm" và bạn có {question.ResponseTime} giây cho mỗi câu hỏi.  
               </Text>
               
               <View style={styles.buttonContainer}>
@@ -216,6 +321,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 1 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(1)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -229,6 +335,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 2 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(2)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -242,6 +349,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 3 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(3)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -268,9 +376,8 @@ export function TestScreen({ navigation }: any) {
           {question.QuestionType === 'imageWithQuestion' && (
             <>
               <Text style={styles.directions}>
-                Directions: In this part of the test, you will answer three questions based on the table shown. 
-                You will have {question.PreparationTime} seconds to prepare. 
-                Then you will have {question.ResponseTime} seconds to speak about each question.
+                Bạn sẽ trả lời 3 câu hỏi dựa trên bảng thông tin cho trước.              
+                Khi sẵn sàng, nhấn nút "Bắt đầu ghi âm" và bạn có {question.ResponseTime} giây cho mỗi câu hỏi. 
               </Text>
 
               <View style={styles.buttonContainer}>
@@ -280,6 +387,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 1 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(1)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -293,6 +401,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 2 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(2)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -306,6 +415,7 @@ export function TestScreen({ navigation }: any) {
                     selectedContent === 3 && styles.contentButtonActive
                   ]}
                   onPress={() => setSelectedContent(3)}
+                  disabled={isDisabled}
                 >
                   <Text style={[
                     styles.contentButtonText,
@@ -348,9 +458,9 @@ export function TestScreen({ navigation }: any) {
           {question.QuestionType === 'topic' && (
             <>
               <Text style={styles.directions}>
-                Directions: In this part of the test, you will give your opinion about a specific topic. 
-                You will have {question.PreparationTime} seconds to prepare. 
-                Then you will have {question.ResponseTime} seconds to speak.
+                Bạn sẽ bày tỏ quan điểm của mình về 1 vấn đề nào đó.              
+                Khi sẵn sàng, nhấn nút "Bắt đầu ghi âm" và bạn có {question.ResponseTime} giây để trả lời.
+                Bạn có thể dùng phần "Ghi chú" để viết dàn ý cho bài nói của mình.
               </Text>
               <View style={styles.topicBox}>
                 <Text style={styles.topicText}>{question.Content1}</Text>
@@ -359,6 +469,26 @@ export function TestScreen({ navigation }: any) {
           )}
         </ScrollView>
       </View>
+      
+      
+      {!isRecording && recordingPath !== '' && (
+        <TouchableOpacity 
+        style={styles.playButton}
+        onPress={() => {
+          if (isPlaying) {
+            handleStopPlaying(); // Nếu đang phát, dừng phát
+          } else {
+            playRecording(recordingPath); // Nếu không, phát lại
+          }
+        }}
+        disabled={isRecording} // Vô hiệu hóa nút nếu dang ghi am 
+      >
+        <Text style={styles.buttonText}>
+          {isPlaying ? 'Ngừng phát lại' : 'Phát lại ghi âm'} {/* Thay đổi văn bản dựa trên trạng thái */}
+        </Text>
+      </TouchableOpacity>
+      )}
+      
 
       <View style={styles.footer}>
         <TouchableOpacity 
@@ -366,11 +496,18 @@ export function TestScreen({ navigation }: any) {
             styles.button,
             isRecording && styles.recordingButton // Thêm style cho trạng thái đang ghi âm
           ]}
-          onPress={handleStartRecording}
-          disabled={isRecording} // Disable nút khi đang ghi âm
+          onPress={() => {
+            if (isRecording) {
+              handleStopRecording();
+            } else {
+              handleStartRecording();
+            }
+          }}
+          disabled={isPlaying} // Vô hiệu hóa nút nếu isPlaying là true
         >
+          
           <Text style={styles.buttonText}>
-            {isRecording ? 'Đang ghi âm...' : 'Bắt đầu ghi âm'}
+            {isRecording ? 'Dừng ghi âm...' : 'Bắt đầu ghi âm'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -549,4 +686,14 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height * 0.7,
     borderRadius: 8,
   },
+  playButton: {
+    backgroundColor: '#28a745', // Màu xanh lá cây
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+    elevation: 2, // Đổ bóng cho nút
+    marginHorizontal:20
+  },
+
 });

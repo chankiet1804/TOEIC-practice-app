@@ -24,6 +24,7 @@ export const getDBConnection = async () => {
         tx.executeSql('DROP TABLE IF EXISTS Questions;');
         tx.executeSql('DROP TABLE IF EXISTS Parts;');
         tx.executeSql('DROP TABLE IF EXISTS Tests;');
+        tx.executeSql('DROP TABLE IF EXISTS Recordings;');
 
         // Tạo bảng Tests
         tx.executeSql(
@@ -75,6 +76,21 @@ export const getDBConnection = async () => {
               resolve(true);
             }
           );
+        // Tạo bảng Recordings
+        tx.executeSql(
+          `CREATE TABLE IF NOT EXISTS Recordings (
+            testId INTEGER NOT NULL,
+            partNumber INTEGER NOT NULL,
+            questionNumber INTEGER NOT NULL,
+            fileName TEXT NOT NULL PRIMARY KEY,
+            filePath TEXT NOT NULL,
+            createdAt TEXT NOT NULL
+          );`,
+          [],
+          () => {
+            console.log('Recordings table created successfully');
+          }
+        );
       });
     });
   };
@@ -321,4 +337,78 @@ export const getDBConnection = async () => {
     });
   };
 
-    
+  // Hàm để lưu thông tin ghi âm
+  export const saveRecordingInfo = async (db: SQLite.SQLiteDatabase, recordingInfo: {
+    testId: number;
+    partNumber: number;
+    questionNumber: number;
+    fileName: string;
+    filePath: string;
+    createdAt: string;
+  }) => {
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          `INSERT OR REPLACE INTO Recordings (testId, partNumber, questionNumber, fileName, filePath, createdAt) 
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            recordingInfo.testId,
+            recordingInfo.partNumber,
+            recordingInfo.questionNumber,
+            recordingInfo.fileName,
+            recordingInfo.filePath,
+            recordingInfo.createdAt
+          ],
+          (_, result) => {
+            console.log('Recording info saved successfully with file name: ', recordingInfo.fileName);
+            resolve(result);
+          },
+          (_, error) => {
+            console.error('Error saving recording info:', error);
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
+  };
+
+  // Ham lấy danh sách recordings theo test và part 
+  export const getRecording = async (db: SQLite.SQLiteDatabase, testId: string, partNumber: number, questionNumber: number) => {
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'SELECT filePath FROM Recordings WHERE testId = ? AND partNumber = ? AND questionNumber = ?',
+          [testId, partNumber, questionNumber],
+          (_, { rows: { _array } }) => {
+            console.log('Query result:', _array);
+            resolve(_array);
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
+  };
+
+  // Thêm hàm để xóa recording cũ trước khi lưu recording mới
+  export const deleteExistingRecording = async (db: SQLite.SQLiteDatabase, testId: string, partNumber: number) => {
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        tx.executeSql(
+          'DELETE FROM Recordings WHERE testId = ? AND partNumber = ?',
+          [testId, partNumber],
+          (_, result) => {
+            resolve(result);
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
+  };
+
