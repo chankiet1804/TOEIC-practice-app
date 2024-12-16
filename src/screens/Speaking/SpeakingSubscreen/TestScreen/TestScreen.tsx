@@ -505,11 +505,11 @@ export function TestScreen({ navigation }: any) {
           }}
           disabled={isPlaying} // Vô hiệu hóa nút nếu isPlaying là true
         >
-          
           <Text style={styles.buttonText}>
             {isRecording ? 'Dừng ghi âm...' : 'Bắt đầu ghi âm'}
           </Text>
         </TouchableOpacity>
+
       </View>
     </SafeAreaBox>
   );
