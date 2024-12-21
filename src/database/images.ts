@@ -33,3 +33,16 @@ export const SPEAKING_IMAGES = {
     '10_4': require('../../assets/Speaking_questions_img/10_4.png'),
   } as const;
 
+export const WRITING_IMAGES = {
+  '1_1_1_WR' : require('../../assets/Writing_questions_img/1_1_1_WR.png'),
+  '1_1_2_WR' : require('../../assets/Writing_questions_img/1_1_2_WR.png'),
+  '2_1_1_WR' : require('../../assets/Writing_questions_img/2_1_1_WR.png'),
+  '2_1_2_WR' : require('../../assets/Writing_questions_img/2_1_2_WR.png'),
+  '3_1_1_WR' : require('../../assets/Writing_questions_img/3_1_1_WR.png'),
+  '3_1_2_WR' : require('../../assets/Writing_questions_img/3_1_2_WR.png'),
+  '4_1_1_WR' : require('../../assets/Writing_questions_img/4_1_1_WR.png'),
+  '4_1_2_WR' : require('../../assets/Writing_questions_img/4_1_2_WR.png'),
+  '5_1_1_WR' : require('../../assets/Writing_questions_img/5_1_1_WR.png'),
+  '5_1_2_WR' : require('../../assets/Writing_questions_img/5_1_2_WR.png'),
+
+} as const;

@@ -3,7 +3,7 @@ import { FlatList, View, StyleSheet } from 'react-native';
 import { SpeakingScreenProps } from '../types';
 import { PartCard } from './components/PartCard';
 import { SafeAreaBox } from "../../components";
-//import { createTables, getDBConnection, insertTests,getAllTests, insertParts, getPartsForTest } from '../../database/db-service';
+
 
 
 export function SpeakingScreen({ navigation }: SpeakingScreenProps) {

@@ -4,7 +4,10 @@ import {
   part2Questions, 
   part3Questions, 
   part4Questions, 
-  part5Questions 
+  part5Questions,
+  part1WRQuestions,
+  part2WRQuestions,
+  part3WRQuestions,
 } from './questionData';
 
 export const getDBConnection = async () => {
@@ -24,6 +27,7 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
       DROP TABLE IF EXISTS Parts;
       DROP TABLE IF EXISTS Tests;
       DROP TABLE IF EXISTS Recordings;
+      DROP TABLE IF EXISTS QuestionsWR;
       
       CREATE TABLE IF NOT EXISTS Tests (
         TestID TEXT PRIMARY KEY,
@@ -52,6 +56,21 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
         ResponseTime INTEGER,
         FOREIGN KEY (PartID) REFERENCES Parts(PartID)
       );
+
+      CREATE TABLE IF NOT EXISTS QuestionsWR (
+        QuestionID TEXT PRIMARY KEY,
+        PartID TEXT,
+        QuestionType TEXT,
+        Content1 TEXT,
+        Content2 TEXT,
+        Require1 TEXT,
+        Require2 TEXT,
+        ImagePath1 TEXT,
+        ImagePath2 TEXT,
+        PreparationTime INTEGER,
+        ResponseTime INTEGER,
+        FOREIGN KEY (PartID) REFERENCES Parts(PartID)
+      );
       
       CREATE TABLE IF NOT EXISTS Recordings (
         testId INTEGER NOT NULL,
@@ -61,6 +80,7 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
         filePath TEXT NOT NULL,
         createdAt TEXT NOT NULL
       );
+
     `);
     
     console.log('All tables created successfully');
@@ -141,7 +161,7 @@ export const insertQuestions = async (db: SQLite.SQLiteDatabase) => {
     });
 
     await db.execAsync(insertSQL);
-    console.log('All questions inserted successfully');
+    console.log('All Speaking questions inserted successfully');
     return true;
   } catch (error) {
     console.error('Error inserting questions:', error);
@@ -149,25 +169,38 @@ export const insertQuestions = async (db: SQLite.SQLiteDatabase) => {
   }
 };
 
-export const getAllTests = async (db: SQLite.SQLiteDatabase) => {
+export const insertWRQuestions = async (db: SQLite.SQLiteDatabase) => {
   try {
-    const result = await db.getAllAsync('SELECT * FROM Tests ORDER BY TestID');
-    return result;
+    let insertSQL = '';
+    
+    // Part 1 Questions
+    part1WRQuestions.forEach(q => {
+      insertSQL += `INSERT OR IGNORE INTO QuestionsWR (QuestionID, PartID, QuestionType, ImagePath1, ImagePath2, PreparationTime, ResponseTime) 
+        VALUES ('${q.questionId}', '${q.partId}', 'image', '${q.imagePath1}', '${q.imagePath2}', 600, 600);`;
+    });
+    
+
+    // Part 2 Questions 
+    part2WRQuestions.forEach(q => {
+      insertSQL += `INSERT OR IGNORE INTO QuestionsWR (QuestionID, PartID, QuestionType, Content1, Content2, Require1, Require2, PreparationTime, ResponseTime) 
+        VALUES ('${q.questionId}', '${q.partId}', 'email', '${q.content1}', '${q.content2}', '${q.require1}', '${q.require2}', 1200, 1200);`;
+    });
+
+    // Part 3 Questions
+    part3WRQuestions.forEach(q => {
+      insertSQL += `INSERT OR IGNORE INTO QuestionsWR (QuestionID, PartID, QuestionType, Content1, PreparationTime, ResponseTime) 
+        VALUES ('${q.questionId}', '${q.partId}', 'essay', '${q.content1}', 1800, 1800);`;
+    });
+
+    await db.execAsync(insertSQL);
+    console.log('All Writing questions inserted successfully');
+    return true;
   } catch (error) {
-    console.error('Error getting all tests:', error);
+    console.error('Error inserting WR questions:', error);
     throw error;
   }
 };
 
-export const getPartsForTest = async (db: SQLite.SQLiteDatabase, testId: string) => {
-  try {
-    const result = await db.getAllAsync('SELECT * FROM Parts WHERE TestID = ? ORDER BY PartNumber', [testId]);
-    return result;
-  } catch (error) {
-    console.error('Error getting parts for test:', error);
-    throw error;
-  }
-};
 
 export const getQuestionById = async (db: SQLite.SQLiteDatabase, questionId: string) => {
   try {
@@ -175,6 +208,16 @@ export const getQuestionById = async (db: SQLite.SQLiteDatabase, questionId: str
     return result || null;
   } catch (error) {
     console.error('Error getting question:', error);
+    throw error;
+  }
+};
+
+export const getWRQuestionById = async (db: SQLite.SQLiteDatabase, questionId: string) => {
+  try {
+    const result = await db.getFirstAsync('SELECT * FROM QuestionsWR WHERE QuestionID = ?', [questionId]);
+    return result || null;
+  } catch (error) {
+    console.error('Error getting WR question:', error);
     throw error;
   }
 };

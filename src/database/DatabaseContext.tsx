@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getDBConnection, createTables, insertTests, insertParts, insertQuestions } from './db-service';
+import { getDBConnection, createTables, insertTests, insertParts, insertQuestions, insertWRQuestions } from './db-service';
 
 interface DatabaseContextType {
   database: any;
@@ -22,6 +22,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         await insertTests(db);
         await insertParts(db);
         await insertQuestions(db);
+        await insertWRQuestions(db);
         
         setDatabase(db);
       } catch (err) {
