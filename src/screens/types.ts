@@ -22,11 +22,18 @@ export type HomeStackParamList = {
   Writing: undefined;
   Vocabulary: undefined;
   InforTestScreen: { PartNumber: string };
+  InforTestScreenWR: { PartNumber: string };
   TestScreen: {
     testId: number;
     PartNumber: string;
   };
+  TestScreenWR: {
+    testId: number;
+    PartNumber: string;
+  };
+  
   MyLibraryScreen: undefined;
+  
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -72,3 +79,12 @@ export type MyLibraryScreenProps = NativeStackScreenProps<
   "MyLibraryScreen"
 >;
 
+export type InforTestScreenWRProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "InforTestScreenWR"
+>;
+
+export type TestScreenWRProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "TestScreenWR"
+>;

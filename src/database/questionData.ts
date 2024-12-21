@@ -380,3 +380,124 @@ export const part5Questions = [
     content1: 'Do you agree or disagree with the following statement? “It’s more important to eat a good diet than to exercise a lot”. Support your choice with reasons and details.'
 },
 ];
+
+// Dữ liệu cho Part 1 Writing
+export const part1WRQuestions = [
+{
+    questionId: '1_1_WR',
+    partId: '1_1_WR',
+    imagePath1: '1_1_1_WR', //ImagePath format: TestID_PartID_QuestionNumber_WR
+    imagePath2: '1_1_2_WR',
+    // imagePath3: '1_1_3_WR',
+    // imagePath4: '1_1_4_WR',
+    // imagePath5: '1_1_5_WR',
+},
+{
+    questionId: '2_1_WR',
+    partId: '2_1_WR',
+    imagePath1: '2_1_1_WR',
+    imagePath2: '2_1_2_WR',
+    // imagePath3: '2_1_3_WR',
+    // imagePath4: '2_1_4_WR',
+    // imagePath5: '2_1_5_WR',
+},
+{
+    questionId: '3_1_WR',
+    partId: '3_1_WR',
+    imagePath1: '3_1_1_WR',
+    imagePath2: '3_1_2_WR',
+    // imagePath3: '3_1_3_WR',
+    // imagePath4: '3_1_4_WR',
+    // imagePath5: '3_1_5_WR',
+},
+{
+    questionId: '4_1_WR',
+    partId: '4_1_WR',
+    imagePath1: '4_1_1_WR',
+    imagePath2: '4_1_2_WR',
+    // imagePath3: '4_1_3_WR',
+    // imagePath4: '4_1_4_WR',
+    // imagePath5: '4_1_5_WR',
+},
+{
+    questionId: '5_1_WR',
+    partId: '5_1_WR',
+    imagePath1: '5_1_1_WR',
+    imagePath2: '5_1_2_WR',
+    // imagePath3: '5_1_3_WR',
+    // imagePath4: '5_1_4_WR',
+    // imagePath5: '5_1_5_WR',
+}
+];
+
+// Dữ liệu cho Part 2 Writing
+export const part2WRQuestions = [
+{
+    questionId: '1_2_WR',
+    partId: '1_2_WR',
+    content1: 'From: George Pinkney \nTo: Social Committee members \nSubject: Meeting \nSent: April 12, 2024 \nIt is time for a meeting of the Social Committee. We need to start planning the annual year-end party. I would like all members of the committee to meet next Friday morning from 9 to 11 in Conference Room A. Please let me know as soon as possible if you are available to attend this meeting. \nThank you. \nGeorge Pinkney \nSocial Committee Chair',
+    require1: 'Respond to the e-mail as if you are a member of the Social Committee. In your e-mail, explain ONE problem and make TWO suggestions.',
+    content2: 'From: Journal of Business News \nTo: Business professionals \nSubject: Subscribe \nSent: December 2, 20- \nDear Business Professional, \nThe Journal Of Business News brings you all the latest news about important developments in the international business world. It is read by thousands of businesspeople just like you in over 40 countries around the world. Subscribe today and receive a 30% discount off the regular price.',
+    require2: 'Respond to the e-mail as if you are a businessperson interested in subscribing to the Journal of Business News. In your e-mail, ask THREE questions',
+},
+{
+    questionId: '2_2_WR',
+    partId: '2_2_WR',
+    content1: 'From: James Parker, Office Manager \nTo: All employees \nSubject: Moving offices \nSent: August 16, 2:35 P.M. \nWe are going to be moving our current office to another section of this building from Monday to Wednesday next week. I would like all staff members to be involved in this process. Please tell me on which of these days you can participate. \nThank you, \nJames',
+    require1: 'Respond to the e-mail as if you are an employee of James Parker. In your e-mail, suggest ONE time that you would like to participate and ask TWO questions about the move.',
+    content2: 'From: Cameron Contos, Passageways Travel Company \nTo: Customer list \nSubject: A great vacation package \nSent: December 22, 9:23 A.M. \nDear Passageways customers, \nYou are our valued clients and we want to share a great travel package with you. We are offering an unbelievable, once-in-a-lifetime opportunity for you to explore the Galapagos Islands. The first 200 customers who respond to this advertisement will receive a 10% discount on their hotel fares.',
+    require2: 'Respond to the e-mail as if you are a Passageways Travel customer. In your e-mail, ask TWO questions and make ONE request regarding the travel package.'
+},
+{
+    questionId: '3_2_WR',
+    partId: '3_2_WR',
+    content1: 'From: A. Chae, General Company \nTo: Fine Prints \nSubject: Printing accident \nSent: May 2, 10:32 A.M. \nDear Fine Prints, \nYour company recently prepared letterheads for us. However, I’ve just noticed that you printed our old address by mistake. I have to send out hundreds of letters to our customers for a new promotion. Please e-mail me about this as soon as possible. \nThank you, \nA. Chae',
+    require1: 'Respond to the e-mail as if you are an employee at Fine Prints. In your e-mail, make TWO suggestions for how to handle the problem and provide ONE piece of information you think will be useful.',
+    content2: 'From: Bill Britten, Teachers’ Association Chairman \nTo: TA Members \nSubject: Summer Concert Participant Recruitment \nSent: May 28, 3:45 P.M. \nWe’re going to hold our annual summer concert festival from July 7 to 11. If you have any students interested in playing in our orchestra, please give us their names and the instruments they play so they can join in this wonderful event. Please reply by e-mail no later than June 6. \nThanks in advance for your assistance.',
+    require2: 'Respond to the e-mail as if you are a member of the Teachers’ Association. In your e-mail, ask TWO questions and give ONE piece of information about the event'
+},
+{
+    questionId : '4_2_WR',
+    partId : '4_2_WR',
+    content1: 'From: P. Spata \nTo: A. Means \nSubject: Welcome \nSent: November 9, 4:08 P.M. \nWelcome! \nI’m happy to have you in our department. Please tell me if there is anything I can do to make your transition here more comfortable. And let me know if you have any questions about working in our office.',
+    require1: 'Respond to the e-mail as if you are A. Means. In your e-mail, ask TWO questions about working in the new office and make ONE request.',
+    content2: 'From: Daniel Tucker \nTo: Exacto Translation Services \nSubject: Need more information \nSent: November 14, 11:37 A.M. \nI am currently working on a 5,000-word document for my Ph.D. course that I need translated into French. I checked your website but there is not much information about your services. Please let me know more about pricing, how long translations take, and so on. \nDaniel Tucker',
+    require2: 'Respond to the e-mail as if you are a translator at Exacto Translation Services. In your e-mail, explain TWO steps involved in the translation process and request ONE additional piece of information about the customer’s document.'
+},
+{
+    questionId : '5_2_WR',
+    partId : '5_2_WR',
+    content1: 'From: Barry Cole, Accounting \nTo: Jim Slate, Assistant Manager, Accounting \nSubject: Computer problems \nSent: March 10, 3:58 P.M. \nMr. Slate: \nI have been having problems with my office computer recently. I requested assistance from the help desk several times but they have not fixed it yet. Could you please help me find a way to solve this problem? \nThank you, \nBarry',
+    require1: 'Respond to the e-mail as if you are Mr. Slate. In your e-mail, ask ONE question and make TWO suggestions about getting the computer fixed.',
+    content2: 'From: Tradewinds Apartments \nTo: All residents \nSubject: Residents’ meeting \nSent: September 3, 12:28 P.M. \nDear Tradewinds residents, \nThis message is to remind you that we will be having our monthly meeting next week. To make the meeting more beneficial for all, please e-mail us with some suggestions for topics to discuss and let us know if you are going to attend the meeting or not. \nThank you.',
+    require2: 'Respond to the e-mail as if you are a resident at Tradewinds Apartments. In your e-mail, suggest TWO topics and ask ONE question about the meeting.'
+}
+];
+
+export const part3WRQuestions = [
+{
+    questionId: '1_3_WR',
+    partId: '1_3_WR',
+    content1: 'Do you agree or disagree with the following statement? It is more important to work at a job you enjoy than to make a lot of money. Support your answer with specific reasons and examples.'
+},
+{
+    questionId: '2_3_WR',
+    partId: '2_3_WR',
+    content1: 'What do you think are the most important characteristics for a job you have had or you want to have? Use specific details and examples to support your opinion.'
+},
+{
+    questionId: '3_3_WR',
+    partId: '3_3_WR',
+    content1: 'Some workers must work at night. What are the advantages and disadvantages of night-shift work? Give reasons and examples to support your opinion.'
+},
+{
+    questionId: '4_3_WR',
+    partId: '4_3_WR',
+    content1: 'Some people choose to work at one job for a long time. Others prefer to change jobs frequently. Which way do you think is better? Use specific reasons and examples to explain your choice.'
+},
+{
+    questionId: '5_3_WR',
+    partId: '5_3_WR',
+    content1: 'Some companies push employees to retire after they pass middle age. Others allow employees to stay until they want to retire. Which do you think is better from the company’s point of view? Use specific reasons and examples to explain your choice.'
+}
+];

@@ -11,9 +11,12 @@ import { NoteScreen } from "./src/screens/Note";
 import { SettingsScreen } from "./src/screens/Settings";
 import { Image } from "react-native";
 import { InforTestScreen } from "./src/screens/Speaking/SpeakingSubscreen/InforTestScreen";
+import { InforTestScreenWR } from "./src/screens/Writing/WritingSubscreen/InforTestScreen";
+
 import { TestScreen } from "./src/screens/Speaking/SpeakingSubscreen/TestScreen";
 import { DatabaseProvider } from "./src/database/DatabaseContext";
 import { DatabaseStateHandler } from "./src/database/DatabaseStateHandler";
+import { TestScreenWR } from "./src/screens/Writing/WritingSubscreen/TestScreen";
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -48,8 +51,6 @@ function MainStack() {
           },
         }}
       />
-      <Stack.Screen name="Writing" component={WritingScreen} />
-      <Stack.Screen name="Vocabulary" component={VocabularyScreen} />
       <Stack.Screen 
         name="InforTestScreen" 
         component={InforTestScreen}
@@ -78,6 +79,52 @@ function MainStack() {
           },
         }}
       />
+      <Stack.Screen name="Writing" component={WritingScreen}
+      options={{
+        headerTitle: "Các phần trong Writing",
+        headerTitleAlign: 'center',
+        headerStyle: {
+          backgroundColor: '#5799DB',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+      />
+      <Stack.Screen 
+        name="InforTestScreenWR" 
+        component={InforTestScreenWR}
+        options={{
+          headerTitle: "Thông tin bài thi",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: '#5799DB',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
+      <Stack.Screen name="TestScreenWR" component={TestScreenWR}
+        options={{
+          headerTitle: "Trang bài thi",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: '#5799DB',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
+      
+      <Stack.Screen name="Vocabulary" component={VocabularyScreen} />
+      
+      
+      
     </Stack.Navigator>
   );
 }
