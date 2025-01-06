@@ -1,118 +1,170 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
-import { Audio } from 'expo-av';
-import { SafeAreaBox } from '../../components/SafeAreaBox';
+import React, { useEffect, useState } from 'react';
+import { View, Button, Text, StyleSheet } from 'react-native';
+import * as SpeechRecognition from 'expo-speech-recognition';
 
-interface RecordingLine {
-  sound: Audio.Sound;
-  duration: string;
-  file: string;
+// Định nghĩa interfaces
+interface SpeechResult {
+  value: string[];
+  isFinal: boolean;
 }
 
-export function NoteScreen() {
-  const [recording, setRecording] = useState<Audio.Recording | undefined>();
-  const [recordings, setRecordings] = useState<RecordingLine[]>([]);
+interface SpeechError {
+  message: string;
+}
 
-  async function startRecording() {
-    try {
-      const perm = await Audio.requestPermissionsAsync();
-      if (perm.status === "granted") {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true
-        });
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.HIGH_QUALITY
-        );
-        setRecording(recording);
+interface SpeechState {
+  isListening: boolean;
+  results: string[];
+  partialResults: string[];
+  error?: string;
+}
+
+const SpeechRecognitionComponent: React.FC = () => {
+  // State management
+  const [state, setState] = useState<SpeechState>({
+    isListening: false,
+    results: [],
+    partialResults: [],
+  });
+
+  // Kiểm tra và xin quyền khi component mount
+  useEffect(() => {
+    const checkPermissions = async () => {
+      try {
+        const { granted } = await SpeechRecognition.requestPermissionsAsync();
+        if (!granted) {
+          setState(prev => ({
+            ...prev,
+            error: 'Permission to access microphone was denied'
+          }));
+        }
+      } catch (error) {
+        setState(prev => ({
+          ...prev,
+          error: 'Error requesting permissions: ' + (error as Error).message
+        }));
       }
-    } catch (err) {
-      console.error('Error starting recording:', err);
-    }
-  }
+    };
 
-  async function stopRecording() {
-    if (!recording) return;
-    
-    setRecording(undefined);
-    await recording.stopAndUnloadAsync();
-    
-    const uri = recording.getURI();
-    if (!uri) return;
+    checkPermissions();
+  }, []);
 
-    let allRecordings = [...recordings];
-    const { sound, status } = await recording.createNewLoadedSoundAsync();
-    
-    if (!status.isLoaded || !status.durationMillis) return;
-
-    allRecordings.push({
-      sound: sound,
-      duration: getDurationFormatted(status.durationMillis),
-      file: uri
-    });
-
-    setRecordings(allRecordings);
-  }
-
-  function getDurationFormatted(milliseconds: number): string {
-    const minutes = milliseconds / 1000 / 60;
-    const seconds = Math.round((minutes - Math.floor(minutes)) * 60);
-    return seconds < 10 ? `${Math.floor(minutes)}:0${seconds}` : `${Math.floor(minutes)}:${seconds}`;
-  }
-
-  function getRecordingLines() {
-    return recordings.map((recordingLine, index) => {
-      return (
-        <View key={index} style={styles.row}>
-          <Text style={styles.fill}>
-            Recording #{index + 1} | {recordingLine.duration}
-          </Text>
-          <Button 
-            onPress={() => {
-              console.log('File Path:', recordingLine.file);
-              recordingLine.sound.replayAsync()} }
-            title="Play"
-          />
-        </View>
+  const startListening = async () => {
+    try {
+      setState(prev => ({ ...prev, isListening: true }));
+      
+      await SpeechRecognition.startListeningAsync(
+        {
+          language: 'vi-VN',
+          partialResults: true,
+          cancelOnStop: true
+        },
+        {
+          onPartialResults: (result: SpeechResult) => {
+            setState(prev => ({
+              ...prev,
+              partialResults: result.value
+            }));
+          },
+          onResults: (result: SpeechResult) => {
+            setState(prev => ({
+              ...prev,
+              results: [...prev.results, ...result.value]
+            }));
+          },
+          onError: (error: SpeechError) => {
+            setState(prev => ({
+              ...prev,
+              error: error.message,
+              isListening: false
+            }));
+          }
+        }
       );
-    });
-  }
+    } catch (error) {
+      setState(prev => ({
+        ...prev,
+        error: 'Error starting speech recognition: ' + (error as Error).message,
+        isListening: false
+      }));
+    }
+  };
 
-  function clearRecordings() {
-    setRecordings([]);
-  }
+  const stopListening = async () => {
+    try {
+      await SpeechRecognition.stopListeningAsync();
+      setState(prev => ({ ...prev, isListening: false }));
+    } catch (error) {
+      setState(prev => ({
+        ...prev,
+        error: 'Error stopping speech recognition: ' + (error as Error).message,
+        isListening: false
+      }));
+    }
+  };
 
   return (
-    <SafeAreaBox>
-      <View style={styles.container}>
-        <Button
-          title={recording ? "Stop Recording" : "Start Recording"}
-          onPress={recording ? stopRecording : startRecording}
-        />
-        {getRecordingLines()}
-        {recordings.length > 0 && (
-          <Button title="Clear Recordings" onPress={clearRecordings} />
-        )}
-      </View>
-    </SafeAreaBox>
+    <View style={styles.container}>
+      <Button
+        title={state.isListening ? "Stop" : "Start"}
+        onPress={state.isListening ? stopListening : startListening}
+      />
+      
+      {state.error && (
+        <Text style={styles.errorText}>Error: {state.error}</Text>
+      )}
+
+      {state.isListening && (
+        <Text style={styles.statusText}>Listening...</Text>
+      )}
+
+      {state.partialResults.length > 0 && (
+        <View style={styles.resultContainer}>
+          <Text style={styles.headerText}>Partial Results:</Text>
+          <Text>{state.partialResults.join(' ')}</Text>
+        </View>
+      )}
+
+      {state.results.length > 0 && (
+        <View style={styles.resultContainer}>
+          <Text style={styles.headerText}>Results:</Text>
+          {state.results.map((result, index) => (
+            <Text key={index}>{result}</Text>
+          ))}
+        </View>
+      )}
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 20,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 8,
+  statusText: {
+    marginTop: 10,
+    fontStyle: 'italic',
   },
-  fill: {
-    flex: 1,
-    margin: 8,
-  }
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+  },
+  resultContainer: {
+    marginTop: 20,
+  },
+  headerText: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
 });
+
+export default SpeechRecognitionComponent;
+
+export function NoteScreen() {
+  return (
+    <View style={{ flex: 1 }}>
+      <SpeechRecognitionComponent />
+    </View>
+  );
+}
