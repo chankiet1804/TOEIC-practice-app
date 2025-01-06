@@ -18,6 +18,8 @@ import { DatabaseProvider } from "./src/database/DatabaseContext";
 import { DatabaseStateHandler } from "./src/database/DatabaseStateHandler";
 import { TestScreenWR } from "./src/screens/Writing/WritingSubscreen/TestScreen";
 
+import 'expo-dev-client';
+
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator();
 
