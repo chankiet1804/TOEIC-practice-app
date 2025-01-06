@@ -29,7 +29,13 @@
     },
     "newArchEnabled": true,
     "plugins": [
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow quiz-app to use the microphone.",
+          "speechRecognitionPermission": "Allow quiz-app to use speech recognition.",
+          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+        }
     ],
     "extra": {
       "eas": {
