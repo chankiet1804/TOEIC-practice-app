@@ -6,16 +6,18 @@ import { HomeStackParamList } from "./src/screens/types";
 import { HomeScreen} from "./src/screens";
 import { SpeakingScreen } from "./src/screens/Speaking";
 import { WritingScreen } from "./src/screens/Writing";
-import { VocabularyScreen } from "./src/screens/Vocabulary";
+// import { VocabularyScreen } from "./src/screens/Vocabulary";
 import { NoteScreen } from "./src/screens/Note";
 import { SettingsScreen } from "./src/screens/Settings";
-import { Image, TouchableOpacity } from "react-native";
+import { Image, TouchableOpacity, ActivityIndicator, Text } from "react-native";
 import { InforTestScreen } from "./src/screens/Speaking/SpeakingSubscreen/InforTestScreen";
 import { TestScreen } from "./src/screens/Speaking/SpeakingSubscreen/TestScreen";
 import { DatabaseProvider } from "./src/database/DatabaseContext";
 import { DatabaseStateHandler } from "./src/database/DatabaseStateHandler";
 import { MyLibraryScreen } from './src/screens/Vocabulary/VocabularySubscreen/MyLibraryScreen/MyLibraryScreen';
 import { TopicsScreen } from "./src/screens/Vocabulary/TopicsScreen/TopicsScreen";
+import { Ionicons } from '@expo/vector-icons';
+import { VocabularyScreen } from './src/screens/Vocabulary/VocabularyScreen'; // Nhập khẩu hàm
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -100,7 +102,7 @@ function MainStack() {
       <Stack.Screen 
         name="MyLibraryScreen" 
         component={MyLibraryScreen}
-        options={({ navigation }) => ({
+        options={({ navigation, route }) => ({
           headerTitle: "Thêm chủ đề mới",
           headerTitleAlign: 'center',
           headerStyle: {
@@ -113,11 +115,13 @@ function MainStack() {
           },
           headerTintColor: '#fff',
           headerRight: () => (
-            <TouchableOpacity onPress={() => {/* Add your tick action here */}}>
-              <Image
-                source={require("./assets/tick-icon.png")}
-                style={{ width: 24, height: 24, tintColor: '#fff', marginRight: 10 }}
-              />
+            <TouchableOpacity onPress={async () => {
+              if (route.params?.handleSaveTopic) {
+                await route.params.handleSaveTopic();
+                navigation.navigate('Vocabulary');
+              }
+            }}>
+              <Ionicons name="checkmark" size={24} color="#fff" style={{ marginRight: 10 }} />
             </TouchableOpacity>
           ),
         })}

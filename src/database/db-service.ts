@@ -1,5 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import { Platform } from 'react-native';
+import { VocabTopic } from '../data/Vocab';
 
 export const getDBConnection = async () => {
     try {
@@ -196,37 +197,74 @@ export const getPartsForTest = async (db: SQLite.SQLiteDatabase, testId: string)
 };
 
 // Hàm thêm chủ đề mới
-export const insertTopics = async (db: SQLite.SQLiteDatabase, vocabData: { topic: string; vocabulary: any[] }) => {
+export const insertTopics = async (db: SQLite.SQLiteDatabase, vocabData: { 
+    topic: string; 
+    description?: string;
+    vocabulary: { id: string; term: string; definition: string; }[] 
+}) => {
     return new Promise((resolve, reject) => {
+        const topicId = vocabData.topic.toLowerCase().replace(/\s+/g, '-');
+        
         db.transaction(tx => {
-            // Thêm chủ đề mới
+            // Kiểm tra xem topic đã tồn tại chưa
             tx.executeSql(
-                'INSERT INTO Topics (TopicID, TopicName, Description) VALUES (?, ?, ?)',
-                [vocabData.topic, vocabData.topic, 'Chủ đề từ vựng mới'], // Bạn có thể thay đổi mô tả nếu cần
-                (_, result) => {
-                    // Thêm từ vựng vào bảng Vocabulary
-                    vocabData.vocabulary.forEach(word => {
-                        tx.executeSql(
-                            'INSERT INTO Vocabulary (VocabID, TopicID, Word, Meaning) VALUES (?, ?, ?, ?)',
-                            [word.id, vocabData.topic, word.term, word.definition],
-                        );
-                    });
+                'SELECT TopicID FROM Topics WHERE TopicID = ?',
+                [topicId],
+                (_, { rows }) => {
+                    if (rows.length > 0) {
+                        reject(new Error('Chủ đề này đã tồn tại'));
+                        return;
+                    }
+
+                    // Thêm topic mới
+                    tx.executeSql(
+                        'INSERT INTO Topics (TopicID, TopicName, Description) VALUES (?, ?, ?)',
+                        [topicId, vocabData.topic, vocabData.description || ''],
+                        (_, topicResult) => {
+                            if (topicResult.rowsAffected === 0) {
+                                reject(new Error('Không thể thêm chủ đề'));
+                                return;
+                            }
+
+                            // Tạo bảng mới cho từ vựng của chủ đề này
+                            const createVocabTableQuery = `CREATE TABLE IF NOT EXISTS ${topicId} (
+                                VocabID TEXT PRIMARY KEY,
+                                Word TEXT NOT NULL,
+                                Meaning TEXT NOT NULL
+                            );`;
+                            tx.executeSql(createVocabTableQuery);
+
+                            // Thêm từ vựng
+                            const vocabPromises = vocabData.vocabulary.map(word => {
+                                return new Promise((resolveVocab, rejectVocab) => {
+                                    const vocabId = `${topicId}_${word.id}`;
+                                    tx.executeSql(
+                                        `INSERT INTO ${topicId} (VocabID, Word, Meaning) VALUES (?, ?, ?)`,
+                                        [vocabId, word.term, word.definition],
+                                        (_, vocabResult) => {
+                                            if (vocabResult.rowsAffected === 0) {
+                                                rejectVocab(new Error(`Không thể thêm từ vựng: ${word.term}`));
+                                            } else {
+                                                resolveVocab(true);
+                                            }
+                                        }
+                                    );
+                                });
+                            });
+
+                            Promise.all(vocabPromises)
+                                .then(() => resolve(true))
+                                .catch(error => reject(error));
+                        }
+                    );
                 }
             );
-        },
-        (error) => {
-            console.error('Lỗi trong giao dịch thêm chủ đề:', error);
-            reject(error);
-        },
-        () => {
-            console.log('Chủ đề và từ vựng đã được thêm thành công');
-            resolve(true);
         });
     });
 };
 
 // Hàm lấy tất cả chủ đề
-export const getAllTopics = async (db: SQLite.SQLiteDatabase) => {
+export const getAllTopics = async (db: SQLite.SQLiteDatabase): Promise<VocabTopic[]> => {
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
             tx.executeSql(
@@ -242,6 +280,38 @@ export const getAllTopics = async (db: SQLite.SQLiteDatabase) => {
             );
         });
     });
+};
+
+export const getVocabByTopic = async (db: SQLite.WebSQLDatabase, topicId: string) => {
+  return new Promise<VocabTopic>((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        'SELECT v.*, t.TopicName FROM Vocabulary v JOIN Topics t ON v.TopicID = t.TopicID WHERE v.TopicID = ?',
+        [topicId],
+        (_, { rows: { _array } }) => {
+          if (_array.length > 0) {
+            const topic: VocabTopic = {
+              TopicID: topicId,
+              TopicName: _array[0].TopicName,
+              words: _array.map(row => ({
+                id: row.VocabID,
+                word: row.Word,
+                partOfSpeech: 'noun',
+                vietnamese: row.Meaning
+              }))
+            };
+            resolve(topic);
+          } else {
+            resolve({ TopicID: topicId, TopicName: '', words: [] });
+          }
+        },
+        (_, error) => {
+          reject(error);
+          return false;
+        }
+      );
+    });
+  });
 };
 
     

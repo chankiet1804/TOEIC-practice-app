@@ -107,7 +107,6 @@ export function TopicsScreen() {
           <Animated.View style={[styles.cardContainer, { transform: [{ translateX }] }]}>
             <Animated.View style={[styles.flashcard, frontAnimatedStyle]}>
               <Text style={styles.wordText}>{currentWord?.word}</Text>
-              <Text style={styles.partOfSpeechText}>{currentWord?.partOfSpeech}</Text>
             </Animated.View>
             
             <Animated.View style={[styles.flashcard, styles.flashcardBack, backAnimatedStyle]}>

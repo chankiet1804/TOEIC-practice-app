@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
 import { HomeStackParamList, MyLibraryScreenProps } from '../../../types';
@@ -9,6 +9,8 @@ import { insertTopics, getDBConnection } from '../../../../database/db-service';
 import * as SQLite from 'expo-sqlite';
 
 type MyLibraryScreenRouteProp = RouteProp<HomeStackParamList, 'MyLibraryScreen'>;
+
+const itemWidth = 300; // Set this to the actual width of your vocabulary item
 
 export function MyLibraryScreen({ navigation }: MyLibraryScreenProps) {
   const route = useRoute<MyLibraryScreenRouteProp>();
@@ -20,17 +22,84 @@ export function MyLibraryScreen({ navigation }: MyLibraryScreenProps) {
   ]);
   const [swipeX, setSwipeX] = React.useState<{ [key: number]: number }>({});
   const scrollViewRef = useRef<ScrollView>(null);
-  const itemWidth = 300;
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const initializeDB = async () => {
-      const database = await getDBConnection();
-      setDb(database);
+      try {
+        const database = await getDBConnection();
+        setDb(database);
+      } catch (error) {
+        console.error('Error initializing database:', error);
+        Alert.alert('Lỗi', 'Không thể kết nối với cơ sở dữ liệu');
+      }
     };
 
     initializeDB();
   }, []);
+
+  const handleSaveTopic = async () => {
+    // Validation
+    if (!title.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập tiêu đề chủ đề');
+      return;
+    }
+
+    const hasEmptyFields = vocabularyList.some(item => !item.term.trim() || !item.definition.trim());
+    if (hasEmptyFields) {
+      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thuật ngữ và định nghĩa');
+      return;
+    }
+
+    if (!db) {
+      Alert.alert('Lỗi', 'Không thể kết nối với cơ sở dữ liệu');
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+
+      // Chuẩn bị dữ liệu để lưu
+      const vocabData = {
+        topic: title,
+        description: description,
+        vocabulary: vocabularyList.map(item => ({
+          id: item.id.toString(),
+          term: item.term,
+          definition: item.definition,
+        })),
+      };
+
+      // Lưu vào database
+      await insertTopics(db, vocabData);
+
+      // Gọi callback để cập nhật danh sách topic trong VocabularyScreen
+      if (route.params?.onTopicAdded) {
+        const newTopic = {
+          TopicID: title.toLowerCase().replace(/\s+/g, '-'),
+          TopicName: title,
+          wordCount: vocabularyList.length,
+        };
+        route.params.onTopicAdded(newTopic);
+      }
+
+      Alert.alert('Thành công', 'Đã lưu chủ đề thành công');
+    } catch (error) {
+      console.error('Error saving topic:', error);
+      Alert.alert('Lỗi', 'Không thể lưu chủ đề. Vui lòng thử lại.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    if (navigation) {
+      navigation.setParams({
+        handleSaveTopic: handleSaveTopic, // Đảm bảo hàm này đã được định nghĩa
+      });
+    }
+  }, [handleSaveTopic]);
 
   const addVocabularyItem = () => {
     const newItem = { id: vocabularyList.length + 1, term: '', definition: '' };
@@ -64,26 +133,6 @@ export function MyLibraryScreen({ navigation }: MyLibraryScreenProps) {
       } else {
         setSwipeX(prev => ({ ...prev, [id]: 0 })); // Đặt lại trạng thái cho khung hiện tại
       }
-    }
-  };
-
-  const handleSaveTopic = async () => {
-    if (!db) return;
-
-    const vocabData = {
-      topic: title,
-      vocabulary: vocabularyList.map(item => ({
-        id: item.id.toString(),
-        term: item.term,
-        definition: item.definition,
-      })),
-    };
-
-    try {
-      await insertTopics(db, vocabData);
-      navigation.navigate('Vocabulary');
-    } catch (error) {
-      console.error('Error saving topic:', error);
     }
   };
 
@@ -148,7 +197,29 @@ export function MyLibraryScreen({ navigation }: MyLibraryScreenProps) {
         <TouchableOpacity style={styles.addButton} onPress={addVocabularyItem}>
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
+        {/* <TouchableOpacity 
+          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]} 
+          onPress={handleSaveTopic}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.saveButtonText}>Lưu</Text>
+          )}
+        </TouchableOpacity> */}
       </ScrollView>
+      {/* <TouchableOpacity 
+          style={[styles.saveButton, isSaving && { opacity: 0.7 }]} 
+          onPress={handleSaveTopic}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.saveButtonText}>Lưu</Text>
+          )}
+        </TouchableOpacity> */}
     </SafeAreaBox>
   );
 }
@@ -201,7 +272,6 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     padding: 8,
     marginBottom: 2,
-    fontWeight: 'bold',
   },
   definitionInput: {
     borderBottomWidth: 2,
@@ -247,5 +317,23 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     fontSize: 24,
   },
+  saveButton: {
+    backgroundColor: "#4A90E2",
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    marginTop: 16,
+    width: '80%',
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  saveButtonDisabled: {
+    opacity: 0.7,
+  }
 });
 

@@ -1,4 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { VocabWord } from '../data/Vocab'; // Adjust the path if necessary
 
 export type BottomTabParamList = {
   HomeTab: undefined;
@@ -22,11 +23,16 @@ export type HomeStackParamList = {
   Writing: undefined;
   Vocabulary: undefined;
   InforTestScreen: { PartNumber: string };
+  VocabularyScreen: undefined;
   TestScreen: {
     testId: number;
     PartNumber: string;
   };
-  MyLibraryScreen: undefined;
+  MyLibraryScreen: {
+    onTopicAdded?: (topic: Topic) => void;
+    handleSaveTopic?: () => void;
+    isSaving?: boolean;
+  };
   TopicsScreen: {
     topicId: string;
   };
@@ -90,3 +96,10 @@ export type TopicImage = {
   source: any;
   alt: string;
 };
+
+export interface VocabTopic {
+  TopicID: string;  // Thay đổi từ id
+  TopicName: string; // Thay đổi từ name 
+  Description?: string;
+  words?: VocabWord[];
+}

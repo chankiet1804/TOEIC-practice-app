@@ -1,13 +1,12 @@
 export interface VocabWord {
     id: string;
     word: string;
-    partOfSpeech: string;
     vietnamese: string;
   }
   
   export interface VocabTopic {
-    id: string;
-    name: string;
+    TopicID: string;
+    TopicName: string;
     description?: string;
     words: VocabWord[];
   }

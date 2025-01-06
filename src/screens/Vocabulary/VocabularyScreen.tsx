@@ -5,44 +5,32 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList, Topic } from "../types";
 import { Ionicons } from '@expo/vector-icons';
+import { vocabTopics } from '../../data/vocabData';
 
 export function VocabularyScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
-  const [topics, setTopics] = useState<Topic[]>([
-    { 
-      TopicID: 'contract',
-      TopicName: 'Contract',
-      wordCount: 20,
-    },
-    {
-      TopicID: 'office',
-      TopicName: 'Office',
-      wordCount: 20,
-    },
-    {
-      TopicID: 'marketing',
-      TopicName: 'Marketing',
-      wordCount: 20,
-    },
-    {
-      TopicID: 'computer',
-      TopicName: 'Computer',
-      wordCount: 20,
-    },
-    {
-      TopicID: 'salaries-and-benefits',
-      TopicName: 'Salaries and Benefits',
-      wordCount: 19,
-    },
-  ]);
+  const [topics, setTopics] = useState<Topic[]>(vocabTopics.map(topic => ({
+    TopicID: topic.TopicID,
+    TopicName: topic.TopicName,
+    wordCount: topic.words.length,
+  })));
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTopics = topics.filter(topic => {
+    if (searchQuery === '') return true;
+    
+    const topicNameLower = topic.TopicName.toLowerCase();
+    const searchQueryLower = searchQuery.toLowerCase();
+    
+    return topicNameLower.startsWith(searchQueryLower);
+  });
 
   const handleAddPress = () => {
-    try {
-      console.log('Navigating to MyLibraryScreen');
-      navigation.navigate('MyLibraryScreen');
-    } catch (error) {
-      console.error('Navigation error:', error);
-    }
+    navigation.navigate('MyLibraryScreen', {
+      onTopicAdded: (newTopic: Topic) => {
+        setTopics(prevTopics => [...prevTopics, newTopic]);
+      }
+    });
   };
 
   const handleDeleteTopic = (topicId: string) => {
@@ -52,21 +40,22 @@ export function VocabularyScreen() {
   const handleTopicPress = (topic: Topic) => {
     navigation.navigate('TopicsScreen', { topicId: topic.TopicID });
   };
-
+  
   return (
     <SafeAreaBox>
-      {/* Thanh tìm kiếm */}
       <View style={styles.searchContainer}>
         <TextInput
           placeholder="Nhập chủ đề cần tìm kiếm"
           style={styles.searchInput}
           placeholderTextColor="#666"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
       </View>
 
       <View style={styles.rootContainer}>    
         <FlatList
-          data={topics}
+          data={filteredTopics}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => handleTopicPress(item)}>
               <View style={styles.card}>
