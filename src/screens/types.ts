@@ -33,7 +33,8 @@ export type HomeStackParamList = {
   };
   
   MyLibraryScreen: undefined;
-  
+  NoteScreen: undefined;
+  SettingsScreen: undefined;
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -87,4 +88,14 @@ export type InforTestScreenWRProps = NativeStackScreenProps<
 export type TestScreenWRProps = NativeStackScreenProps<
   HomeStackParamList,
   "TestScreenWR"
+>;
+
+export type NotescreenWRProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "NoteScreen"
+>;
+
+export type SettingsscreenWRProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "SettingsScreen"
 >;
