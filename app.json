@@ -21,14 +21,21 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.chankiet1804.quizapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "newArchEnabled": true,
     "plugins": [
-      "expo-sqlite"
-    ]
+      "expo-sqlite",
+      "expo-speech-recognition"     
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9b8f626c-730f-41b0-a390-bbca8576983f"
+      }
+    }
   }
 }
