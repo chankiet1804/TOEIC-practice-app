@@ -21,7 +21,6 @@ import { TestScreenWR } from "./src/screens/Writing/WritingSubscreen/TestScreen"
 import 'expo-dev-client';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
-const Tab = createBottomTabNavigator();
 
 function MainStack() {
   return (
@@ -125,6 +124,10 @@ function MainStack() {
       
       <Stack.Screen name="Vocabulary" component={VocabularyScreen} />
       
+      <Stack.Screen name="NoteScreen" component={NoteScreen} />
+
+      <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+
       
       
     </Stack.Navigator>
@@ -136,48 +139,7 @@ export default function App() {
     <DatabaseProvider>
       <DatabaseStateHandler>
         <NavigationContainer>
-          <Tab.Navigator
-          screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused, color, size }) => {
-              let iconSource;
-              if (route.name === "Main") {
-                iconSource = require("./assets/main-icon.png");
-              } else if (route.name === "Note") {
-                iconSource = require("./assets/note-icon.png");
-              } else if (route.name === "Settings") {
-                iconSource = require("./assets/settings-icon.png");
-              }
-              return (
-                <Image
-                  source={iconSource}
-                  style={{
-                    width: size,
-                    height: size,
-                    tintColor: color,
-                  }}
-                />
-              );
-            },
-            tabBarActiveTintColor: "#60A5FA",
-            tabBarInactiveTintColor: "gray",
-          })}
-        >
-          <Tab.Screen
-            name="Main"
-            component={MainStack}
-            options={{ headerShown: false }}
-          />
-          <Tab.Screen
-            name="Note"
-            component={NoteScreen}
-            options={{ headerShown: false }}
-          />
-          <Tab.Screen
-            name="Settings"
-            component={SettingsScreen}
-            options={{ headerShown: false }}
-          />
-          </Tab.Navigator>
+          <MainStack />
         </NavigationContainer>
       </DatabaseStateHandler>
     </DatabaseProvider>

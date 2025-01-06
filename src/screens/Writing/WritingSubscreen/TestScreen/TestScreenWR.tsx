@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as SQLite from 'expo-sqlite';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image,Alert,TextInput } from 'react-native';
 import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from '../../../types';
@@ -35,6 +35,11 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
   const [selectedContent, setSelectedContent] = useState<1 | 2 | 3>(1);
   const [dbConnection, setDbConnection] = useState<SQLite.SQLiteDatabase | null>(null);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [answer, setAnswer] = useState('');
+
+  const handleFinish = () => {
+    
+  };
 
   useEffect(() => {
     const loadQuestion = async () => {
@@ -93,10 +98,10 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
 
           {question.QuestionType === 'image' && (
             <>
-              <Text style={styles.directions}>
+              {/* <Text style={styles.directions}>
                 Bạn sẽ mô tả 2 bức ảnh trên màn hình chi tiết nhất có thể.              
                 Khi sẵn sàng, nhấn nút "Bắt đầu ghi âm" và bạn có {question.ResponseTime} giây cho mỗi bức ảnh. 
-              </Text>
+              </Text> */}
 
               <View style={styles.buttonContainer}>
                 <TouchableOpacity 
@@ -147,15 +152,33 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                   )
                 )}
               </View>
+
+              <View style={styles.answerContainer}>
+                <TextInput
+                  style={styles.input}
+                  multiline
+                  placeholder="Nhập câu trả lời của bạn..."
+                  value={answer}
+                  onChangeText={setAnswer}
+                  textAlignVertical="top"
+                />
+                
+                <TouchableOpacity
+                  style={styles.finishButton}
+                  onPress={handleFinish}
+                >
+                  <Text style={styles.finishButtonText}>Finish</Text>
+                </TouchableOpacity>
+              </View>
             </>
           )}
 
           {question.QuestionType === 'email' && (
             <>
-              <Text style={styles.directions}>
+              {/* <Text style={styles.directions}>
               Bạn sẽ trả lời 3 câu hỏi dựa trên thông tin cho trước.              
               Khi sẵn sàng, nhấn nút "Bắt đầu ghi âm" và bạn có {question.ResponseTime} giây cho mỗi câu hỏi.  
-              </Text>
+              </Text> */}
               
               <View style={styles.buttonContainer}>
                 <TouchableOpacity 
@@ -206,11 +229,11 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
 
           {question.QuestionType === 'essay' && (
             <>
-              <Text style={styles.directions}>
+              {/* <Text style={styles.directions}>
                 Bạn sẽ bày tỏ quan điểm của mình về 1 vấn đề nào đó.              
                 Khi sẵn sàng, nhấn nút "Bắt đầu ghi âm" và bạn có {question.ResponseTime} giây để trả lời.
                 Bạn có thể dùng phần "Ghi chú" để viết dàn ý cho bài nói của mình.
-              </Text>
+              </Text> */}
               <View style={styles.topicBox}>
                 <Text style={styles.topicText}>{question.Content1}</Text>
               </View>
@@ -232,7 +255,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 10,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -301,7 +324,7 @@ const styles = StyleSheet.create({
   },
   
   imageContainer: {
-    padding: 16,
+    //padding: 16,
     backgroundColor: '#fff',
     borderRadius: 10,
     marginBottom: 20,
@@ -378,5 +401,32 @@ const styles = StyleSheet.create({
     elevation: 2, // Đổ bóng cho nút
     marginHorizontal:20
   },
-
+  answerContainer: {
+    marginTop: 20,
+    paddingHorizontal: 15,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding:10,
+    minHeight: 120,
+    backgroundColor: '#fff',
+    fontSize: 16,
+    
+    // width: '100%',
+    // alignContent: 'center',
+  },
+  finishButton: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+  finishButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
