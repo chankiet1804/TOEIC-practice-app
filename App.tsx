@@ -6,10 +6,9 @@ import { HomeStackParamList } from "./src/screens/types";
 import { HomeScreen} from "./src/screens";
 import { SpeakingScreen } from "./src/screens/Speaking";
 import { WritingScreen } from "./src/screens/Writing";
-import { VocabularyScreen } from "./src/screens/Vocabulary";
 import { NoteScreen } from "./src/screens/Note";
 import { SettingsScreen } from "./src/screens/Settings";
-import { Image } from "react-native";
+import { Image,TouchableOpacity, ActivityIndicator, Text } from "react-native"; // Add these imports
 import { InforTestScreen } from "./src/screens/Speaking/SpeakingSubscreen/InforTestScreen";
 import { InforTestScreenWR } from "./src/screens/Writing/WritingSubscreen/InforTestScreen";
 
@@ -18,7 +17,15 @@ import { DatabaseProvider } from "./src/database/DatabaseContext";
 import { DatabaseStateHandler } from "./src/database/DatabaseStateHandler";
 import { TestScreenWR } from "./src/screens/Writing/WritingSubscreen/TestScreen";
 
+import { MyLibraryScreen } from './src/screens/Vocabulary/VocabularySubscreen/MyLibraryScreen/MyLibraryScreen';
+import { TopicsScreen } from "./src/screens/Vocabulary/TopicsScreen/TopicsScreen";
+import { Ionicons } from '@expo/vector-icons';
+import { VocabularyScreen } from './src/screens/Vocabulary'; 
+
+
+
 import 'expo-dev-client';
+import 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
@@ -122,13 +129,74 @@ function MainStack() {
         }}
       />
       
-      <Stack.Screen name="Vocabulary" component={VocabularyScreen} />
+      <Stack.Screen 
+        name="Vocabulary" 
+        component={VocabularyScreen}
+        options={{ 
+          headerTitle: 'Thư viện của tôi',
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: "#4A90E2"
+          },
+          headerTitleStyle: {
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: "bold"
+          },
+          headerTintColor: '#fff'
+        }}
+      />
+
+      <Stack.Screen 
+        name="MyLibraryScreen" 
+        component={MyLibraryScreen}
+        options={({ navigation, route }) => ({
+          headerTitle: "Thêm chủ đề mới",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: "#4A90E2"
+          },
+          headerTitleStyle: {
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: "bold"
+          },
+          headerTintColor: '#fff',
+          headerRight: () => (
+            <TouchableOpacity onPress={async () => {
+              if (route.params?.handleSaveTopic) {
+                await route.params.handleSaveTopic();
+                navigation.navigate('Vocabulary');
+              }
+            }}>
+              <Ionicons name="checkmark" size={24} color="#fff" style={{ marginRight: 10 }} />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+
+      <Stack.Screen 
+        name="TopicsScreen" 
+        component={TopicsScreen} 
+        options={{
+          headerTitle: "Từ Vựng",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: "#4A90E2"
+          },
+          headerTitleStyle: {
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: "bold"
+          },
+          headerTintColor: '#fff'
+        }}
+      />
       
       <Stack.Screen name="NoteScreen" component={NoteScreen} />
 
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
 
-      
       
     </Stack.Navigator>
   );

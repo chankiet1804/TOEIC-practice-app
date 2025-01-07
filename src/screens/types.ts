@@ -1,5 +1,7 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
+import type { VocabWord } from '../data/Vocab'; // Adjust the path if necessary
+
 export type BottomTabParamList = {
   HomeTab: undefined;
   SavedTab: undefined;
@@ -31,10 +33,19 @@ export type HomeStackParamList = {
     testId: number;
     PartNumber: string;
   };
+
+  MyLibraryScreen: {
+    onTopicAdded?: (topic: Topic) => void;
+    handleSaveTopic?: () => void;
+    isSaving?: boolean;
+  };
+  TopicsScreen: {
+    topicId: string;
+  };
   
-  MyLibraryScreen: undefined;
   NoteScreen: undefined;
   SettingsScreen: undefined;
+
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -75,10 +86,6 @@ export type TestScreenProps = NativeStackScreenProps<
   "TestScreen"
 >;
 
-export type MyLibraryScreenProps = NativeStackScreenProps<
-  HomeStackParamList,
-  "MyLibraryScreen"
->;
 
 export type InforTestScreenWRProps = NativeStackScreenProps<
   HomeStackParamList,
@@ -90,6 +97,33 @@ export type TestScreenWRProps = NativeStackScreenProps<
   "TestScreenWR"
 >;
 
+export type MyLibraryScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "MyLibraryScreen"
+>;
+
+export type TopicsScreenRouteProp = NativeStackScreenProps<
+  HomeStackParamList,
+  "TopicsScreen"
+>;
+
+export type Topic = {
+  TopicID: string;
+  TopicName: string;
+  wordCount: number;
+};
+
+export type TopicImage = {
+  source: any;
+  alt: string;
+};
+
+export interface VocabTopic {
+  TopicID: string;  // Thay đổi từ id
+  TopicName: string; // Thay đổi từ name 
+  Description?: string;
+  words?: VocabWord[];
+}
 export type NotescreenWRProps = NativeStackScreenProps<
   HomeStackParamList,
   "NoteScreen"
@@ -99,3 +133,4 @@ export type SettingsscreenWRProps = NativeStackScreenProps<
   HomeStackParamList,
   "SettingsScreen"
 >;
+
