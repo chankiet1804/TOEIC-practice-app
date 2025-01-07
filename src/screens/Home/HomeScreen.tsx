@@ -66,6 +66,43 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <View style={homeScreen.bottomNavContainer}>
+        <TouchableOpacity
+          style={homeScreen.bottomNavButton}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Image
+            source={require("../../../assets/main-icon.png")}
+            style={homeScreen.bottomNavIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={homeScreen.bottomNavButton}
+          onPress={() => navigation.navigate("NoteScreen")}
+        >
+          <Image
+            source={require("../../../assets/note-icon.png")}
+            style={homeScreen.bottomNavIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={homeScreen.bottomNavButton}
+          onPress={() => navigation.navigate("SettingsScreen")}
+        >
+          <Image
+            source={require("../../../assets/settings-icon.png")}
+            style={homeScreen.bottomNavIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+      </View>
+
     </SafeAreaBox>
   );
 }
@@ -136,6 +173,21 @@ const homeScreen = StyleSheet.create({
     position: "absolute",
     bottom: 16,
     left: 16,
+  },
+  bottomNavContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 10,
+    backgroundColor: "#f8f8f8",
+    borderTopColor: "#ddd",
+    borderTopWidth: 2,
+  },
+  bottomNavButton: {
+    padding: 10,
+  },
+  bottomNavIcon: {
+    width: 30, // Định kích thước icon
+    height: 30,
   },
 });
 

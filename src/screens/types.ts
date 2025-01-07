@@ -33,6 +33,7 @@ export type HomeStackParamList = {
     testId: number;
     PartNumber: string;
   };
+
   MyLibraryScreen: {
     onTopicAdded?: (topic: Topic) => void;
     handleSaveTopic?: () => void;
@@ -42,6 +43,9 @@ export type HomeStackParamList = {
     topicId: string;
   };
   
+  NoteScreen: undefined;
+  SettingsScreen: undefined;
+
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -120,3 +124,13 @@ export interface VocabTopic {
   Description?: string;
   words?: VocabWord[];
 }
+export type NotescreenWRProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "NoteScreen"
+>;
+
+export type SettingsscreenWRProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "SettingsScreen"
+>;
+
