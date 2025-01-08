@@ -196,7 +196,7 @@ export function TestScreen({ navigation }: any) {
           {isRecording && question && (
             <CountdownTimer 
               initialMinutes={question.ResponseTime / 60} // Chuyển đổi giây thành phút
-              onTimeUp={handleStopRecording}
+              onTimeUp={()=>handleStopRecording}
             />
           )}
         </View>

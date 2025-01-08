@@ -29,6 +29,7 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
       DROP TABLE IF EXISTS Tests;
       DROP TABLE IF EXISTS Recordings;
       DROP TABLE IF EXISTS QuestionsWR;
+      DROP TABLE IF EXISTS AnswerWriting;
       
       CREATE TABLE IF NOT EXISTS Tests (
         TestID TEXT PRIMARY KEY,
@@ -101,6 +102,10 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
         FOREIGN KEY (TopicID) REFERENCES Topics(TopicID)
       );
 
+      CREATE TABLE IF NOT EXISTS AnswerWriting (
+        AnswerID TEXT PRIMARY KEY,
+        Content TEXT
+      );
 
     `);
     
@@ -343,5 +348,23 @@ export const insertTopics = async (db: SQLite.SQLiteDatabase, vocabData: {
   } catch (error) {
       console.error('Error inserting topic and vocabulary:', error);
       throw error;
+  }
+};
+
+export const saveAnswerWriting = async (db: SQLite.SQLiteDatabase, answerID: string, content: string) => {
+  try {
+    await db.runAsync(
+      `INSERT OR REPLACE INTO AnswerWriting (AnswerID, Content) 
+       VALUES (?, ?)`,
+      [
+        answerID,
+        content
+      ]
+    );
+    console.log(`Answer of writing with ID : ${answerID} saved successfully`);
+    return true;
+  } catch (error) {
+    console.error(`Error saving Answer of writing with ID : ${answerID}, info:`, error);
+    throw error;
   }
 };

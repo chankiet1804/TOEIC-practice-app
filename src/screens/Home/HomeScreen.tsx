@@ -30,9 +30,9 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                 style={homeScreen.cardThumb}
                 resizeMode="contain"
               />
-              <Text style={[homeScreen.cardText, { color: "#000" }]}>
+              {/* <Text style={[homeScreen.cardText, { color: "#000" }]}>
                 Speaking
-              </Text>
+              </Text> */}
             </View>
           </TouchableOpacity>
 
@@ -46,9 +46,9 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                 style={homeScreen.cardThumb}
                 resizeMode="contain"
               />
-              <Text style={[homeScreen.cardText, { color: "#000" }]}>
+              {/* <Text style={[homeScreen.cardText, { color: "#000" }]}>
                 Writing
-              </Text>
+              </Text> */}
             </View>
           </TouchableOpacity>
 
@@ -62,12 +62,12 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
               style={homeScreen.vocabularyImage}
               resizeMode="cover"
             />
-            <Text style={homeScreen.cardText}>Learn Vocabulary</Text>
+            {/* <Text style={homeScreen.cardText}>Learn Vocabulary</Text> */}
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      <View style={homeScreen.bottomNavContainer}>
+      {/* <View style={homeScreen.bottomNavContainer}>
         <TouchableOpacity
           style={homeScreen.bottomNavButton}
           onPress={() => navigation.navigate("Home")}
@@ -101,7 +101,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           />
         </TouchableOpacity>
 
-      </View>
+      </View> */}
 
     </SafeAreaBox>
   );
@@ -129,8 +129,8 @@ const homeScreen = StyleSheet.create({
     fontSize: 24,
     fontWeight: "600",
     color: "#666",
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: 4,
+    marginBottom: 4,
   },
   card: {
     backgroundColor: "#fff",
@@ -164,7 +164,7 @@ const homeScreen = StyleSheet.create({
   },
   vocabularyImage: {
     width: "100%",
-    height: 200,
+    height: 170,
   },
   cardText: {
     fontSize: 18,

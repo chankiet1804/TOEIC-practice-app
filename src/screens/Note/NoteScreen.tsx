@@ -30,7 +30,7 @@ export function NoteScreen() {
       lang: "en-US",
       interimResults: true,
       maxAlternatives: 1,
-      continuous: false,
+      continuous: true,
       requiresOnDeviceRecognition: false,
       addsPunctuation: false,
       contextualStrings: ["Carlsen", "Nepomniachtchi", "Praggnanandhaa"],
