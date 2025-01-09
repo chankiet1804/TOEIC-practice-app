@@ -18,6 +18,7 @@ import { MyLibraryScreen } from './src/screens/Vocabulary/VocabularySubscreen/My
 import { TopicsScreen } from "./src/screens/Vocabulary/TopicsScreen/TopicsScreen";
 import { Ionicons } from '@expo/vector-icons';
 import { VocabularyScreen } from './src/screens/Vocabulary/VocabularyScreen'; // Nhập khẩu hàm
+import { EditTopicScreen } from './src/screens/Vocabulary/EditTopicScreen/EditTopicScreen'; // Nhập khẩu hàm
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -114,23 +115,31 @@ function MainStack() {
             fontWeight: "bold"
           },
           headerTintColor: '#fff',
-          headerRight: () => (
-            <TouchableOpacity onPress={async () => {
-              if (route.params?.handleSaveTopic) {
-                await route.params.handleSaveTopic();
-                navigation.navigate('Vocabulary');
-              }
-            }}>
-              <Ionicons name="checkmark" size={24} color="#fff" style={{ marginRight: 10 }} />
-            </TouchableOpacity>
-          ),
         })}
       />
+
       <Stack.Screen 
         name="TopicsScreen" 
         component={TopicsScreen} 
         options={{
           headerTitle: "Từ Vựng",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: "#4A90E2"
+          },
+          headerTitleStyle: {
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: "bold"
+          },
+          headerTintColor: '#fff'
+        }}
+      />
+      <Stack.Screen 
+        name="EditTopicScreen" 
+        component={EditTopicScreen}
+        options={{
+          title: 'Chỉnh sửa chủ đề',
           headerTitleAlign: 'center',
           headerStyle: {
             backgroundColor: "#4A90E2"

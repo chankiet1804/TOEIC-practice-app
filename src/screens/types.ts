@@ -36,6 +36,14 @@ export type HomeStackParamList = {
   TopicsScreen: {
     topicId: string;
   };
+  EditTopicScreen: {
+    topicId: string;
+    onTopicUpdated: (topic: VocabTopic) => void;
+  };
+  
+  NoteScreen: undefined;
+  SettingsScreen: undefined;
+
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -86,20 +94,22 @@ export type TopicsScreenRouteProp = NativeStackScreenProps<
   "TopicsScreen"
 >;
 
-export type Topic = {
+
+export type EditTopicScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "EditTopicScreen"
+>;
+
+export interface VocabTopic {
+  TopicID: string;
+  TopicName: string;
+  description?: string;
+  words: VocabWord[];
+}
+
+export interface Topic {
   TopicID: string;
   TopicName: string;
   wordCount: number;
-};
-
-export type TopicImage = {
-  source: any;
-  alt: string;
-};
-
-export interface VocabTopic {
-  TopicID: string;  // Thay đổi từ id
-  TopicName: string; // Thay đổi từ name 
-  Description?: string;
-  words?: VocabWord[];
 }
+

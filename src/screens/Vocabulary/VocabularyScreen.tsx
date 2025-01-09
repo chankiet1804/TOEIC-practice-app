@@ -1,9 +1,9 @@
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from "react-native";
 import { SafeAreaBox } from "../../components";
-import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { HomeStackParamList, Topic } from "../types";
+import { HomeStackParamList, Topic, VocabTopic } from "../types";
 import { Ionicons } from '@expo/vector-icons';
 import { vocabTopics } from '../../data/vocabData';
 
@@ -40,6 +40,22 @@ export function VocabularyScreen() {
   const handleTopicPress = (topic: Topic) => {
     navigation.navigate('TopicsScreen', { topicId: topic.TopicID });
   };
+
+  const handleEditPress = (topic: Topic) => {
+    navigation.navigate('EditTopicScreen', {
+      topicId: topic.TopicID,
+      onTopicUpdated: (updatedTopic: VocabTopic) => {
+        // Update the topics list with the edited topic
+        setTopics(currentTopics => 
+          currentTopics.map(t => 
+            t.TopicID === updatedTopic.TopicID 
+              ? { ...t, TopicName: updatedTopic.TopicName, wordCount: updatedTopic.words?.length ?? 0 }
+              : t
+          )
+        );
+      }
+    });
+  };
   
   return (
     <SafeAreaBox>
@@ -64,7 +80,7 @@ export function VocabularyScreen() {
                   <Text style={styles.title}>{item.TopicName}</Text>
                 </View>
                 <View style={styles.cardActions}>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleEditPress(item)}>
                     <Ionicons name="pencil" size={20} color="#4A90E2" />
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleDeleteTopic(item.TopicID)}>
@@ -118,7 +134,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#000",
     padding: 0,
-    outlineStyle: 'none',
   },
   searchButton: {
     padding: 8,

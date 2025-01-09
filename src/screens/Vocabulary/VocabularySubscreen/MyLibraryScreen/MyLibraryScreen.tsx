@@ -45,22 +45,21 @@ export function MyLibraryScreen({ navigation }: MyLibraryScreenProps) {
       Alert.alert('Lỗi', 'Vui lòng nhập tiêu đề chủ đề');
       return;
     }
-
+  
     const hasEmptyFields = vocabularyList.some(item => !item.term.trim() || !item.definition.trim());
     if (hasEmptyFields) {
       Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thuật ngữ và định nghĩa');
       return;
     }
-
+  
     if (!db) {
       Alert.alert('Lỗi', 'Không thể kết nối với cơ sở dữ liệu');
       return;
     }
-
+  
     try {
       setIsSaving(true);
-
-      // Chuẩn bị dữ liệu để lưu
+  
       const vocabData = {
         topic: title,
         description: description,
@@ -70,11 +69,9 @@ export function MyLibraryScreen({ navigation }: MyLibraryScreenProps) {
           definition: item.definition,
         })),
       };
-
-      // Lưu vào database
+  
       await insertTopics(db, vocabData);
-
-      // Gọi callback để cập nhật danh sách topic trong VocabularyScreen
+  
       if (route.params?.onTopicAdded) {
         const newTopic = {
           TopicID: title.toLowerCase().replace(/\s+/g, '-'),
@@ -83,8 +80,10 @@ export function MyLibraryScreen({ navigation }: MyLibraryScreenProps) {
         };
         route.params.onTopicAdded(newTopic);
       }
-
-      Alert.alert('Thành công', 'Đã lưu chủ đề thành công');
+  
+      // Chuyển trang ngay lập tức sau khi lưu thành công
+      navigation.navigate('Vocabulary');
+      
     } catch (error) {
       console.error('Error saving topic:', error);
       Alert.alert('Lỗi', 'Không thể lưu chủ đề. Vui lòng thử lại.');
@@ -197,7 +196,7 @@ export function MyLibraryScreen({ navigation }: MyLibraryScreenProps) {
         <TouchableOpacity style={styles.addButton} onPress={addVocabularyItem}>
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity 
+        <TouchableOpacity 
           style={[styles.saveButton, isSaving && styles.saveButtonDisabled]} 
           onPress={handleSaveTopic}
           disabled={isSaving}
@@ -205,21 +204,10 @@ export function MyLibraryScreen({ navigation }: MyLibraryScreenProps) {
           {isSaving ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.saveButtonText}>Lưu</Text>
+            <Text style={styles.saveButtonText}>Lưu Chủ đề</Text>
           )}
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </ScrollView>
-      {/* <TouchableOpacity 
-          style={[styles.saveButton, isSaving && { opacity: 0.7 }]} 
-          onPress={handleSaveTopic}
-          disabled={isSaving}
-        >
-          {isSaving ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.saveButtonText}>Lưu</Text>
-          )}
-        </TouchableOpacity> */}
     </SafeAreaBox>
   );
 }
