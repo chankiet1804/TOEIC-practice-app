@@ -5,7 +5,7 @@ import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from '../../../types';
 import { RouteProp } from '@react-navigation/native';
-import { getDBConnection, getWRQuestionById } from '../../../../database/db-service';
+import { getDBConnection, getWRQuestionById,getAnswerWR } from '../../../../database/db-service';
 import { CountdownTimer } from '../../../../components/CountdownTimer';
 import { WRITING_IMAGES } from '../../../../database/images';
 import { TestScreenWRProps } from '../../../types';
@@ -46,6 +46,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [outline, setOutline] = useState('');
+  //const [ansWR, setWR] = useState('');
   
 
   useEffect(() => {
@@ -54,8 +55,29 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
         const db = await getDBConnection();
         setDbConnection(db);
         // Format questionId: TestID_PartNumber
-        const questionId = `${testId}_${PartNumber}_WR`; 
+        const questionId = `${testId}_${PartNumber}_WR`;
         const questionData = await getWRQuestionById(db, questionId);
+
+        // bo sung load answer chung voi load cau hoi
+        const answerID = `${testId}_${PartNumber}_1`; // lay ID cua cau hoi 1 
+        const answerWR = await getAnswerWR(db,answerID);
+        if(answerWR.length !== 0){ // neu da thay cau tra loi cua cau hoi nay roi
+          setSubmitted(true); // bat bien da nop bai len
+          if(PartNumber==='1' || PartNumber==='2'){
+            const ansID1= testId + '_' + PartNumber +'_1';
+            const ansID2= testId + '_' + PartNumber +'_2';
+            const result1 = await getAnswerWR(db, ansID1) as { Content: string }[];
+            const result2 = await getAnswerWR(db, ansID2) as { Content: string }[];
+            setAnswer1(result1.length > 0 ? result1[0].Content : '');
+            setAnswer2(result2.length > 0 ? result2[0].Content : '');           
+          }
+          else{
+            const ansID1= testId + '_' + PartNumber +'_1';
+            const result1 = await getAnswerWR(db, ansID1) as { Content: string }[];
+            setAnswer3(result1.length > 0 ? result1[0].Content : '');
+          }
+        }
+        
         setQuestion(questionData as Question);
       } catch (error) {
         console.error('Error loading question:', error);
@@ -93,7 +115,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
       if(answer1 === '' || answer2 === '') {
         Alert.alert('Thông báo','Vui lòng điền đầy đủ câu trả lời!');
       }else{
-        Alert.alert('Thành công', 'Bài làm của bạn đã được nộp');   
+        Alert.alert('Thành công', 'Bài làm của bạn đã được hệ thống ghi nhận');   
         const ID1 = testId + '_' + PartNumber +'_1';   
         const ID2 = testId + '_' + PartNumber +'_2';  
         if (dbConnection) {
@@ -110,7 +132,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
         Alert.alert('Thông báo','Vui lòng điền đầy đủ câu trả lời!');
       }
       else{
-        Alert.alert('Thành công', 'Bài làm của bạn đã được nộp');
+        Alert.alert('Thành công', 'Bài làm của bạn đã được hệ thống ghi nhận');
         const ID1 = testId + '_' + PartNumber +'_1';  
         if (dbConnection) {
               await saveAnswerWriting(dbConnection,ID1,answer3);
@@ -201,6 +223,15 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                   scrollEnabled={true} 
                   editable={!submitted}
                 />
+                <View style={submitted ? styles.rowContainer : null}>
+                {submitted && (
+                  <TouchableOpacity
+                    style={styles.tryAgainButton}
+                    onPress={() => setSubmitted(false)}
+                  >
+                  <Text style={styles.tryAgainButtonText}>Làm lại bài</Text>
+                </TouchableOpacity>)
+                }
                 
                 <TouchableOpacity
                   style={submitted ? styles.navigateButton : styles.finishButton}
@@ -220,6 +251,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                 >
                   <Text style={styles.finishButtonText}>{submitted ? 'Xem kết quả' : 'Nộp bài'}</Text>      
                 </TouchableOpacity>
+                </View>
               </View>
             </>
           )}
@@ -287,6 +319,16 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                   scrollEnabled={true} 
                   editable={!submitted}
                 />
+
+              <View style={submitted ? styles.rowContainer : null}>
+                {submitted && (
+                  <TouchableOpacity
+                    style={styles.tryAgainButton}
+                    onPress={() => setSubmitted(false)}
+                  >
+                  <Text style={styles.tryAgainButtonText}>Làm lại bài</Text>
+                </TouchableOpacity>)
+                }
                 
                 <TouchableOpacity
                   style={submitted ? styles.navigateButton : styles.finishButton}
@@ -306,6 +348,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                 >
                   <Text style={styles.finishButtonText}>{submitted ? 'Xem kết quả' : 'Nộp bài'}</Text>      
                 </TouchableOpacity>
+                </View>
               </View>
 
             </>
@@ -365,7 +408,16 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                   scrollEnabled={true} 
                   editable={!submitted}
                 />
-                
+              <View style={submitted ? styles.rowContainer : null}>
+                {submitted && (
+                  <TouchableOpacity
+                    style={styles.tryAgainButton}
+                    onPress={() => setSubmitted(false)}
+                  >
+                  <Text style={styles.tryAgainButtonText}>Làm lại bài</Text>
+                </TouchableOpacity>)
+                }
+
                 <TouchableOpacity
                   style={submitted ? styles.navigateButton : styles.finishButton}
                   onPress={() => {
@@ -384,7 +436,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                   <Text style={styles.finishButtonText}>{submitted ? 'Xem kết quả' : 'Nộp bài'}</Text>      
                 </TouchableOpacity>
               </View>
-
+            </View>
             </>
           )}
         </ScrollView>
@@ -669,5 +721,32 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  tryAgainButton: {
+    backgroundColor: '#60A5FA',
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 12,
+    marginTop: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+    marginBottom: 50,
+  },
+  tryAgainButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  rowContainer: {
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    marginVertical: 10, 
   },
 });

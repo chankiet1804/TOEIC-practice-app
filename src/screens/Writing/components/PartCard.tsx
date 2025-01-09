@@ -1,9 +1,9 @@
-import { Dimensions, Image, Pressable, StyleSheet, View } from "react-native";
+import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Heading } from "../../../components/Heading";
 
 
 const windowWidth = Dimensions.get('window').width;
-const cardWidth = 0.8*windowWidth;
+const cardWidth = (windowWidth - (8 * 2) - 8) / 2;
 
 export interface image {
     source: any;
@@ -26,7 +26,7 @@ export interface Props {
     return (
       <Pressable
         onPress={onPress}
-        style={partCard.root}>
+        style={[partCard.root, { marginRight: index % 2 === 0 ? 8 : 0 }]}>
         <View style={partCard.imageContainer}>
         <Image
           style={partCard.image}
@@ -44,8 +44,8 @@ export interface Props {
 
   const partCard = StyleSheet.create({
     root: {
-      flex: 0.5,
-      //maxWidth: cardWidth,
+      flex: 1,
+      maxWidth: cardWidth,
       backgroundColor: 'white',
       borderRadius: 8,
       marginBottom: 8,
@@ -57,10 +57,6 @@ export interface Props {
       },
       shadowOpacity: 0.22,
       shadowRadius: 2.22,
-      marginHorizontal: 10,
-      justifyContent: 'center',
-      height: 250,
-
     },
     imageContainer: {
       width: '100%',
@@ -71,12 +67,11 @@ export interface Props {
     },
     image: {
       width: '100%',
-      height: '90%',
+      height: '100%',
     },
     textContainer: {
-      paddingHorizontal: 8,
-      paddingBottom: 8,
-      marginLeft: 10,
+      padding: 8,
+      alignItems: 'center',
       justifyContent: 'center',
     },
   });

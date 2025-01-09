@@ -33,7 +33,7 @@ export function WritingScreen({ navigation }: WritingScreenProps) {
     <SafeAreaBox>
       <View style={writingScreen.rootContainer}>    
         <FlatList
-          numColumns={1}
+          numColumns={2}
           data={Parts}
           renderItem={({ item, index }) => (
             <PartCard
@@ -46,7 +46,7 @@ export function WritingScreen({ navigation }: WritingScreenProps) {
             />
           )}
           keyExtractor={(item) => item.PartNumber}
-          key = {1}
+          //key = {1}
         />
       </View>
     </SafeAreaBox>
@@ -58,6 +58,7 @@ const writingScreen = StyleSheet.create({
     padding: 8,
     flex: 1,
     gap: 8,
+    marginTop:20
   },
   title: {
     fontSize: 20,

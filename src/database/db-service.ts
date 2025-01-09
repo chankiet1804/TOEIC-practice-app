@@ -24,12 +24,14 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
   try {
     // Xóa các bảng cũ
     await db.execAsync(`
+      /*
       DROP TABLE IF EXISTS Questions;
       DROP TABLE IF EXISTS Parts;
       DROP TABLE IF EXISTS Tests;
       DROP TABLE IF EXISTS Recordings;
       DROP TABLE IF EXISTS QuestionsWR;
       DROP TABLE IF EXISTS AnswerWriting;
+      */
       
       CREATE TABLE IF NOT EXISTS Tests (
         TestID TEXT PRIMARY KEY,
@@ -108,6 +110,7 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
         feedback TEXT
       );
 
+      
     `);
     
     console.log('All tables created successfully');
@@ -383,3 +386,29 @@ export const getFeedback = async (db: SQLite.SQLiteDatabase, quesID:string) => {
     throw error;
   }
 };
+
+export const getAnswerWR = async (db: SQLite.SQLiteDatabase, quesID:string) => {
+  try {
+    const result = await db.getAllAsync(
+      'SELECT Content FROM AnswerWriting WHERE AnswerID = ?',
+      [quesID]
+    );
+    return result;
+  } catch (error) {
+    console.error('Error getting content:', error);
+    throw error;
+  }
+};
+
+// export const getStatusQuestion = async (db: SQLite.SQLiteDatabase, quesID:string) => {
+//   try {
+//     const result = await db.getAllAsync(
+//       'SELECT Status FROM StatusQuestion WHERE QuestionID = ?',
+//       [quesID]
+//     );
+//     return result;
+//   } catch (error) {
+//     console.error('Error getting status:', error);
+//     throw error;
+//   }
+// };

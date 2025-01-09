@@ -116,7 +116,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
           } catch (error) {
             console.error('Error loading feedback:', error);
           } finally {
-            //setLoading(false);
+            setLoading(false);
           }
         };
         loadFeedback();
@@ -135,7 +135,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
             } catch (error) {
             Alert.alert('Lỗi', 'Không thể đánh giá kết quả. Vui lòng thử lại sau.');
             } finally {
-            //setLoading(false);
+            setLoading(false);
             }
         };
 
