@@ -1,5 +1,5 @@
 import { ResultScreenProps } from "../types";
-import { SafeAreaBox } from "../../components";
+// import { SafeAreaBox } from "../../components";
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -14,17 +14,22 @@ import { HomeStackParamList } from '../types';
 import { useRoute } from '@react-navigation/native';
 import { getFeedback,getDBConnection } from "../../database/db-service";
 
+import OpenAI from "openai";
+// import 'dotenv/config';
+import { OPENAI_API_KEY } from '@env';
+
+
 type ResultRouteProp = RouteProp<HomeStackParamList, 'ResultScreen'>;
 
-interface answer {
-    questionID: string,
-    answerContent: string
-};
+// interface answer {
+//     questionID: string,
+//     answerContent: string
+// };
 
 interface EvaluationResult {
-    feedback: string;
-    suggestions: string;
-};
+  feedback: string;
+  suggestions?: string;
+}
 
 
 
@@ -33,53 +38,73 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
     const [results, setResults] = useState<EvaluationResult[]>([]);
     const [feedbacks, setFeedbacks] = useState<(any | null)[]>([]);
 
+    const openai = new OpenAI({
+        apiKey: OPENAI_API_KEY, // Lấy từ file .env
+      });
+
     const route = useRoute<ResultRouteProp>();
     const answers = route.params.answers; // danh sach cac cau tra loi dc truyen vao tu TestScreenWR
     
 
-    const evaluateAnswer = async (answer: string): Promise<EvaluationResult> => {
+    const evaluateAnswer = async (answer: string): Promise<EvaluationResult | null> => {
         try {
-          // Thay thế URL và API key bằng của bạn
-          const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              
-            },
-            body: JSON.stringify({
-              model: "gpt-3.5-turbo",
-              messages: [
-                {
-                  role: "system",
-                  content: "Bạn đang là 1 chuyên gia đánh giá phần thi toeic writing. Hãy đánh giá câu trả lời của người dùng dựa vào gợi ý đáp án.Trả lời tiếng việt"
-                },
-                {
-                  role: "user",
-                  content: `Đánh giá câu trả lời này và cho 1 câu nhận xét ngắn gọn, cần cải thiện chỗ nào : "${answer}"`
-                }
-              ]
-            })
+          
+          const prompt = `
+            Hãy đánh giá câu trả lời sau đây và trả về kết quả theo định dạng JSON:
+            Câu trả lời: "${answer}"
+            
+            Yêu cầu: Trả về chính xác định dạng JSON với cấu trúc:
+            {
+              "feedback": "Nhận xét về câu trả lời"
+            }
+            
+            CHÚ Ý: Chỉ trả về object JSON, không thêm bất kỳ text nào khác.
+          `;
+
+          const completion = await openai.chat.completions.create({
+            messages: [
+              {
+                role: "system",
+                content: "Bạn là assistant chuyên đánh giá câu trả lời. Luôn trả về kết quả ở định dạng JSON."
+              },
+              { role: "user", content: prompt }
+            ],
+            model: "gpt-4o-mini",
+            temperature: 0.7,
+            max_tokens: 200,
           });
-    
-          const data = await response.json();
-          console.log(data);
-          return {
-            feedback: "hihihi", // Parse from response
-            suggestions: "Example" // Parse from response
-          };
+
+          const response = completion.choices[0]?.message?.content;
+          if(response){         
+            console.log('API Response:', response);
+            try{
+              const feedbackFromAPI = JSON.parse(response.trim());
+              return {
+              feedback: feedbackFromAPI.feedback, // Parse from response
+              suggestions: "hihihi" // Parse from response
+              };
+            } catch (error) {
+              console.error('Raw response:', response);
+              console.error('Error parsing API response:', error);
+              return null;
+            }
+          }
+          return null;
         } 
          catch (error) {
           console.error('Error evaluating answer:', error);
-          return {
-            feedback: "Không thể đánh giá do lỗi hệ thống",
-            suggestions: "Vui lòng thử lại sau"
-          };
+          // return {
+          //   feedback: "Không thể đánh giá do lỗi hệ thống",
+          //   suggestions: "Vui lòng thử lại sau"
+          // };
+          return null;
         }
     };
 
     useEffect(() => {
         const loadFeedback = async () => {
           try {
+            setLoading(true);
             const db = await getDBConnection();
             const feedbackResult = await Promise.all(
                 answers.map(async (answer) => {
@@ -91,7 +116,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
           } catch (error) {
             console.error('Error loading feedback:', error);
           } finally {
-            setLoading(false);
+            //setLoading(false);
           }
         };
         loadFeedback();
@@ -101,14 +126,16 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
     useEffect(() => {
         const evaluateAllAnswers = async () => {
             try {
+            setLoading(true);
             const evaluations = await Promise.all(
                 answers.map(answer => evaluateAnswer(answer.answerContent))
             );
-            setResults(evaluations);
+            const validEvaluations = evaluations.filter((evaluation): evaluation is EvaluationResult => evaluation !== null);
+            setResults(validEvaluations);
             } catch (error) {
             Alert.alert('Lỗi', 'Không thể đánh giá kết quả. Vui lòng thử lại sau.');
             } finally {
-            setLoading(false);
+            //setLoading(false);
             }
         };
 
@@ -157,6 +184,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
                 <Text style={styles.suggestionsLabel}>Gợi ý cải thiện:</Text>
                 <Text style={styles.suggestionsContent}>
                   {results[index]?.suggestions}
+                  {/* hihihi */}
                 </Text>
               </View>
             </View>
