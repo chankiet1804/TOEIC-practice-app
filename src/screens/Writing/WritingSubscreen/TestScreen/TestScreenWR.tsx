@@ -209,7 +209,12 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     handleFinish(1);
                     }
                     else{
-
+                      navigation.navigate("ResultScreen",{
+                        answers: [
+                        {questionID: testId+'_'+PartNumber+'_1', answerContent: answer1},
+                        {questionID: testId+'_'+PartNumber+'_2', answerContent: answer2}
+                        ]
+                      });
                     }
                   }}
                 >
@@ -290,7 +295,12 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     handleFinish(2);
                     }
                     else{
-
+                      navigation.navigate("ResultScreen",{
+                        answers: [
+                        {questionID: testId+'_'+PartNumber+'_1', answerContent: answer1},
+                        {questionID: testId+'_'+PartNumber+'_2', answerContent: answer2}
+                        ]
+                      });
                     }
                   }}
                 >
@@ -363,7 +373,11 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     handleFinish(3);
                     }
                     else{
-
+                      navigation.navigate("ResultScreen",{
+                        answers: [
+                        {questionID: testId+'_'+PartNumber+'_1', answerContent: answer3},                       
+                        ]
+                      });
                     }
                   }}
                 >

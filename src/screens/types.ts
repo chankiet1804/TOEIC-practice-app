@@ -45,7 +45,13 @@ export type HomeStackParamList = {
   
   NoteScreen: undefined;
   SettingsScreen: undefined;
-
+  ResultScreen: {
+    answers: {
+      questionID: string;
+      answerContent: string;
+    }[];
+  };
+  
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
@@ -124,13 +130,17 @@ export interface VocabTopic {
   Description?: string;
   words?: VocabWord[];
 }
-export type NotescreenWRProps = NativeStackScreenProps<
+export type NoteScreenProps = NativeStackScreenProps<
   HomeStackParamList,
   "NoteScreen"
 >;
 
-export type SettingsscreenWRProps = NativeStackScreenProps<
+export type SettingsScreenProps = NativeStackScreenProps<
   HomeStackParamList,
   "SettingsScreen"
 >;
 
+export type ResultScreenProps = NativeStackScreenProps<
+HomeStackParamList,
+"ResultScreen"
+>;

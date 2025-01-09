@@ -16,6 +16,7 @@ import { TestScreen } from "./src/screens/Speaking/SpeakingSubscreen/TestScreen"
 import { DatabaseProvider } from "./src/database/DatabaseContext";
 import { DatabaseStateHandler } from "./src/database/DatabaseStateHandler";
 import { TestScreenWR } from "./src/screens/Writing/WritingSubscreen/TestScreen";
+import { ResultScreen } from "./src/screens/Result";
 
 import { MyLibraryScreen } from './src/screens/Vocabulary/VocabularySubscreen/MyLibraryScreen/MyLibraryScreen';
 import { TopicsScreen } from "./src/screens/Vocabulary/TopicsScreen/TopicsScreen";
@@ -197,6 +198,21 @@ function MainStack() {
 
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
 
+      <Stack.Screen 
+        name="ResultScreen" 
+        component={ResultScreen}
+        options={{
+          headerTitle: "Kết quả bài làm",
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: '#5799DB',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
       
     </Stack.Navigator>
   );

@@ -103,8 +103,9 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
       );
 
       CREATE TABLE IF NOT EXISTS AnswerWriting (
-        AnswerID TEXT PRIMARY KEY,
-        Content TEXT
+        AnswerID TEXT PRIMARY KEY NOT NULL,
+        Content TEXT NOT NULL,
+        feedback TEXT
       );
 
     `);
@@ -365,6 +366,20 @@ export const saveAnswerWriting = async (db: SQLite.SQLiteDatabase, answerID: str
     return true;
   } catch (error) {
     console.error(`Error saving Answer of writing with ID : ${answerID}, info:`, error);
+    throw error;
+  }
+};
+
+// ham lay feedback tu db
+export const getFeedback = async (db: SQLite.SQLiteDatabase, quesID:string) => {
+  try {
+    const result = await db.getAllAsync(
+      'SELECT feedback FROM AnswerWriting WHERE AnswerID = ?',
+      [quesID]
+    );
+    return result;
+  } catch (error) {
+    console.error('Error getting feedback:', error);
     throw error;
   }
 };

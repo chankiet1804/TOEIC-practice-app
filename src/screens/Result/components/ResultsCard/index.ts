@@ -1,1 +1,0 @@
-export { ResultsCard } from './ResultsCard';
