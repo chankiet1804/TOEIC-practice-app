@@ -65,6 +65,7 @@ export function InforTestScreenWR({ navigation }: InforTestScreenWRProps) {
     { id: 8, title: 'Bài test 8' },
     { id: 9, title: 'Bài test 9' },
     { id: 10, title: 'Bài test 10' },
+    { id: 11, title: 'Bài test 11' },
   ];
 
   return (

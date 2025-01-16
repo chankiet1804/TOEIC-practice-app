@@ -25,6 +25,8 @@
     "expo-speech-recognition": "^1.1.0",
     "expo-sqlite": "~15.0.3",
     "expo-status-bar": "~2.0.0",
+    "firebase": "^11.1.0",
+    "idb": "^8.0.1",
     "metro": "^0.81.0",
     "metro-config": "^0.81.0",
     "metro-resolver": "^0.81.0",

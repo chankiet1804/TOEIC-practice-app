@@ -427,6 +427,12 @@ export const part1WRQuestions = [
     // imagePath3: '5_1_3_WR',
     // imagePath4: '5_1_4_WR',
     // imagePath5: '5_1_5_WR',
+},
+{
+    questionId: '11_1_WR',
+    partId: '11_1_WR',
+    imagePath1: '5_1_1_WR',
+    imagePath2: '5_1_2_WR',
 }
 ];
 

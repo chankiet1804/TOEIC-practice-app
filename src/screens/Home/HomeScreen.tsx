@@ -67,7 +67,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         </View>
       </ScrollView>
 
-      {/* <View style={homeScreen.bottomNavContainer}>
+      <View style={homeScreen.bottomNavContainer}>
         <TouchableOpacity
           style={homeScreen.bottomNavButton}
           onPress={() => navigation.navigate("Home")}
@@ -101,7 +101,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           />
         </TouchableOpacity>
 
-      </View> */}
+      </View>
 
     </SafeAreaBox>
   );

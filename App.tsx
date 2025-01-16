@@ -27,6 +27,7 @@ import { VocabularyScreen } from './src/screens/Vocabulary';
 
 import 'expo-dev-client';
 import 'react-native-gesture-handler';
+import 'firebase/firestore';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 

@@ -11,6 +11,9 @@ import { SPEAKING_IMAGES } from '../../../../database/images';
 import { saveRecordingInfo } from '../../../../database/db-service';
 import { Audio } from 'expo-av';
 
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../../../firebase';  
+
 type TestScreenRouteProp = RouteProp<HomeStackParamList, 'TestScreen'>;
 
 interface Question {
@@ -19,14 +22,16 @@ interface Question {
   QuestionType: string;
   Content1: string | null;
   Content2: string | null;
-  ImagePath1: keyof typeof SPEAKING_IMAGES;
-  ImagePath2: keyof typeof SPEAKING_IMAGES;
+  ImagePath1: keyof typeof SPEAKING_IMAGES ;
+  ImagePath2: keyof typeof SPEAKING_IMAGES ;
   Question1: string | null;
   Question2: string | null;
   Question3: string | null;
-  PreparationTime: number;
+  //PreparationTime: number;
   ResponseTime: number;
 }
+
+
 
 interface RecordingPath {
   filePath: string;
@@ -46,17 +51,80 @@ export function TestScreen({ navigation }: any) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | undefined>(undefined);
 
+  // useEffect(() => {
+  //   const loadQuestion = async () => {
+  //     try {
+  //       const db = await getDBConnection();
+  //       setDbConnection(db);
+  //       // Format questionId: TestID_PartNumber
+  //       const questionId = `${testId}_${PartNumber}`; 
+  //       const questionData = await getQuestionById(db, questionId);
+  //       setQuestion(questionData as Question);
+  //     } catch (error) {
+  //       console.error('Error loading question:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   loadQuestion();
+  // }, [testId, PartNumber]);
+
   useEffect(() => {
     const loadQuestion = async () => {
       try {
-        const db = await getDBConnection();
-        setDbConnection(db);
+        const dbase = await getDBConnection();
+        setDbConnection(dbase);
+        
         // Format questionId: TestID_PartNumber
-        const questionId = `${testId}_${PartNumber}`; 
-        const questionData = await getQuestionById(db, questionId);
-        setQuestion(questionData as Question);
+        const questionId = `${testId}_${PartNumber}_SP`; 
+        //const questionData = await getQuestionById(db, questionId);
+        const q = query(
+          collection(db, 'question'),
+          where('questionID', '==', questionId),
+          //orderBy('order', 'asc')
+        );
+        const querySnapshot = await getDocs(q);
+        const questionData = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            QuestionID: data.questionID, // hoặc data.QuestionID nếu bạn có sẵn field này
+            PartID: data.PartID,
+            //QuestionType: data.questionType,
+            QuestionType : (
+              PartNumber === '1' ? "text" :
+              PartNumber === '2' ? "image" :
+              PartNumber === '3' ? "passage" :
+              PartNumber === '4' ? "imageWithQuestion" :
+              PartNumber === '5' ? "topic" :
+              null ),
+
+            Content1: data.content1 || null,
+            Content2: data.content2 || null,
+            ImagePath1: data.imagePath1 || null,
+            ImagePath2: data.imagePath2 || null,
+            Question1: data.question1 || null,
+            Question2: data.question2 || null,
+            Question3: data.question3 || null,
+            //PreparationTime: data.preparationTime,
+            //ResponseTime: data.responseTime
+            ResponseTime : (
+              PartNumber === '1' ? 45 :
+              PartNumber === '2' ? 45 :
+              PartNumber === '3' ? 15 :
+              PartNumber === '4' ? 15 :
+              PartNumber === '5' ? 60 :
+              null ),
+          
+          } as Question;
+        });
+        if (questionData.length > 0) {
+          setQuestion(questionData[0]);
+        } else {
+          setQuestion(null);
+        }
       } catch (error) {
         console.error('Error loading question:', error);
+        setQuestion(null);
       } finally {
         setLoading(false);
       }
@@ -84,14 +152,16 @@ export function TestScreen({ navigation }: any) {
 
   useEffect(() => {
     loadRecordings();
-  },[selectedContent]);
+  },[testId, PartNumber,selectedContent]);
 
 
   if (loading) {
     return (
       <SafeAreaBox>
         <View style={styles.container}>
-          <Text>Loading...</Text>
+          <View style={styles.loadingContainer}>
+            <Text style={styles.messageText}>Loading...</Text>
+          </View>
         </View>
       </SafeAreaBox>
     );
@@ -101,7 +171,9 @@ export function TestScreen({ navigation }: any) {
     return (
       <SafeAreaBox>
         <View style={styles.container}>
-          <Text>No question found</Text>
+          <View style={styles.loadingContainer}>
+            <Text style={styles.messageText}>No question found</Text>
+          </View>
         </View>
       </SafeAreaBox>
     );
@@ -695,5 +767,24 @@ const styles = StyleSheet.create({
     elevation: 2, // Đổ bóng cho nút
     marginHorizontal:20
   },
+  messageText: {
+    fontSize: 16,
+    color: '#666666',
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  }
 
 });

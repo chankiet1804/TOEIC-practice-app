@@ -12,6 +12,9 @@ import { TestScreenWRProps } from '../../../types';
 import { saveAnswerWriting } from '../../../../database/db-service';
 import Foundation from '@expo/vector-icons/Foundation';
 
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../../../firebase'; 
+
 type TestScreenWRRouteProp = RouteProp<HomeStackParamList, 'TestScreenWR'>;
 
 interface Question {
@@ -24,7 +27,7 @@ interface Question {
   ImagePath2: keyof typeof WRITING_IMAGES;
   Require1: string | null;
   Require2: string | null;
-  PreparationTime: number;
+  //PreparationTime: number;
   ResponseTime: number;
 }
 
@@ -52,33 +55,71 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
   useEffect(() => {
     const loadQuestion = async () => {
       try {
-        const db = await getDBConnection();
-        setDbConnection(db);
+        const dbase = await getDBConnection();
+        setDbConnection(dbase);
         // Format questionId: TestID_PartNumber
         const questionId = `${testId}_${PartNumber}_WR`;
-        const questionData = await getWRQuestionById(db, questionId);
-
-        // bo sung load answer chung voi load cau hoi
+        //const questionData = await getWRQuestionById(db, questionId);
+        
+        //load answer chung voi load cau hoi
         const answerID = `${testId}_${PartNumber}_1`; // lay ID cua cau hoi 1 
-        const answerWR = await getAnswerWR(db,answerID);
+        const answerWR = await getAnswerWR(dbase,answerID);
         if(answerWR.length !== 0){ // neu da thay cau tra loi cua cau hoi nay roi
           setSubmitted(true); // bat bien da nop bai len
           if(PartNumber==='1' || PartNumber==='2'){
             const ansID1= testId + '_' + PartNumber +'_1';
             const ansID2= testId + '_' + PartNumber +'_2';
-            const result1 = await getAnswerWR(db, ansID1) as { Content: string }[];
-            const result2 = await getAnswerWR(db, ansID2) as { Content: string }[];
+            const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
+            const result2 = await getAnswerWR(dbase, ansID2) as { Content: string }[];
             setAnswer1(result1.length > 0 ? result1[0].Content : '');
             setAnswer2(result2.length > 0 ? result2[0].Content : '');           
           }
           else{
             const ansID1= testId + '_' + PartNumber +'_1';
-            const result1 = await getAnswerWR(db, ansID1) as { Content: string }[];
+            const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
             setAnswer3(result1.length > 0 ? result1[0].Content : '');
           }
         }
+
+        const q = query(
+          collection(db, 'questionWR'),
+          where('questionID', '==', questionId),
+          //orderBy('order', 'asc')
+        );
+        const querySnapshot = await getDocs(q);
+        const questionData = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          QuestionID: data.questionID, // hoặc data.QuestionID nếu bạn có sẵn field này
+          PartID: data.PartID,
+          //QuestionType: data.questionType,
+          QuestionType : (
+            PartNumber === '1' ? "image" :
+            PartNumber === '2' ? "email" :
+            PartNumber === '3' ? "essay" :
+            null ),
+
+          Content1: data.content1 || null,
+          Content2: data.content2 || null,
+          ImagePath1: data.imagePath1 || null,
+          ImagePath2: data.imagePath2 || null,
+          Require1 : data.require1 || null,
+          Require2 : data.require2 || null,
+          //PreparationTime: data.preparationTime,
+          //ResponseTime: data.responseTime
+          ResponseTime : (
+            PartNumber === '1' ? 600 :
+            PartNumber === '2' ? 1200 :
+            PartNumber === '3' ? 1800 :
+            null ),
         
-        setQuestion(questionData as Question);
+        } as Question;
+        });
+        if (questionData.length > 0) {
+          setQuestion(questionData[0]);
+        } else {
+          setQuestion(null);
+        }
       } catch (error) {
         console.error('Error loading question:', error);
       } finally {
@@ -89,24 +130,24 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
   }, [testId, PartNumber]);
 
   if (loading) {
-    return (
-      <SafeAreaBox>
-        <View style={styles.container}>
-          <Text>Loading...</Text>
-        </View>
-      </SafeAreaBox>
-    );
-  }
-
-  if (!question) {
-    return (
-      <SafeAreaBox>
-        <View style={styles.container}>
-          <Text>No question found</Text>
-        </View>
-      </SafeAreaBox>
-    );
-  }
+      return (
+        <SafeAreaBox>
+          <View style={styles.loading}>          
+              <Text style={styles.messageText}>Loading...</Text>           
+          </View>
+        </SafeAreaBox>
+      );
+    }
+  
+    if (!question) {
+      return (
+        <SafeAreaBox>
+          <View style={styles.loading}>           
+              <Text style={styles.messageText}>No question found</Text>           
+          </View>
+        </SafeAreaBox>
+      );
+    }
 
 
   const handleFinish = async (part:number) => {
@@ -116,8 +157,8 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
         Alert.alert('Thông báo','Vui lòng điền đầy đủ câu trả lời!');
       }else{
         Alert.alert('Thành công', 'Bài làm của bạn đã được hệ thống ghi nhận');   
-        const ID1 = testId + '_' + PartNumber +'_1';   
-        const ID2 = testId + '_' + PartNumber +'_2';  
+        const ID1 = testId + '_' + PartNumber +'_1_WR';   
+        const ID2 = testId + '_' + PartNumber +'_2_WR';  
         if (dbConnection) {
               await saveAnswerWriting(dbConnection,ID1,answer1);
               await saveAnswerWriting(dbConnection,ID2,answer2);
@@ -133,7 +174,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
       }
       else{
         Alert.alert('Thành công', 'Bài làm của bạn đã được hệ thống ghi nhận');
-        const ID1 = testId + '_' + PartNumber +'_1';  
+        const ID1 = testId + '_' + PartNumber +'_1_WR';  
         if (dbConnection) {
               await saveAnswerWriting(dbConnection,ID1,answer3);
             }
@@ -242,8 +283,8 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     else{
                       navigation.navigate("ResultScreen",{
                         answers: [
-                        {questionID: testId+'_'+PartNumber+'_1', answerContent: answer1},
-                        {questionID: testId+'_'+PartNumber+'_2', answerContent: answer2}
+                        {questionID: testId+'_'+PartNumber+'_1_WR', answerContent: answer1},
+                        {questionID: testId+'_'+PartNumber+'_2_WR', answerContent: answer2}
                         ]
                       });
                     }
@@ -339,8 +380,8 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     else{
                       navigation.navigate("ResultScreen",{
                         answers: [
-                        {questionID: testId+'_'+PartNumber+'_1', answerContent: answer1},
-                        {questionID: testId+'_'+PartNumber+'_2', answerContent: answer2}
+                        {questionID: testId+'_'+PartNumber+'_1_WR', answerContent: answer1},
+                        {questionID: testId+'_'+PartNumber+'_2_WR', answerContent: answer2}
                         ]
                       });
                     }
@@ -427,7 +468,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     else{
                       navigation.navigate("ResultScreen",{
                         answers: [
-                        {questionID: testId+'_'+PartNumber+'_1', answerContent: answer3},                       
+                        {questionID: testId+'_'+PartNumber+'_1_WR', answerContent: answer3},                       
                         ]
                       });
                     }
@@ -749,4 +790,17 @@ const styles = StyleSheet.create({
     alignItems: "center", 
     marginVertical: 10, 
   },
+  messageText: {
+    fontSize: 30,
+    color: '#666666',
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  loading:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5', // Màu nền nhẹ nhàng
+  },
+  
 });
