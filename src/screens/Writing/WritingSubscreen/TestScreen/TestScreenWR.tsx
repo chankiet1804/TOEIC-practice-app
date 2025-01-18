@@ -9,7 +9,7 @@ import { getDBConnection, getWRQuestionById,getAnswerWR } from '../../../../data
 import { CountdownTimer } from '../../../../components/CountdownTimer';
 import { WRITING_IMAGES } from '../../../../database/images';
 import { TestScreenWRProps } from '../../../types';
-import { saveAnswerWriting } from '../../../../database/db-service';
+import { saveAnswerWriting,deleteFeedback } from '../../../../database/db-service';
 import Foundation from '@expo/vector-icons/Foundation';
 
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -51,6 +51,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
   const [outline, setOutline] = useState('');
   //const [ansWR, setWR] = useState('');
   
+  
 
   useEffect(() => {
     const loadQuestion = async () => {
@@ -62,20 +63,20 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
         //const questionData = await getWRQuestionById(db, questionId);
         
         //load answer chung voi load cau hoi
-        const answerID = `${testId}_${PartNumber}_1`; // lay ID cua cau hoi 1 
+        const answerID = `${testId}_${PartNumber}_1_WR`; // lay ID cua cau hoi 1 
         const answerWR = await getAnswerWR(dbase,answerID);
         if(answerWR.length !== 0){ // neu da thay cau tra loi cua cau hoi nay roi
           setSubmitted(true); // bat bien da nop bai len
           if(PartNumber==='1' || PartNumber==='2'){
-            const ansID1= testId + '_' + PartNumber +'_1';
-            const ansID2= testId + '_' + PartNumber +'_2';
+            const ansID1= testId + '_' + PartNumber +'_1_WR';
+            const ansID2= testId + '_' + PartNumber +'_2_WR';
             const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
             const result2 = await getAnswerWR(dbase, ansID2) as { Content: string }[];
             setAnswer1(result1.length > 0 ? result1[0].Content : '');
             setAnswer2(result2.length > 0 ? result2[0].Content : '');           
           }
           else{
-            const ansID1= testId + '_' + PartNumber +'_1';
+            const ansID1= testId + '_' + PartNumber +'_1_WR';
             const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
             setAnswer3(result1.length > 0 ? result1[0].Content : '');
           }
@@ -183,6 +184,13 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
     }
   }
 
+  const deletefeed = async(quesID:string) => {
+    if(dbConnection){
+      await deleteFeedback(dbConnection, quesID);
+      console.log("Deleted feedback with ID: " + quesID);
+    }
+  }
+
   return (
     <SafeAreaBox>
       <View style={styles.container}>
@@ -268,7 +276,13 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                 {submitted && (
                   <TouchableOpacity
                     style={styles.tryAgainButton}
-                    onPress={() => setSubmitted(false)}
+                    onPress={() => {
+                      setSubmitted(false);
+                      const quesID1 = testId+'_'+PartNumber+'_'+'1_WR';
+                      const quesID2 = testId+'_'+PartNumber+'_'+'2_WR';
+                      deletefeed(quesID1);
+                      deletefeed(quesID2);
+                    }}
                   >
                   <Text style={styles.tryAgainButtonText}>Làm lại bài</Text>
                 </TouchableOpacity>)
@@ -365,7 +379,13 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                 {submitted && (
                   <TouchableOpacity
                     style={styles.tryAgainButton}
-                    onPress={() => setSubmitted(false)}
+                    onPress={() => {
+                      setSubmitted(false)
+                      const quesID1 = testId+'_'+PartNumber+'_'+'1_WR';
+                      const quesID2 = testId+'_'+PartNumber+'_'+'2_WR';
+                      deletefeed(quesID1);
+                      deletefeed(quesID2);
+                    }}
                   >
                   <Text style={styles.tryAgainButtonText}>Làm lại bài</Text>
                 </TouchableOpacity>)
@@ -453,7 +473,11 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                 {submitted && (
                   <TouchableOpacity
                     style={styles.tryAgainButton}
-                    onPress={() => setSubmitted(false)}
+                    onPress={() => {
+                      setSubmitted(false)
+                      const quesID1 = testId+'_'+PartNumber+'_'+'1_WR';                     
+                      deletefeed(quesID1);                     
+                    }}
                   >
                   <Text style={styles.tryAgainButtonText}>Làm lại bài</Text>
                 </TouchableOpacity>)
@@ -468,7 +492,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     else{
                       navigation.navigate("ResultScreen",{
                         answers: [
-                        {questionID: testId+'_'+PartNumber+'_1_WR', answerContent: answer3},                       
+                        {questionID: testId+'_'+PartNumber+')_1_WR', answerContent: answer3},                       
                         ]
                       });
                     }

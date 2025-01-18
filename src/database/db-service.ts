@@ -106,11 +106,14 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
 
       CREATE TABLE IF NOT EXISTS AnswerWriting (
         AnswerID TEXT PRIMARY KEY NOT NULL,
-        Content TEXT NOT NULL,
-        feedback TEXT
+        Content TEXT NOT NULL
       );
 
-      
+      CREATE TABLE IF NOT EXISTS Feedback (
+        AnswerID TEXT PRIMARY KEY NOT NULL,
+        Feedback TEXT
+      );
+     
     `);
     
     console.log('All tables created successfully');
@@ -377,7 +380,7 @@ export const saveAnswerWriting = async (db: SQLite.SQLiteDatabase, answerID: str
 export const getFeedback = async (db: SQLite.SQLiteDatabase, quesID:string) => {
   try {
     const result = await db.getAllAsync(
-      'SELECT feedback FROM AnswerWriting WHERE AnswerID = ?',
+      'SELECT feedback FROM Feedback WHERE AnswerID = ?',
       [quesID]
     );
     return result;
@@ -386,6 +389,39 @@ export const getFeedback = async (db: SQLite.SQLiteDatabase, quesID:string) => {
     throw error;
   }
 };
+
+export const saveFeedback = async (db: SQLite.SQLiteDatabase, quesID:string, feedback:string) => {
+  try {
+    const result = await db.getAllAsync(
+      `INSERT OR REPLACE INTO Feedback (AnswerID, Feedback) 
+       VALUES (?, ?)`,
+      [
+        quesID,
+        feedback
+      ]
+    );
+    console.log(`Feedback of writing with ID : ${quesID} saved successfully`);
+    return result;
+  } catch (error) {
+    console.error('Error setting feedback:', error);
+    throw error;
+  }
+};
+
+export const deleteFeedback = async (db: SQLite.SQLiteDatabase, quesID: string) => {
+  try {
+    const result = await db.getAllAsync(
+      `DELETE FROM Feedback WHERE AnswerID = ?`,
+      [quesID]
+    );
+    console.log(`Feedback with ID: ${quesID} deleted successfully when the answer is changed.`);
+    return result;
+  } catch (error) {
+    console.error('Error deleting feedback:', error);
+    throw error;
+  }
+};
+
 
 export const getAnswerWR = async (db: SQLite.SQLiteDatabase, quesID:string) => {
   try {
