@@ -23,6 +23,8 @@ import { OPENAI_API_KEY } from '@env';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase'; 
 
+import { WRITING_IMAGES } from '../../database/images';
+
 
 type ResultRouteProp = RouteProp<HomeStackParamList, 'ResultScreen'>;
 
@@ -37,7 +39,20 @@ interface EvaluationResult {
 
 interface FeedbackItem {
   Feedback: string;
-  // thêm các properties khác nếu có
+}
+
+interface Question {
+  QuestionID: string;
+  PartID: string;
+  QuestionType: string | null;
+  Content1: string | null;
+  Content2: string | null;
+  ImagePath1: keyof typeof WRITING_IMAGES;
+  ImagePath2: keyof typeof WRITING_IMAGES;
+  Require1: string | null;
+  Require2: string | null;
+  //PreparationTime: number;
+  ResponseTime: number | null;
 }
 
 
@@ -51,6 +66,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
     const [suggestionList,setSuggestionList] = useState<Map<string,string>>(new Map());
     const [dbConnection, setDbConnection] = useState<SQLite.SQLiteDatabase | null>(null);
     const [haveFeedback,setHaveFeedback] = useState(false);
+    const [question, setQuestion] = useState<Question | null>(null);
 
     const openai = new OpenAI({
         apiKey: OPENAI_API_KEY, // Lấy từ file .env
@@ -64,18 +80,62 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
 
     const evaluateAnswer = async (answer: string, answerID : string): Promise<EvaluationResult | null> => {
         try {
-          const sugest = suggestionList.get(answerID);
-          console.log(sugest);
-          const prompt_part1_WR = `
-            Câu trả lời: "${answer}"
-            Gợi ý của đề : "${sugest}"   
-            Yêu cầu: Trả về chính xác định dạng JSON với cấu trúc:
-            {
-              "feedback": "Nhận xét về câu trả lời"
+          const parts = answerID.split('_');
+          //const testID = parts[0];  // phần trước dấu "_"
+          const partID = parts[1];  // phần giữa dấu "_"
+          const quesNum = parts[2]; // thu tu cau tra loi
+          const type = parts[3]; // kiem tra WR hay SP
+          let prompt='';
+          if(partID==="1" && type==="WR"){
+            const sugest = suggestionList.get(answerID);
+            //console.log(sugest);
+            prompt = `
+              Câu trả lời: "${answer}"
+              Gợi ý của đề : "${sugest}"   
+              Yêu cầu: Trả về chính xác định dạng JSON với cấu trúc:
+              {
+                "feedback": "Nhận xét về câu trả lời"
+              }
+              Kiểm tra câu trả lời có đúng ngữ pháp, và sử dụng đúng cặp từ keyword trong ngoặc ở gợi ý, nội dung chỉ cần tương đồng với gợi ý hoặc thiếu cũng đc, khi nào khác hoàn toàn với gợi ý thì mới nhắc nhở. 
+              CHÚ Ý: Chỉ trả về object JSON, không thêm bất kỳ text nào khác.
+            `;
+          }
+          else if(partID==="2" && type==="WR"){
+            let content;
+            let require;
+            if(quesNum==="1"){
+              content=question?.Content1;
+              require=question?.Require1;
             }
-            Kiểm tra câu trả lời có đúng ngữ pháp, và sử dụng đúng cặp từ keyword trong ngoặc ở gợi ý, nội dung chỉ cần tương đồng với gợi ý hoặc thiếu cũng đc, khi nào khác hoàn toàn với gợi ý thì mới nhắc nhở. 
-            CHÚ Ý: Chỉ trả về object JSON, không thêm bất kỳ text nào khác.
-          `;
+            else if(quesNum==="2"){
+              content=question?.Content2;
+              require=question?.Require2;
+            }
+            prompt = `
+              
+              Đây là email đề bài: "${content}"
+              Đây là yêu cầu viết email phản hồi: "${require}"
+              Đay là câu trả lời: "${answer}"
+              Yêu cầu: Trả về chính xác định dạng JSON với cấu trúc:
+              {
+                "feedback": "Nhận xét về câu trả lời"
+              }
+              Nhận xét về câu trả lời trên có phù hợp với email và yêu cầu hay không?
+              CHÚ Ý: Chỉ trả về object JSON, không thêm bất kỳ text nào khác.
+            `;
+          }
+          else if(partID==="3" && type==="WR"){
+            prompt = `
+              Đây là yêu cầu đề bài viết 1 essay : "${question?.Content1}"
+              Đay là câu trả lời: "${answer}"
+              Yêu cầu: Trả về chính xác định dạng JSON với cấu trúc:
+              {
+                "feedback": "Nhận xét về câu trả lời"
+              }
+              Nhận xét về câu trả lời trên có phù hợp với yêu cầu hay không?
+              CHÚ Ý: Chỉ trả về object JSON, không thêm bất kỳ text nào khác.
+            `;
+          }
 
           const completion = await openai.chat.completions.create({
             messages: [
@@ -83,7 +143,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
                 role: "system",
                 content: "Bạn là assistant chuyên đánh giá câu trả lời. Luôn trả về kết quả ở định dạng JSON."
               },
-              { role: "user", content: prompt_part1_WR  }
+              { role: "user", content: prompt  }
             ],
             model: "gpt-4o-mini",
             temperature: 0.7,
@@ -186,7 +246,8 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
           setLoading(true);
           //const dbase = await getDBConnection();
           const myMap: Map<string, string> = new Map(suggestionList);
-          for(let i=0;i<2;i++){
+          
+          for(let i=0;i<answers.length;i++){
             const q = query(
               collection(db, 'suggestion'),
               where('questionID', '==', answers[i].questionID),
@@ -210,6 +271,87 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
       };
       loadSuggestion();
     }, [answers]);
+
+
+    useEffect(() => {
+        const loadQuestion = async () => {
+          try {
+            const dbase = await getDBConnection();
+            setDbConnection(dbase);
+            // Format questionId: TestID_PartNumber
+            const ID = answers[0].questionID;
+            const parts = ID.split('_');
+            const questionId = `${parts[0]}_${parts[1]}_WR`;
+            //const questionData = await getWRQuestionById(db, questionId);
+            
+            // //load answer chung voi load cau hoi
+            // const answerID = `${testId}_${PartNumber}_1_WR`; // lay ID cua cau hoi 1 
+            // const answerWR = await getAnswerWR(dbase,answerID);
+            // if(answerWR.length !== 0){ // neu da thay cau tra loi cua cau hoi nay roi
+            //   setSubmitted(true); // bat bien da nop bai len
+            //   if(PartNumber==='1' || PartNumber==='2'){
+            //     const ansID1= testId + '_' + PartNumber +'_1_WR';
+            //     const ansID2= testId + '_' + PartNumber +'_2_WR';
+            //     const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
+            //     const result2 = await getAnswerWR(dbase, ansID2) as { Content: string }[];
+            //     setAnswer1(result1.length > 0 ? result1[0].Content : '');
+            //     setAnswer2(result2.length > 0 ? result2[0].Content : '');           
+            //   }
+            //   else{
+            //     const ansID1= testId + '_' + PartNumber +'_1_WR';
+            //     const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
+            //     setAnswer3(result1.length > 0 ? result1[0].Content : '');
+            //   }
+            // }
+    
+            const q = query(
+              collection(db, 'questionWR'),
+              where('questionID', '==', questionId),
+              //orderBy('order', 'asc')
+            );
+            const querySnapshot = await getDocs(q);
+            const questionData = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              QuestionID: data.questionID, // hoặc data.QuestionID nếu bạn có sẵn field này
+              PartID: data.PartID,
+              //QuestionType: data.questionType,
+              // QuestionType : (
+              //   PartNumber === '1' ? "image" :
+              //   PartNumber === '2' ? "email" :
+              //   PartNumber === '3' ? "essay" :
+              //   null ),
+    
+              Content1: data.content1 || null,
+              Content2: data.content2 || null,
+              ImagePath1: data.imagePath1 || null,
+              ImagePath2: data.imagePath2 || null,
+              Require1 : data.require1 || null,
+              Require2 : data.require2 || null,
+              //PreparationTime: data.preparationTime,
+              //ResponseTime: data.responseTime
+              // ResponseTime : (
+              //   PartNumber === '1' ? 600 :
+              //   PartNumber === '2' ? 1200 :
+              //   PartNumber === '3' ? 1800 :
+              //   null ),
+            
+            } as Question;
+            });
+            if (questionData.length > 0) {
+              setQuestion(questionData[0]);
+            } else {
+              setQuestion(null);
+            }
+          } catch (error) {
+            console.error('Error loading question:', error);
+          } finally {
+            setLoading(false);
+          }
+        };
+        loadQuestion();
+      }, [answers]);
+
 
     if (loading) {
         return (

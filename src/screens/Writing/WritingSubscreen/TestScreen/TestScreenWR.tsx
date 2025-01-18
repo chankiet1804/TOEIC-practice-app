@@ -492,7 +492,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     else{
                       navigation.navigate("ResultScreen",{
                         answers: [
-                        {questionID: testId+'_'+PartNumber+')_1_WR', answerContent: answer3},                       
+                        {questionID: testId+'_'+PartNumber+'_1_WR', answerContent: answer3},                       
                         ]
                       });
                     }
