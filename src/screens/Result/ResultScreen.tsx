@@ -96,7 +96,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
               {
                 "feedback": "Nhận xét về câu trả lời"
               }
-              Kiểm tra câu trả lời có đúng ngữ pháp, và sử dụng đúng cặp từ keyword trong ngoặc ở gợi ý, nội dung chỉ cần tương đồng với gợi ý hoặc thiếu cũng đc, khi nào khác hoàn toàn với gợi ý thì mới nhắc nhở. 
+              Kiểm tra câu trả lời có đúng ngữ pháp, và sử dụng đúng cặp từ keyword trong ngoặc ở cuối cùng của gợi ý, nội dung chỉ cần tương đồng với gợi ý hoặc thiếu cũng đc, khi nào khác hoàn toàn với gợi ý thì mới nhắc nhở. 
               CHÚ Ý: Chỉ trả về object JSON, không thêm bất kỳ text nào khác.
             `;
           }
@@ -203,7 +203,6 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
       const dbase = await getDBConnection();
       setDbConnection(dbase);
       const myMap: Map<string, string> = new Map(feedbacks);
-      //const feedbackResult = await Promise.all(
         await Promise.all( 
         answers.map(async (answer) => {
           const feedback = await getFeedback(dbase, answer.questionID);
@@ -211,17 +210,10 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
           console.log("Individual feedback for question", answer.questionID, ":", feedbackContent);
           if(feedbackContent!=="") 
             myMap.set(answer.questionID,JSON.stringify(feedbackContent))
-          // Giả sử feedback là một mảng các object có property feedback
-          // return (feedback as Array<{ feedback: string }>)
-          //   .map(f => f.feedback)
-          //   .join('');
         }) 
       );  
       
       setFeedbacks(myMap);
-      // console.log("FEEDBACK: " + JSON.stringify(feedbacks[0]) + "\n" + JSON.stringify(feedbacks[1]));
-      // console.log("kkkkk" + JSON.stringify(feedbackResult[0].feedback) + "------------\n" + JSON.stringify(feedbackResult[1].feedback));
-      //console.log("FEEDBACKS:", feedbackResult);
     } catch (error) {
       console.error('Error loading feedback:', error);
     } finally { 
@@ -244,7 +236,6 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
       const loadSuggestion = async () => {
         try {
           setLoading(true);
-          //const dbase = await getDBConnection();
           const myMap: Map<string, string> = new Map(suggestionList);
           
           for(let i=0;i<answers.length;i++){
@@ -278,49 +269,19 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
           try {
             const dbase = await getDBConnection();
             setDbConnection(dbase);
-            // Format questionId: TestID_PartNumber
             const ID = answers[0].questionID;
             const parts = ID.split('_');
-            const questionId = `${parts[0]}_${parts[1]}_WR`;
-            //const questionData = await getWRQuestionById(db, questionId);
-            
-            // //load answer chung voi load cau hoi
-            // const answerID = `${testId}_${PartNumber}_1_WR`; // lay ID cua cau hoi 1 
-            // const answerWR = await getAnswerWR(dbase,answerID);
-            // if(answerWR.length !== 0){ // neu da thay cau tra loi cua cau hoi nay roi
-            //   setSubmitted(true); // bat bien da nop bai len
-            //   if(PartNumber==='1' || PartNumber==='2'){
-            //     const ansID1= testId + '_' + PartNumber +'_1_WR';
-            //     const ansID2= testId + '_' + PartNumber +'_2_WR';
-            //     const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
-            //     const result2 = await getAnswerWR(dbase, ansID2) as { Content: string }[];
-            //     setAnswer1(result1.length > 0 ? result1[0].Content : '');
-            //     setAnswer2(result2.length > 0 ? result2[0].Content : '');           
-            //   }
-            //   else{
-            //     const ansID1= testId + '_' + PartNumber +'_1_WR';
-            //     const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
-            //     setAnswer3(result1.length > 0 ? result1[0].Content : '');
-            //   }
-            // }
-    
+            const questionId = `${parts[0]}_${parts[1]}_WR`;  
             const q = query(
               collection(db, 'questionWR'),
               where('questionID', '==', questionId),
-              //orderBy('order', 'asc')
             );
             const querySnapshot = await getDocs(q);
             const questionData = querySnapshot.docs.map(doc => {
             const data = doc.data();
             return {
-              QuestionID: data.questionID, // hoặc data.QuestionID nếu bạn có sẵn field này
+              QuestionID: data.questionID, 
               PartID: data.PartID,
-              //QuestionType: data.questionType,
-              // QuestionType : (
-              //   PartNumber === '1' ? "image" :
-              //   PartNumber === '2' ? "email" :
-              //   PartNumber === '3' ? "essay" :
-              //   null ),
     
               Content1: data.content1 || null,
               Content2: data.content2 || null,
@@ -328,13 +289,6 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
               ImagePath2: data.imagePath2 || null,
               Require1 : data.require1 || null,
               Require2 : data.require2 || null,
-              //PreparationTime: data.preparationTime,
-              //ResponseTime: data.responseTime
-              // ResponseTime : (
-              //   PartNumber === '1' ? 600 :
-              //   PartNumber === '2' ? 1200 :
-              //   PartNumber === '3' ? 1800 :
-              //   null ),
             
             } as Question;
             });
@@ -365,23 +319,23 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
     return (
       <View style={styles.container}>
         <ScrollView >
-          <Text style={styles.title}>Kết quả đánh giá</Text>
+          {/* <Text style={styles.title}>Kết quả đánh giá</Text> */}
           
           {answers.map((answer, index) => (
             <View key={index} style={styles.resultCard}>
               <Text style={styles.partTitle}>Câu hỏi {answer.questionID}</Text>
-              
-              {/* <View style={styles.timeSpentContainer}>
-                <Text style={styles.timeSpentLabel}>Thời gian làm bài:</Text>
-                <Text style={styles.timeSpentValue}>
-                  {answer.timeSpent.minutes} phút {answer.timeSpent.seconds} giây
-                </Text>
-              </View> */}
     
               {/* <View style={styles.scoreContainer}>
                 <Text style={styles.scoreLabel}>Điểm số:</Text>
-                <Text style={styles.scoreValue}>{results[index]?.score}/10</Text>
+                <Text style={styles.scoreValue}>100/10</Text>
               </View> */}
+
+              <View style={styles.feedbackContainer}>
+                <Text style={styles.feedbackLabel}>Câu trả lời của bạn:</Text>
+                <Text style={styles.feedbackContent}>
+                  {answers[index].answerContent}
+                </Text>
+              </View>
     
               <View style={styles.feedbackContainer}>
                 <Text style={styles.feedbackLabel}>Nhận xét:</Text>
@@ -397,7 +351,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
                   }
                 </Text>
               </View>
-    
+              {suggestionList.size>0 &&(
               <View style={styles.suggestionsContainer}>
                 <Text style={styles.suggestionsLabel}>Gợi ý cải thiện:</Text>
                 <Text style={styles.suggestionsContent}>
@@ -405,6 +359,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
                   {index === 0 ? suggestionList.get(answers[0].questionID) : suggestionList.get(answers[1].questionID)}
                 </Text>
               </View>
+              )}
             </View>
           ))}
         </ScrollView>
@@ -420,7 +375,7 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
           <Text style={styles.submitButtonText}>Xem nhận xét</Text>      
         </TouchableOpacity>
         )}
-        </View>
+      </View>
     );
 };
 
@@ -501,6 +456,9 @@ const styles = StyleSheet.create({
     },
     feedbackContainer: {
       marginBottom: 12,
+      backgroundColor: '#f8f9fa',
+      padding: 12,
+      borderRadius: 8,
     },
     feedbackLabel: {
       fontSize: 14,
