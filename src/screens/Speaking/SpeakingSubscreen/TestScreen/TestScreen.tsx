@@ -8,11 +8,16 @@ import { RouteProp } from '@react-navigation/native';
 import { getDBConnection, getQuestionById, getRecording } from '../../../../database/db-service';
 import { CountdownTimer } from '../../../../components/CountdownTimer';
 import { SPEAKING_IMAGES } from '../../../../database/images';
-import { saveRecordingInfo } from '../../../../database/db-service';
+import { saveRecordingInfo, getContentOfSpeaking,saveContentOfSpeaking } from '../../../../database/db-service';
 import { Audio } from 'expo-av';
 
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../../firebase';  
+
+import {
+  ExpoSpeechRecognitionModule,
+  useSpeechRecognitionEvent,
+} from "expo-speech-recognition";
 
 type TestScreenRouteProp = RouteProp<HomeStackParamList, 'TestScreen'>;
 
@@ -31,8 +36,6 @@ interface Question {
   ResponseTime: number;
 }
 
-
-
 interface RecordingPath {
   filePath: string;
 }
@@ -50,24 +53,19 @@ export function TestScreen({ navigation }: any) {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | undefined>(undefined);
+  const [contentOfSpeaking, setContentOfSpeaking] = useState<string>('');
 
-  // useEffect(() => {
-  //   const loadQuestion = async () => {
-  //     try {
-  //       const db = await getDBConnection();
-  //       setDbConnection(db);
-  //       // Format questionId: TestID_PartNumber
-  //       const questionId = `${testId}_${PartNumber}`; 
-  //       const questionData = await getQuestionById(db, questionId);
-  //       setQuestion(questionData as Question);
-  //     } catch (error) {
-  //       console.error('Error loading question:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   loadQuestion();
-  // }, [testId, PartNumber]);
+  useSpeechRecognitionEvent("start", () => setIsRecording(true));
+  useSpeechRecognitionEvent("end", () => setIsRecording(false));
+  useSpeechRecognitionEvent("result", (event) => {
+    if (event.results[0]?.transcript) {
+      const newTranscript = event.results[0].transcript;      
+      setContentOfSpeaking(newTranscript.trim());
+    }
+  });
+  useSpeechRecognitionEvent("error", (event) => {
+    console.log("error code:", event.error, "error message:", event.message);
+  });
 
   useEffect(() => {
     const loadQuestion = async () => {
@@ -133,8 +131,9 @@ export function TestScreen({ navigation }: any) {
   }, [testId, PartNumber]);
 
   const loadRecordings = async () => {
-    if (dbConnection) {     
-        const Paths = await getRecording(dbConnection, testId.toString(), Number(PartNumber), selectedContent) as RecordingPath[]; 
+    const dbase = await getDBConnection();
+    if (dbase) {     
+        const Paths = await getRecording(dbase, testId.toString(), Number(PartNumber), selectedContent) as RecordingPath[]; 
         if(Paths.length > 0){
           const path = Paths[0].filePath;
           console.log('Loaded recording successfully:', path);
@@ -150,8 +149,24 @@ export function TestScreen({ navigation }: any) {
       }
   };
 
+  // const loadContentOfSpeaking = async () => {
+  //   const dbase = await getDBConnection();
+  //   if (dbase) {         
+  //     const quesid = `${testId}_${PartNumber}_${selectedContent}`;
+  //     const content = await getContentOfSpeaking(dbase, quesid) as string[];
+  //     console.log("Loadded content of speaking successfully:");
+  //     setContentOfSpeaking(content[0]);   
+  //   } 
+  //   else {
+  //     console.log('Fail to load recording');
+  //   }
+  // };
+
+
+
   useEffect(() => {
     loadRecordings();
+    //loadContentOfSpeaking();
   },[testId, PartNumber,selectedContent]);
 
 
@@ -193,6 +208,8 @@ export function TestScreen({ navigation }: any) {
         setRecording(recording);
         setIsRecording(true);
         setIsDisabled(true);
+        //handleStartRecognize();
+        handleStartRecognize();
       }
     } catch (err) {
       console.error('Error starting recording:', err);
@@ -201,7 +218,10 @@ export function TestScreen({ navigation }: any) {
 
   const handleStopRecording = async () => {
     if (!recording) return;
-
+    handleStopRecognize();
+    //console.log("Content of speaking: "+contentOfSpeaking);
+    //loadContentOfSpeaking();
+    setContentOfSpeaking('');
     setIsRecording(false);
     await recording.stopAndUnloadAsync();
 
@@ -214,8 +234,9 @@ export function TestScreen({ navigation }: any) {
 
     // Tạo tên file theo định dạng testId_partNumber_questionNumber
     const fileName = `${testId}_${PartNumber}_${questionNumber}.m4a`; // Định dạng tên file
-
+    
     if (dbConnection) {
+      // luu file ghi am
       await saveRecordingInfo(dbConnection, {
         testId: Number(testId),
         partNumber: Number(PartNumber),
@@ -224,6 +245,7 @@ export function TestScreen({ navigation }: any) {
         filePath: uri,
         createdAt: createdAt
       });
+      
     }
     console.log('Recording saved successfully:', fileName);   
     setRecording(undefined);
@@ -258,7 +280,53 @@ export function TestScreen({ navigation }: any) {
       setIsPlaying(false);
       setSound(undefined);
     }
-  };
+};
+
+  
+
+const handleStartRecognize = async () => {
+  const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+  if (!result.granted) {
+    console.warn("Permissions not granted", result);
+    return;
+  }
+  // Start speech recognition
+  ExpoSpeechRecognitionModule.start({
+    lang: "en-US",
+    interimResults: false,
+    maxAlternatives: 1,
+    continuous: true,
+    requiresOnDeviceRecognition: false,
+    addsPunctuation: false,
+  });
+};
+
+const handleStopRecognize = async () => {
+  ExpoSpeechRecognitionModule.stop();
+};
+
+// const saveContent = async (quesid:string,content:string) => {
+//   const dbase = await getDBConnection();
+//   await saveContentOfSpeaking(dbase,quesid,content);
+// };
+
+// const getContent = async (quesid:string) => {
+//   const dbase = await getDBConnection();
+//   const result = await getContentOfSpeaking(dbase,quesid) as any[];
+//   // console.log("Loadded content of speaking successfully");
+//   // return content[0].content;
+//   if (result.length > 0) {
+//     // Lấy giá trị của cột Content từ đối tượng đầu tiên
+//     const content = result[0].Content as string; 
+//     console.log('CONTENT GETTED FROM DATABASE:', content); // In nội dung cụ thể
+//     return content;
+//   } else {
+//     console.log('No content found for the given AnswerID.');
+//     return null; // Không có dữ liệu
+//   }
+// };
+
+
 
   return (
     <SafeAreaBox>
@@ -532,7 +600,6 @@ export function TestScreen({ navigation }: any) {
               <Text style={styles.directions}>
                 Bạn sẽ bày tỏ quan điểm của mình về 1 vấn đề nào đó.              
                 Khi sẵn sàng, nhấn nút "Bắt đầu ghi âm" và bạn có {question.ResponseTime} giây để trả lời.
-                Bạn có thể dùng phần "Ghi chú" để viết dàn ý cho bài nói của mình.
               </Text>
               <View style={styles.topicBox}>
                 <Text style={styles.topicText}>{question.Content1}</Text>
@@ -542,8 +609,8 @@ export function TestScreen({ navigation }: any) {
         </ScrollView>
       </View>
       
-      
       {!isRecording && recordingPath !== '' && (
+        <View>
         <TouchableOpacity 
         style={styles.playButton}
         onPress={() => {
@@ -559,8 +626,26 @@ export function TestScreen({ navigation }: any) {
           {isPlaying ? 'Ngừng phát lại' : 'Phát lại ghi âm'} {/* Thay đổi văn bản dựa trên trạng thái */}
         </Text>
       </TouchableOpacity>
-      )}
       
+
+      <TouchableOpacity 
+        style={styles.playButton}
+        onPress={() => {
+          console.log(contentOfSpeaking);    
+          // luu noi dung ghi am
+          //const quesid = `${testId}_${PartNumber}_${selectedContent}`;
+          //saveContent(quesid,contentOfSpeaking);   
+          }
+        }  
+      >
+        <Text style={styles.buttonText}>
+          Xem nội dung ghi âm
+        </Text>
+      </TouchableOpacity>
+
+      </View>
+
+      )}
 
       <View style={styles.footer}>
         <TouchableOpacity 
@@ -570,9 +655,9 @@ export function TestScreen({ navigation }: any) {
           ]}
           onPress={() => {
             if (isRecording) {
-              handleStopRecording();
+              handleStopRecording();                       
             } else {
-              handleStartRecording();
+              handleStartRecording();           
             }
           }}
           disabled={isPlaying} // Vô hiệu hóa nút nếu isPlaying là true

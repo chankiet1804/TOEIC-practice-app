@@ -113,6 +113,12 @@ export const createTables = async (db: SQLite.SQLiteDatabase) => {
         AnswerID TEXT PRIMARY KEY NOT NULL,
         Feedback TEXT
       );
+
+      CREATE TABLE IF NOT EXISTS ContentOfSpeaking (
+        AnswerID TEXT PRIMARY KEY NOT NULL,
+        Content TEXT
+      );
+
      
     `);
     
@@ -432,6 +438,37 @@ export const getAnswerWR = async (db: SQLite.SQLiteDatabase, quesID:string) => {
     return result;
   } catch (error) {
     console.error('Error getting content:', error);
+    throw error;
+  }
+};
+
+export const getContentOfSpeaking = async (db: SQLite.SQLiteDatabase, quesID:string) => {
+  try {
+    const result = await db.getAllAsync(
+      'SELECT Content FROM ContentOfSpeaking WHERE AnswerID = ?',
+      [quesID]
+    );
+    return result;
+  } catch (error) {
+    console.error('Error getting Content:', error);
+    throw error;
+  }
+};
+
+export const saveContentOfSpeaking = async (db: SQLite.SQLiteDatabase, quesID:string, content:string) => {
+  try {
+    const result = await db.getAllAsync(
+      `INSERT OR REPLACE INTO ContentOfSpeaking (AnswerID, Content) 
+       VALUES (?, ?)`,
+      [
+        quesID,
+        content
+      ]
+    );
+    console.log(`Content of speaking with ID : ${quesID} saved successfully`);
+    return result;
+  } catch (error) {
+    console.error('Error saving content:', error);
     throw error;
   }
 };
