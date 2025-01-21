@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as SQLite from 'expo-sqlite';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image,Modal } from 'react-native';
 import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from '../../../types';
@@ -54,6 +54,7 @@ export function TestScreen({ navigation }: any) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | undefined>(undefined);
   const [contentOfSpeaking, setContentOfSpeaking] = useState<string>('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   useSpeechRecognitionEvent("start", () => setIsRecording(true));
   useSpeechRecognitionEvent("end", () => setIsRecording(false));
@@ -631,6 +632,7 @@ const handleStopRecognize = async () => {
       <TouchableOpacity 
         style={styles.playButton}
         onPress={() => {
+          setModalVisible(true)
           console.log(contentOfSpeaking);    
           // luu noi dung ghi am
           //const quesid = `${testId}_${PartNumber}_${selectedContent}`;
@@ -642,6 +644,38 @@ const handleStopRecognize = async () => {
           Xem nội dung ghi âm
         </Text>
       </TouchableOpacity>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Nội dung ghi âm</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.contentContainer}>
+              <Text style={styles.contentText}>{contentOfSpeaking}</Text>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.doneButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.doneButtonText}>Đóng</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       </View>
 
@@ -870,6 +904,69 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-  }
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: '90%',
+    maxHeight: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  closeButton: {
+    padding: 5,
+  },
+  closeButtonText: {
+    fontSize: 22,
+    color: '#666',
+    fontWeight: '500',
+  },
+  contentContainer: {
+    marginVertical: 15,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    padding: 15,
+  },
+  contentText: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#333',
+  },
+  doneButton: {
+    backgroundColor: '#2196F3',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  doneButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 
 });

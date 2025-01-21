@@ -24,32 +24,25 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             style={homeScreen.card}
             onPress={() => navigation.navigate("Speaking")}
           >
-            <View style={[homeScreen.cardContent, homeScreen.speakingCard]}>
+            
               <Image
-                source={require("../../../assets/speaking-thumb.png")}
-                style={homeScreen.cardThumb}
-                resizeMode="contain"
+                source={require("../../../assets/speaking.png")}
+                style={homeScreen.Image}
+                resizeMode="cover"
               />
-              {/* <Text style={[homeScreen.cardText, { color: "#000" }]}>
-                Speaking
-              </Text> */}
-            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={homeScreen.card}
             onPress={() => navigation.navigate("Writing")}
           >
-            <View style={[homeScreen.cardContent, homeScreen.writingCard]}>
+            
               <Image
-                source={require("../../../assets/writing-thumb.png")}
-                style={homeScreen.cardThumb}
-                resizeMode="contain"
+                
+                source={require("../../../assets/writing-toeic.jpg")}
+                style={homeScreen.Image}
+                resizeMode="cover"
               />
-              {/* <Text style={[homeScreen.cardText, { color: "#000" }]}>
-                Writing
-              </Text> */}
-            </View>
           </TouchableOpacity>
 
           <Text style={homeScreen.sectionTitle}>Vocabulary</Text>
@@ -59,15 +52,14 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           >
             <Image
               source={require("../../../assets/vocabulary-thumb.png")}
-              style={homeScreen.vocabularyImage}
+              style={homeScreen.Image}
               resizeMode="cover"
             />
-            {/* <Text style={homeScreen.cardText}>Learn Vocabulary</Text> */}
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      <View style={homeScreen.bottomNavContainer}>
+      {/* <View style={homeScreen.bottomNavContainer}>
         <TouchableOpacity
           style={homeScreen.bottomNavButton}
           onPress={() => navigation.navigate("Home")}
@@ -101,7 +93,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           />
         </TouchableOpacity>
 
-      </View>
+      </View> */}
 
     </SafeAreaBox>
   );
@@ -146,34 +138,11 @@ const homeScreen = StyleSheet.create({
     elevation: 3,
     overflow: "hidden",
   },
-  cardContent: {
+  Image: {
     width: "100%",
-    height: 120,
-    padding: 16,
-    position: "relative",
+    height: 160,
   },
-  speakingCard: {
-    backgroundColor: "#FFD7CE",
-  },
-  writingCard: {
-    backgroundColor: "#90EE90",
-  },
-  cardThumb: {
-    width: width - 64,
-    height: "100%",
-  },
-  vocabularyImage: {
-    width: "100%",
-    height: 170,
-  },
-  cardText: {
-    fontSize: 18,
-    fontWeight: "500",
-    color: "#333",
-    position: "absolute",
-    bottom: 16,
-    left: 16,
-  },
+
   bottomNavContainer: {
     flexDirection: "row",
     justifyContent: "space-around",

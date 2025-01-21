@@ -12,19 +12,19 @@ export function WritingScreen({ navigation }: WritingScreenProps) {
     { PartNumber: '1', 
       Title: 'Mô tả hình ảnh với từ khóa', 
       image: {
-        source: require('../../../assets/toeic_speaking_part1.jpg'),
+        source: require('../../../assets/toeic_writing_part1.png'),
         alt: 'Mô tả hình ảnh với từ khóa' },
     },
     { PartNumber: '2', 
       Title: 'Viết email phản hồi',
       image: {
-        source: require('../../../assets/toeic_speaking_part2.jpg'),
+        source: require('../../../assets/toeic_writing_part2.png'),
         alt: 'Viết email phản hồi' },
     },
     { PartNumber: '3', 
       Title: 'Viết bài luận bày tỏ quan điểm cá nhân', 
       image: {
-        source: require('../../../assets/toeic_speaking_part3.jpg'),
+        source: require('../../../assets/toeic_writing_part3.png'),
         alt: 'Viết bài luận bày tỏ quan điểm cá nhân' },
     },
   ];
