@@ -38,5 +38,5 @@ A mobile app for practicing TOEIC Speaking and Writing skills, powered by AI and
 
 | Họ và Tên            | Email                  | LinkedIn 
 | -------------------- | ---------------------- | ---------------------- |
-| Huỳnh Chấn Kiệt      | 22520717@gm.uit.edu.vn |[LinkedIn profile](www.linkedin.com/in/kiet-huynh-651bb6317)|
+| Huỳnh Chấn Kiệt      | 22520717@gm.uit.edu.vn |[My profile](https://www.linkedin.com/in/kiet-huynh-651bb6317/)|
 | Nguyễn Minh Lộc      | 22520791@gm.uit.edu.vn |
