@@ -1,18 +1,42 @@
-# React Native Quiz App
+# React Native TOEIC App
 
 ## Overview
 
-The React Native Quiz App is a mobile application developed using React Native and Expo. This app provides an engaging and interactive quiz experience for users. With a user-friendly interface, it allows players to answer a series of quiz questions. The app is built to be easily deployable, thanks to Expo's tools and services.
+A mobile app for practicing TOEIC Speaking and Writing skills, powered by AI and speech-to-text technology.
 
-### Demo Video
+## ✨ Features
+- Practice **Speaking** with real-time speech-to-text feedback.
+- Get **AI-powered** feedback on Writing answers using OpenAI API.
+- Track user progress with a built-in SQLite database.
+- Support for **multiple users** with backend integration (Node.js + MySQL).
+- **User-friendly interface** designed for an intuitive and seamless learning experience.
 
-https://github.com/smite1921/quiz-app/assets/43019533/2c1595e3-61f5-480e-a84b-c465495446f7
+## 📥 Installation  
+1. Clone this repository:  
+   ```bash
+   git clone https://github.com/chankiet1804/TOEIC-practice-app.git
+   cd TOEIC-practice-app
+2. Install dependencies:
+   ```bash
+   npm install
+3. Run the app using Expo:
+    ```bash
+      npx expo start
+    ```
+## 🎥 Demo Video
 
+[Watch the demo here](https://www.youtube.com/shorts/rDcqCB0BCDE)
 
-### Project Motivation
+## 🛠️ Tech Stack  
+- **Frontend:** React Native, Expo, TypeScript  
+- **Backend:** Node.js, Express, MySQL  
+- **AI & APIs:** OpenAI API, expo-speech-recognition library  
+- **Database:** SQLite (local), MySQL (backend)  
+- **Version Control:** Git & GitHub 
 
-This project was created with the primary goal of helping me learn React Native. The codebase is structured to be beginner-friendly, making it a valuable resource for others interested in learning React Native.
+# <img src="https://img.icons8.com/fluency/48/000000/group.png" alt="Team Icon" width="25"/> Author  
 
-Whether you're a quiz enthusiast or a developer looking to explore React Native, this app is a fun and educational project to get started with.
-
-<img src="https://user-images.githubusercontent.com/43019533/95948979-b5815a00-0dbf-11eb-9d4b-6447b7d89340.png" width=300/>
+| Họ và Tên            | Email                  | LinkedIn 
+| -------------------- | ---------------------- | ---------------------- |
+| Huỳnh Chấn Kiệt      | 22520717@gm.uit.edu.vn |[My profile](https://www.linkedin.com/in/kiet-huynh-651bb6317/)|
+| Nguyễn Minh Lộc      | 22520791@gm.uit.edu.vn |
