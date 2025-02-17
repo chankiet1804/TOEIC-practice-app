@@ -26,7 +26,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           >
             
               <Image
-                source={require("../../../assets/speaking.png")}
+                source={require("../../../assets/speaking2.png")}
                 style={homeScreen.Image}
                 resizeMode="cover"
               />
