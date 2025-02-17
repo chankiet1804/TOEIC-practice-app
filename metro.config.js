@@ -13,4 +13,8 @@ config.transformer.minifierConfig = {
   }
 };
 
+config.resolver.blockList = [
+  /.*[/\\]node_modules[/\\]react-native[/\\]node_modules[/\\].*/,
+];
+
 module.exports = config;

@@ -22,12 +22,15 @@ import { MyLibraryScreen } from './src/screens/Vocabulary/VocabularySubscreen/My
 import { TopicsScreen } from "./src/screens/Vocabulary/TopicsScreen/TopicsScreen";
 import { Ionicons } from '@expo/vector-icons';
 import { VocabularyScreen } from './src/screens/Vocabulary'; 
-
+import LoginScreen from "./src/screens/Login/LoginScreen";
+import RegisterScreen from "./src/screens/Register/RegisterScreen";
 
 
 import 'expo-dev-client';
 import 'react-native-gesture-handler';
 import 'firebase/firestore';
+import '@react-native-async-storage/async-storage'
+
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
@@ -39,6 +42,10 @@ function MainStack() {
         animation: "slide_from_right",
       }}
     >
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+
+      <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+
       <Stack.Screen
         name="Home"
         component={HomeScreen}
@@ -198,6 +205,7 @@ function MainStack() {
       <Stack.Screen name="NoteScreen" component={NoteScreen} />
 
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+
 
       <Stack.Screen 
         name="ResultScreen" 

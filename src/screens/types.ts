@@ -51,6 +51,8 @@ export type HomeStackParamList = {
       answerContent: string;
     }[];
   };
+  LoginScreen: undefined;
+  RegisterScreen: undefined;
   
 };
 
@@ -143,4 +145,14 @@ export type SettingsScreenProps = NativeStackScreenProps<
 export type ResultScreenProps = NativeStackScreenProps<
 HomeStackParamList,
 "ResultScreen"
+>;
+
+export type LoginScreenProps = NativeStackScreenProps<
+HomeStackParamList,
+"LoginScreen"
+>;
+
+export type RegisterScreenProps = NativeStackScreenProps<
+HomeStackParamList,
+"RegisterScreen"
 >;
