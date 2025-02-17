@@ -34,7 +34,7 @@ A mobile app for practicing TOEIC Speaking and Writing skills, powered by AI and
 - **Database:** SQLite (local), MySQL (backend)  
 - **Version Control:** Git & GitHub 
 
-# <img src="https://img.icons8.com/fluency/48/000000/group.png" alt="Team Icon" width="25"/> ## 👨‍💻 Author  
+# <img src="https://img.icons8.com/fluency/48/000000/group.png" alt="Team Icon" width="25"/> Author  
 
 | Họ và Tên            | Email                  | LinkedIn 
 | -------------------- | ---------------------- | ---------------------- |
