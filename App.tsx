@@ -22,7 +22,8 @@ import { MyLibraryScreen } from './src/screens/Vocabulary/VocabularySubscreen/My
 import { TopicsScreen } from "./src/screens/Vocabulary/TopicsScreen/TopicsScreen";
 import { Ionicons } from '@expo/vector-icons';
 import { VocabularyScreen } from './src/screens/Vocabulary'; 
-
+import { LoginScreen } from "./src/screens/Login&Register";
+import { RegisterScreen } from "./src/screens/Login&Register";
 
 
 import 'expo-dev-client';
@@ -39,6 +40,20 @@ function MainStack() {
         animation: "slide_from_right",
       }}
     >
+      <Stack.Screen 
+      name="LoginScreen" 
+      component={LoginScreen}
+      options={{
+        headerShown: false,
+      }} />
+
+      <Stack.Screen 
+      name="RegisterScreen" 
+      component={RegisterScreen}
+      options={{
+        headerShown: false,
+      }}
+       />
       <Stack.Screen
         name="Home"
         component={HomeScreen}
@@ -196,8 +211,8 @@ function MainStack() {
       />
       
       <Stack.Screen name="NoteScreen" component={NoteScreen} />
-
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+      
 
       <Stack.Screen 
         name="ResultScreen" 
