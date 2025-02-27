@@ -159,7 +159,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
       const { name, email, password } = formData;
       const res = await createUserApi({ name, email, password });
       
-      if (res) {
+      if (res&&res.EC===0) {
         setAlert({
           visible: true,
           type: 'success',
@@ -170,6 +170,13 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
           name: '',
           password: '',
           confirmPassword: '',
+        });
+      }
+      else if (res&&res.EC===1) {
+        setAlert({
+          visible: true,
+          type: 'error',
+          message: 'Email đã tồn tại, vui lòng nhập email khác!',
         });
       }
     } catch (error) {

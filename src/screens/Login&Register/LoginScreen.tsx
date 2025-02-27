@@ -14,6 +14,7 @@ import {
   StatusBar,
   ScrollView,
 } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';
 import { loginApi } from "../../utils/api";
 import { LoginScreenProps } from "../types";
@@ -138,6 +139,9 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
       const res = await loginApi({ name, email, password });
 
       if (res && res.EC === 0) {
+        await AsyncStorage.setItem("access_token", res.access_token); 
+        ///const token = await AsyncStorage.getItem("access_token");
+        //console.log('>>>Checkk Token ', token);
         setAlert({
           visible: true,
           type: 'success',
