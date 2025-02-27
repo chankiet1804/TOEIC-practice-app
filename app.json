@@ -4,10 +4,10 @@
     "slug": "quiz-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon-app.png",
+    "icon": "./assets/toeic-logo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/icon-app.png",
+      "image": "./assets/toeic-logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
@@ -10,6 +9,9 @@ import {
   Platform,
   Modal,
   Animated,
+  Image,
+  ScrollView,
+  StatusBar,
 } from 'react-native';
 //import { SafeAreaBox } from "../../components";
 //import axios from "../../utils/axios.customize";
@@ -21,6 +23,7 @@ interface FormData {
   email: string;
   name: string;
   password: string;
+  confirmPassword: string;
 }
 
 interface CustomAlertProps {
@@ -31,7 +34,7 @@ interface CustomAlertProps {
   onClose: () => void;
 }
 
-const CustomAlert: React.FC<CustomAlertProps> = ({ visible, type, message, onClose,navigation }) => {
+const CustomAlert: React.FC<CustomAlertProps> = ({ visible, type, message, onClose, navigation }) => {
   const [animation] = useState(new Animated.Value(0));
 
   React.useEffect(() => {
@@ -68,16 +71,17 @@ const CustomAlert: React.FC<CustomAlertProps> = ({ visible, type, message, onClo
             <Ionicons
               name={type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
               size={50}
-              color={type === 'success' ? '#fff' : '#fff'}
+              color="#fff"
             />
           </View>
           <Text style={styles.alertMessage}>{message}</Text>
           <TouchableOpacity
             style={styles.alertButton}
-            onPress={()=>
-              {
-              onClose(),
-              navigation.navigate("Home")
+            onPress={() => {
+              onClose();
+              if (type === 'success') {
+                navigation.navigate("Home");
+              }
             }}
           >
             <Text style={styles.alertButtonText}>OK</Text>
@@ -93,8 +97,10 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [alert, setAlert] = useState<{
     visible: boolean;
     type: 'success' | 'error';
@@ -105,28 +111,66 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
     message: '',
   });
 
-  const handleRegister = async (data:FormData) => {
-    // const {name,email,password} = data;
+  const validateForm = () => {
+    if (!formData.email || !formData.name || !formData.password || !formData.confirmPassword) {
+      setAlert({
+        visible: true,
+        type: 'error',
+        message: 'Vui lòng điền đầy đủ thông tin',
+      });
+      return false;
+    }
 
-    // const res = await createUserApi({name,email,password});
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setAlert({
+        visible: true,
+        type: 'error',
+        message: 'Email không hợp lệ',
+      });
+      return false;
+    }
 
-    // console.log('>>>Success register ', res);
+    if (formData.password.length < 6) {
+      setAlert({
+        visible: true,
+        type: 'error',
+        message: 'Mật khẩu phải có ít nhất 6 ký tự',
+      });
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setAlert({
+        visible: true,
+        type: 'error',
+        message: 'Mật khẩu xác nhận không khớp',
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleRegister = async () => {
+    if (!validateForm()) return;
+
     try {
-      const { name, email, password } = data;
+      const { name, email, password } = formData;
       const res = await createUserApi({ name, email, password });
       
       if (res) {
         setAlert({
           visible: true,
           type: 'success',
-          message: 'Đăng ký thành công! Chào mừng bạn đến với ứng dụng.',
+          message: 'Đăng ký thành công! Chào mừng bạn đến với ứng dụng TOEIC.',
         });
         setFormData({
           email: '',
           name: '',
           password: '',
+          confirmPassword: '',
         });
-        console.log('>>>Success register ', res);
       }
     } catch (error) {
       setAlert({
@@ -138,74 +182,106 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
     } 
   };
 
-
-  //console.log(">>> NoteScreen rendered");
-  //const [data, setData] = useState<any>(null);
-  // useEffect(() => {
-  //   const fetchHelloWorld = async () => {
-  //     try {
-  //       const res = await axios.get("/v1/api"); // Đổi localhost thành IP máy, 10.0.2.2 la ip cua android studio
-  //       console.log(">>> check res : ", res);
-  //       setData(res);
-  //     } catch (error) {
-  //       console.error(">>> API fetch error: ", error);
-  //     }
-  //   };
-  //   fetchHelloWorld();
-  // }, []);
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Đăng ký</Text>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={formData.email}
-            onChangeText={(text) => setFormData({ ...formData, email: text })}
-            keyboardType="email-address"
-            autoCapitalize="none"
+      <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.logoContainer}>
+          <Image 
+            source={require('../../../assets/toeic-logo.png')} 
+            style={styles.logo}
+            resizeMode="contain"
           />
+          <Text style={styles.appName}>TOEIC Learning</Text>
         </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Họ và tên"
-            value={formData.name}
-            onChangeText={(text) => setFormData({ ...formData, name: text })}
-          />
-        </View>
+        <View style={styles.formContainer}>
+          <Text style={styles.title}>Đăng ký tài khoản</Text>
+          <Text style={styles.subtitle}>Tạo tài khoản để tiếp cận các bài học TOEIC</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, { paddingRight: 50 }]}
-            placeholder="Mật khẩu"
-            value={formData.password}
-            onChangeText={(text) => setFormData({ ...formData, password: text })}
-            secureTextEntry={!showPassword}
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Ionicons
-              name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-              size={24}
-              color="#666"
+          <View style={styles.inputContainer}>
+            <Ionicons name="mail-outline" size={20} color="#4A7AFF" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={formData.email}
+              onChangeText={(text) => setFormData({ ...formData, email: text })}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              placeholderTextColor="#999"
             />
-          </TouchableOpacity>
-        </View>
+          </View>
 
-        <TouchableOpacity style={styles.button} onPress={()=>handleRegister(formData)}>
-          <Text style={styles.buttonText}>Đăng ký</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.inputContainer}>
+            <Ionicons name="person-outline" size={20} color="#4A7AFF" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Họ và tên"
+              value={formData.name}
+              onChangeText={(text) => setFormData({ ...formData, name: text })}
+              placeholderTextColor="#999"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Ionicons name="lock-closed-outline" size={20} color="#4A7AFF" style={styles.inputIcon} />
+            <TextInput
+              style={[styles.input, { paddingRight: 50 }]}
+              placeholder="Mật khẩu"
+              value={formData.password}
+              onChangeText={(text) => setFormData({ ...formData, password: text })}
+              secureTextEntry={!showPassword}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Ionicons
+                name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                size={22}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Ionicons name="lock-closed-outline" size={20} color="#4A7AFF" style={styles.inputIcon} />
+            <TextInput
+              style={[styles.input, { paddingRight: 50 }]}
+              placeholder="Xác nhận mật khẩu"
+              value={formData.confirmPassword}
+              onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
+              secureTextEntry={!showConfirmPassword}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              <Ionicons
+                name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
+                size={22}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>ĐĂNG KÝ</Text>
+          </TouchableOpacity>
+
+          <View style={styles.loginLinkContainer}>
+            <Text style={styles.loginText}>Đã có tài khoản? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}>
+              <Text style={styles.loginLink}>Đăng nhập</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
       <CustomAlert
         visible={alert.visible}
         type={alert.type}
@@ -215,62 +291,115 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
       />
     </KeyboardAvoidingView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
+    padding: 20,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  logo: {
+    width: 120,
+    height: 80,
+    marginBottom: 10,
+  },
+  appName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4A7AFF',
   },
   formContainer: {
-    padding: 20,
     backgroundColor: '#fff',
-    borderRadius: 10,
-    margin: 20,
+    borderRadius: 15,
+    padding: 25,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
     elevation: 5,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 20,
-    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 25,
   },
   inputContainer: {
-    marginBottom: 15,
+    marginBottom: 18,
     position: 'relative',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 10,
+    backgroundColor: '#f9f9f9',
+  },
+  inputIcon: {
+    marginLeft: 15,
+    marginRight: 5,
   },
   input: {
-    backgroundColor: '#f9f9f9',
+    flex: 1,
     padding: 15,
-    borderRadius: 8,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    color: '#333',
   },
   eyeIcon: {
     position: 'absolute',
-    right: 12,
-    top: 12,
+    right: 15,
+    height: '100%',
+    justifyContent: 'center',
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: '#4A7AFF',
+    padding: 16,
+    borderRadius: 10,
     marginTop: 10,
+    elevation: 2,
+    shadowColor: '#4A7AFF',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   buttonText: {
     color: '#fff',
     textAlign: 'center',
     fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  loginLinkContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  loginText: {
+    color: '#666',
+    fontSize: 14,
+  },
+  loginLink: {
+    color: '#4A7AFF',
+    fontSize: 14,
     fontWeight: 'bold',
   },
   // Styles cho Custom Alert
@@ -282,24 +411,23 @@ const styles = StyleSheet.create({
   },
   alertContainer: {
     width: '80%',
-    backgroundColor: '#fff',
     borderRadius: 15,
-    padding: 20,
+    padding: 25,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
   },
   successAlert: {
     backgroundColor: '#4CAF50',
   },
   errorAlert: {
-    backgroundColor: '#f44336',
+    backgroundColor: '#ff5252',
   },
   alertIconContainer: {
     marginBottom: 15,
@@ -309,19 +437,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 20,
-    lineHeight: 22,
+    lineHeight: 24,
+    fontWeight: '500',
   },
   alertButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 25,
     borderWidth: 1,
-    borderColor: '#fff',
+    borderColor: 'rgba(255, 255, 255, 0.5)',
   },
   alertButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
   },
 });

@@ -9,9 +9,11 @@ import {
   Platform,
   Modal,
   Animated,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
 } from 'react-native';
-//import { SafeAreaBox } from "../../components";
-//import axios from "../../utils/axios.customize";
 import { Ionicons } from '@expo/vector-icons';
 import { loginApi } from "../../utils/api";
 import { LoginScreenProps } from "../types";
@@ -27,11 +29,11 @@ interface CustomAlertProps {
   type: 'success' | 'error';
   message: string;
   navigation: LoginScreenProps["navigation"];
-  EC:number;
+  EC: number;
   onClose: () => void;
 }
 
-const CustomAlert: React.FC<CustomAlertProps> = ({ visible, type, message, onClose,navigation,EC }) => {
+const CustomAlert: React.FC<CustomAlertProps> = ({ visible, type, message, onClose, navigation, EC }) => {
   const [animation] = useState(new Animated.Value(0));
 
   React.useEffect(() => {
@@ -68,20 +70,18 @@ const CustomAlert: React.FC<CustomAlertProps> = ({ visible, type, message, onClo
             <Ionicons
               name={type === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline'}
               size={50}
-              color={type === 'success' ? '#fff' : '#fff'}
+              color="#fff"
             />
           </View>
           <Text style={styles.alertMessage}>{message}</Text>
           <TouchableOpacity
             style={styles.alertButton}
-            onPress={()=>
-              {
+            onPress={() => {
               onClose();
-              if(EC===0){
-                navigation.navigate("Home")
+              if (EC === 0) {
+                navigation.navigate("Home");
               }
             }}
-            
           >
             <Text style={styles.alertButtonText}>OK</Text>
           </TouchableOpacity>
@@ -91,50 +91,67 @@ const CustomAlert: React.FC<CustomAlertProps> = ({ visible, type, message, onClo
   );
 };
 
-
-
 export function LoginScreen({ navigation }: LoginScreenProps) {
   const [formData, setFormData] = useState<FormData>({
-      email: '',
-      password: '',
-      name: '',
-    });
+    email: '',
+    password: '',
+    name: '',
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [alert, setAlert] = useState<{
     visible: boolean;
     type: 'success' | 'error';
     message: string;
-    EC:number;
+    EC: number;
   }>({
     visible: false,
     type: 'success',
     message: '',
-    EC:1,
+    EC: 1,
   });
 
-  const handleLogin = async (data:FormData) => {
-
+  const handleLogin = async (data: FormData) => {
     try {
       const { name, email, password } = data;
-      const res = await loginApi( { name, email, password } );
       
+      // Validation
+      if (!email.trim()) {
+        setAlert({
+          visible: true,
+          type: 'error',
+          message: 'Vui lòng nhập email',
+          EC: 1,
+        });
+        return;
+      }
+      
+      if (!password.trim()) {
+        setAlert({
+          visible: true,
+          type: 'error',
+          message: 'Vui lòng nhập mật khẩu',
+          EC: 1,
+        });
+        return;
+      }
+      
+      const res = await loginApi({ name, email, password });
+
       if (res && res.EC === 0) {
-        
         setAlert({
           visible: true,
           type: 'success',
           message: 'Đăng nhập thành công! Chào mừng bạn đến với ứng dụng.',
-          EC:0,
-
+          EC: 0,
         });
         console.log('>>>Success login ', res);
       }
-      else if (res && res.EC){
+      else if (res && res.EC) {
         setAlert({
           visible: true,
           type: 'error',
           message: 'Thông tin đăng nhập không chính xác. Vui lòng thử lại!',
-          EC:1,
+          EC: 1,
         });
         console.log('>>>check login ', res);
       }
@@ -143,22 +160,39 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         visible: true,
         type: 'error',
         message: 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại!',
-        EC:1,
+        EC: 1,
       });
-      
+
       console.error('Login error:', error);
-    } 
+    }
   };
 
   return (
-    <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.container}
-        >
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('../../../assets/toeic-logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+           
+            <Text style={styles.appTitle}>TOEIC Practice</Text>
+            <Text style={styles.appSlogan}>Luyện thi TOEIC hiệu quả</Text>
+          </View>
+
           <View style={styles.formContainer}>
             <Text style={styles.title}>Đăng nhập</Text>
-    
+
             <View style={styles.inputContainer}>
+              <View style={styles.inputIconContainer}>
+                <Ionicons name="mail-outline" size={22} color="#5D7EBC" />
+              </View>
               <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -166,17 +200,21 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
                 onChangeText={(text) => setFormData({ ...formData, email: text })}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                placeholderTextColor="#a0a0a0"
               />
             </View>
-    
-    
+
             <View style={styles.inputContainer}>
+              <View style={styles.inputIconContainer}>
+                <Ionicons name="lock-closed-outline" size={22} color="#5D7EBC" />
+              </View>
               <TextInput
                 style={[styles.input, { paddingRight: 50 }]}
                 placeholder="Mật khẩu"
                 value={formData.password}
                 onChangeText={(text) => setFormData({ ...formData, password: text })}
                 secureTextEntry={!showPassword}
+                placeholderTextColor="#a0a0a0"
               />
               <TouchableOpacity
                 style={styles.eyeIcon}
@@ -185,18 +223,48 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
                 <Ionicons
                   name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                   size={24}
-                  color="#666"
+                  color="#5D7EBC"
                 />
               </TouchableOpacity>
             </View>
-    
-            <TouchableOpacity style={styles.button} onPress={()=>handleLogin(formData)}>
-              <Text style={styles.buttonText}>Đăng nhập</Text>
+            
+            <TouchableOpacity style={styles.forgotPasswordButton}>
+              <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate("RegisterScreen")}>
-                <Text style={styles.registerButtonText}>Chưa có tài khoản? Đăng ký ngay</Text>
+
+            <TouchableOpacity 
+              style={styles.loginButton} 
+              onPress={() => handleLogin(formData)}
+            >
+              <Text style={styles.loginButtonText}>Đăng nhập</Text>
             </TouchableOpacity>
+
+            <View style={styles.dividerContainer}>
+              <View style={styles.divider} />
+              <Text style={styles.dividerText}>Hoặc</Text>
+              <View style={styles.divider} />
+            </View>
+
+            <View style={styles.socialLoginContainer}>
+              <TouchableOpacity style={styles.socialButton}>
+                <Ionicons name="logo-google" size={24} color="#DB4437" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <Ionicons name="logo-facebook" size={24} color="#4267B2" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <Ionicons name="logo-apple" size={24} color="#000000" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.registerContainer}>
+              <Text style={styles.registerText}>Chưa có tài khoản? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate("RegisterScreen")}>
+                <Text style={styles.registerLink}>Đăng ký ngay</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+
           <CustomAlert
             visible={alert.visible}
             type={alert.type}
@@ -205,65 +273,165 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
             onClose={() => setAlert(prev => ({ ...prev, visible: false }))}
             EC={alert.EC}
           />
-        </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#ffffff',
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 10,
+  },
+  appTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#3F5CA8',
+    marginBottom: 5,
+  },
+  appSlogan: {
+    fontSize: 16,
+    color: '#888888',
+  },
   formContainer: {
-    padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    margin: 20,
+    paddingHorizontal: 25,
+    paddingVertical: 30,
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    marginHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
     elevation: 5,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
+    color: '#333333',
+    marginBottom: 30,
     textAlign: 'center',
   },
   inputContainer: {
-    marginBottom: 15,
+    marginBottom: 20,
     position: 'relative',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    backgroundColor: '#F5F7FA',
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+  },
+  inputIconContainer: {
+    paddingHorizontal: 12,
   },
   input: {
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    borderRadius: 8,
+    flex: 1,
+    paddingVertical: 15,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    color: '#333333',
   },
   eyeIcon: {
     position: 'absolute',
     right: 12,
-    top: 12,
+    height: '100%',
+    justifyContent: 'center',
   },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 10,
+  forgotPasswordButton: {
+    alignSelf: 'flex-end',
+    marginBottom: 25,
   },
-  buttonText: {
-    color: '#fff',
+  forgotPasswordText: {
+    color: '#5D7EBC',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  loginButton: {
+    backgroundColor: '#5D7EBC',
+    borderRadius: 12,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginBottom: 20,
+    elevation: 3,
+    shadowColor: '#5D7EBC',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  loginButtonText: {
+    color: '#ffffff',
     textAlign: 'center',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E8E8E8',
+  },
+  dividerText: {
+    paddingHorizontal: 15,
+    color: '#888888',
+    fontSize: 14,
+  },
+  socialLoginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 25,
+  },
+  socialButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#F5F7FA',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  registerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  registerText: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  registerLink: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#5D7EBC',
   },
   // Styles cho Custom Alert
   modalOverlay: {
@@ -275,17 +443,17 @@ const styles = StyleSheet.create({
   alertContainer: {
     width: '80%',
     backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 20,
+    borderRadius: 20,
+    padding: 25,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
   },
   successAlert: {
     backgroundColor: '#4CAF50',
@@ -301,38 +469,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 20,
-    lineHeight: 22,
+    lineHeight: 24,
+    fontWeight: '500',
   },
   alertButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 30,
     borderWidth: 1,
     borderColor: '#fff',
   },
   alertButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '500',
-  },
-  registerButton: {
-    backgroundColor: '#3498db',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginVertical: 15,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3
-  },
-  registerButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
     fontWeight: '600',
-    textAlign: 'center'
-  }
+  },
 });
