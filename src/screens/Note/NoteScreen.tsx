@@ -1,28 +1,29 @@
+
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaBox } from "../../components";
 import { ActivityIndicator } from "react-native";
-import { getUserApi } from "../../utils/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAnswerSPApi } from "../../utils/api";
+import { useAuth } from "../../components/Context/auth.context";
 
-interface User {
-  _id: string;
-  email: string;
-  name: string;
-  role: string;
+interface AnswerSP {
+  QuestionID : string,
+  RecordingPath : string,
+  ContentOfSpeaking : string
 }
 
 export function NoteScreen() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [answer, setAnswer] = useState<AnswerSP>();
   const [loading, setLoading] = useState(true);
-
+  const {auth} = useAuth();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getUserApi();
-        //console.log("Dữ liệu người dùng:", data);
-        setUsers(data);
+        
+        const data = await getAnswerSPApi(auth?.userId,"1_1_1");
+        console.log("Dữ liệu cau tra loi:", data);
+        setAnswer(data);
         // const AT = await AsyncStorage.getItem("access_token");
         // console.log(">>> Check access_token:", AT);
       } catch (error) {
@@ -31,7 +32,7 @@ export function NoteScreen() {
         setLoading(false);
       }
     };
-    fetchUser();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -47,18 +48,13 @@ export function NoteScreen() {
   return (
     <SafeAreaBox>
       <View style={styles.container}>
-        <Text style={styles.title}>Danh sách người dùng</Text>
-        <FlatList
-          data={users}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.email}>{item.email}</Text>
-              <Text style={styles.role}>{item.role}</Text>
-            </View>
-          )}
-        />
+        <Text style={styles.title}>Question</Text>
+        <Text>{answer?.QuestionID}</Text>
+        <Text>{answer?.RecordingPath}</Text>
+        <Text>{answer?.ContentOfSpeaking}</Text>
+        <Text>{auth?.userId}</Text>
+        <Text>{auth?.name}</Text>
+        <Text>{auth?.email}</Text>
       </View>
     </SafeAreaBox>
   );

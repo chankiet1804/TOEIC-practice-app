@@ -25,6 +25,7 @@ import { VocabularyScreen } from './src/screens/Vocabulary';
 import { LoginScreen } from "./src/screens/Login&Register";
 import { RegisterScreen } from "./src/screens/Login&Register";
 
+import { AuthWrapper } from "./src/components/Context/auth.context";
 
 import 'expo-dev-client';
 import 'react-native-gesture-handler';
@@ -236,12 +237,14 @@ function MainStack() {
 
 export default function App() {
   return (
-    <DatabaseProvider>
-      <DatabaseStateHandler>
-        <NavigationContainer>
-          <MainStack />
-        </NavigationContainer>
-      </DatabaseStateHandler>
-    </DatabaseProvider>
+    <AuthWrapper>
+      <DatabaseProvider>
+        <DatabaseStateHandler>
+          <NavigationContainer>
+            <MainStack />
+          </NavigationContainer>
+        </DatabaseStateHandler>
+      </DatabaseProvider>
+    </AuthWrapper>
   );
 }

@@ -5,56 +5,67 @@ import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from '../../../types';
 import { RouteProp } from '@react-navigation/native';
-import { getDBConnection, getQuestionById, getRecording } from '../../../../database/db-service';
+//import { getDBConnection, getQuestionById, getRecording } from '../../../../database/db-service';
 import { CountdownTimer } from '../../../../components/CountdownTimer';
 import { SPEAKING_IMAGES } from '../../../../database/images';
-import { saveRecordingInfo, getContentOfSpeaking,saveContentOfSpeaking } from '../../../../database/db-service';
+//import { saveRecordingInfo, getContentOfSpeaking,saveContentOfSpeaking } from '../../../../database/db-service';
 import { Audio } from 'expo-av';
 
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../../../firebase';  
+//import { collection, query, where, getDocs } from 'firebase/firestore';
+//import { db } from '../../../../firebase';  
 
 import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
 } from "expo-speech-recognition";
 
+import { useAuth } from "../../../../components/Context/auth.context";
+import { getQuestionSPApi,saveAnswerSPApi,getAnswerSPApi } from '../../../../utils/api';
+
 type TestScreenRouteProp = RouteProp<HomeStackParamList, 'TestScreen'>;
 
-interface Question {
-  QuestionID: string;
-  PartID: string;
-  QuestionType: string;
-  Content1: string | null;
-  Content2: string | null;
-  ImagePath1: keyof typeof SPEAKING_IMAGES ;
-  ImagePath2: keyof typeof SPEAKING_IMAGES ;
-  Question1: string | null;
-  Question2: string | null;
-  Question3: string | null;
-  //PreparationTime: number;
-  ResponseTime: number;
+
+interface QuestionSP {
+  QuestionID : string,
+  QuestionType : string,
+  Content1 : string | null,
+  Content2 : string | null,
+  ImagePath1 : string | null,
+  ImagePath2 : string | null,
+  Question1 : string | null,
+  Question2 : string | null,
+  Question3 : string | null,
+  PreparationTime : number,
+  ResponseTime : number,
 }
 
-interface RecordingPath {
-  filePath: string;
+interface AnswerSP {
+  UserID : string
+  QuestionID : string,
+  RecordingPath : string,
+  ContentOfSpeaking : string
 }
+
 
 export function TestScreen({ navigation }: any) {
   const route = useRoute<TestScreenRouteProp>();
   const { testId, PartNumber } = route.params;
-  const [question, setQuestion] = useState<Question | null>(null);
+  const [question, setQuestion] = useState<QuestionSP | null>();
+  const [answer, setAnswer] = useState<AnswerSP | null>();
   const [loading, setLoading] = useState(true);
   const [selectedContent, setSelectedContent] = useState<1 | 2 | 3>(1);
-  const [dbConnection, setDbConnection] = useState<SQLite.SQLiteDatabase | null>(null);
+  //const [dbConnection, setDbConnection] = useState<SQLite.SQLiteDatabase | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recording, setRecording] = useState<Audio.Recording | undefined>();
-  const [recordingPath, setRecordingPath] = useState<string>('');
+  //const [recordingPath, setRecordingPath] = useState<string>('');
   const [isDisabled, setIsDisabled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | undefined>(undefined);
   const [contentOfSpeaking, setContentOfSpeaking] = useState<string>('');
   const [modalVisible, setModalVisible] = useState(false);
+
+  const questionID = `${testId}_${PartNumber}`;
+  const {auth} = useAuth();
 
   useSpeechRecognitionEvent("start", () => setIsRecording(true));
   useSpeechRecognitionEvent("end", () => setIsRecording(false));
@@ -62,113 +73,53 @@ export function TestScreen({ navigation }: any) {
     if (event.results[0]?.transcript) {
       const newTranscript = event.results[0].transcript;      
       setContentOfSpeaking(newTranscript.trim());
+      console.log("Recognized Speech:", newTranscript.trim());
     }
   });
   useSpeechRecognitionEvent("error", (event) => {
     console.log("error code:", event.error, "error message:", event.message);
   });
 
+  
   useEffect(() => {
-    const loadQuestion = async () => {
+    const fetchQuestion = async () => {
       try {
-        const dbase = await getDBConnection();
-        setDbConnection(dbase);
-        
-        // Format questionId: TestID_PartNumber
-        const questionId = `${testId}_${PartNumber}_SP`; 
-        //const questionData = await getQuestionById(db, questionId);
-        const q = query(
-          collection(db, 'question'),
-          where('questionID', '==', questionId),
-          //orderBy('order', 'asc')
-        );
-        const querySnapshot = await getDocs(q);
-        const questionData = querySnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            QuestionID: data.questionID, // hoặc data.QuestionID nếu bạn có sẵn field này
-            PartID: data.PartID,
-            //QuestionType: data.questionType,
-            QuestionType : (
-              PartNumber === '1' ? "text" :
-              PartNumber === '2' ? "image" :
-              PartNumber === '3' ? "passage" :
-              PartNumber === '4' ? "imageWithQuestion" :
-              PartNumber === '5' ? "topic" :
-              null ),
-
-            Content1: data.content1 || null,
-            Content2: data.content2 || null,
-            ImagePath1: data.imagePath1 || null,
-            ImagePath2: data.imagePath2 || null,
-            Question1: data.question1 || null,
-            Question2: data.question2 || null,
-            Question3: data.question3 || null,
-            //PreparationTime: data.preparationTime,
-            //ResponseTime: data.responseTime
-            ResponseTime : (
-              PartNumber === '1' ? 45 :
-              PartNumber === '2' ? 45 :
-              PartNumber === '3' ? 15 :
-              PartNumber === '4' ? 15 :
-              PartNumber === '5' ? 60 :
-              null ),
-          
-          } as Question;
-        });
-        if (questionData.length > 0) {
-          setQuestion(questionData[0]);
-        } else {
-          setQuestion(null);
-        }
+        setLoading(true);
+        const data = await getQuestionSPApi(questionID);
+        console.log("Dữ liệu cau hoi:", data);
+        setQuestion(data);
+        // const AT = await AsyncStorage.getItem("access_token");
+        // console.log(">>> Check access_token:", AT);
       } catch (error) {
-        console.error('Error loading question:', error);
-        setQuestion(null);
+        console.error("Lỗi tải dữ liệu:", error);
       } finally {
         setLoading(false);
       }
     };
-    loadQuestion();
-  }, [testId, PartNumber]);
-
-  const loadRecordings = async () => {
-    const dbase = await getDBConnection();
-    if (dbase) {     
-        const Paths = await getRecording(dbase, testId.toString(), Number(PartNumber), selectedContent) as RecordingPath[]; 
-        if(Paths.length > 0){
-          const path = Paths[0].filePath;
-          console.log('Loaded recording successfully:', path);
-          setRecordingPath(path);
-        }
-        else{
-          console.log('No recordings available to play.');
-          setRecordingPath('');
-        }
-      } 
-      else {
-        console.log('Fail to load recording');
-      }
-  };
-
-  // const loadContentOfSpeaking = async () => {
-  //   const dbase = await getDBConnection();
-  //   if (dbase) {         
-  //     const quesid = `${testId}_${PartNumber}_${selectedContent}`;
-  //     const content = await getContentOfSpeaking(dbase, quesid) as string[];
-  //     console.log("Loadded content of speaking successfully:");
-  //     setContentOfSpeaking(content[0]);   
-  //   } 
-  //   else {
-  //     console.log('Fail to load recording');
-  //   }
-  // };
-
-
+    fetchQuestion();
+  }, []);
 
   useEffect(() => {
-    loadRecordings();
-    //loadContentOfSpeaking();
-  },[testId, PartNumber,selectedContent]);
+    const fetchAnswer = async () => {
+      try{
+        setLoading(true);
+        const answerID = `${questionID}_${selectedContent}`
+        const data = await getAnswerSPApi(auth?.userId,answerID)
+        if(data){
+          console.log("Dữ liệu cau tra loi:", data);
+          setAnswer(data);
+        }
+        else{
+          console.log("Khong co du lieu cau tra loi")
+        }
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnswer();
+  },[selectedContent]);
 
 
   if (loading) {
@@ -209,7 +160,6 @@ export function TestScreen({ navigation }: any) {
         setRecording(recording);
         setIsRecording(true);
         setIsDisabled(true);
-        //handleStartRecognize();
         handleStartRecognize();
       }
     } catch (err) {
@@ -217,42 +167,31 @@ export function TestScreen({ navigation }: any) {
     }
   };
 
-  const handleStopRecording = async () => {
-    if (!recording) return;
-    handleStopRecognize();
-    //console.log("Content of speaking: "+contentOfSpeaking);
-    //loadContentOfSpeaking();
-    setContentOfSpeaking('');
-    setIsRecording(false);
-    await recording.stopAndUnloadAsync();
 
-    const uri = recording.getURI();
-    if (!uri) return;
+const handleStopRecording = async () => {
+  if (!recording) return;
+  handleStopRecognize();
+  
+  setIsRecording(false);
+  await recording.stopAndUnloadAsync();
 
-    // Lưu thông tin ghi âm vào cơ sở dữ liệu
-    const createdAt = new Date().toISOString(); // Lấy thời gian hiện tại
-    const questionNumber = selectedContent; // Sử dụng selectedContent làm questionNumber
+  const uri = recording.getURI();
+  if (!uri) return;
 
-    // Tạo tên file theo định dạng testId_partNumber_questionNumber
-    const fileName = `${testId}_${PartNumber}_${questionNumber}.m4a`; // Định dạng tên file
-    
-    if (dbConnection) {
-      // luu file ghi am
-      await saveRecordingInfo(dbConnection, {
-        testId: Number(testId),
-        partNumber: Number(PartNumber),
-        questionNumber: questionNumber,
-        fileName: fileName,
-        filePath: uri,
-        createdAt: createdAt
-      });
-      
-    }
-    console.log('Recording saved successfully:', fileName);   
-    setRecording(undefined);
-    
-    setIsDisabled(false); // cho phep su dung cac nut khi dung ghi am
-    loadRecordings(); // Load lai moi khi ghi am xong
+  // Lưu thông tin ghi âm vào cơ sở dữ liệu
+  const id = `${questionID}_${selectedContent}`
+  setAnswer({
+    UserID : auth?.userId as string,
+    QuestionID:id,  
+    RecordingPath: uri, 
+    ContentOfSpeaking: contentOfSpeaking
+  })
+  const res = await saveAnswerSPApi(auth?.userId as string,id,uri,contentOfSpeaking)
+  console.log(">>>check data : ", res)  
+  setRecording(undefined);
+  setContentOfSpeaking('');
+  setIsDisabled(false); // cho phep su dung cac nut khi dung ghi am
+  //loadRecordings(); // Load lai moi khi ghi am xong
 };
 
   const playRecording = async (filePath: string) => {
@@ -304,29 +243,8 @@ const handleStartRecognize = async () => {
 
 const handleStopRecognize = async () => {
   ExpoSpeechRecognitionModule.stop();
+  console.log(">>>check conten of speaking : ", contentOfSpeaking);
 };
-
-// const saveContent = async (quesid:string,content:string) => {
-//   const dbase = await getDBConnection();
-//   await saveContentOfSpeaking(dbase,quesid,content);
-// };
-
-// const getContent = async (quesid:string) => {
-//   const dbase = await getDBConnection();
-//   const result = await getContentOfSpeaking(dbase,quesid) as any[];
-//   // console.log("Loadded content of speaking successfully");
-//   // return content[0].content;
-//   if (result.length > 0) {
-//     // Lấy giá trị của cột Content từ đối tượng đầu tiên
-//     const content = result[0].Content as string; 
-//     console.log('CONTENT GETTED FROM DATABASE:', content); // In nội dung cụ thể
-//     return content;
-//   } else {
-//     console.log('No content found for the given AnswerID.');
-//     return null; // Không có dữ liệu
-//   }
-// };
-
 
 
   return (
@@ -427,10 +345,11 @@ const handleStopRecognize = async () => {
               </View>
 
               <View style={styles.imageContainer}>
+                
                 {selectedContent === 1 ? (
                   question.ImagePath1 && (
                     <Image
-                      source={SPEAKING_IMAGES[question.ImagePath1]}
+                      source={SPEAKING_IMAGES[question.ImagePath1 as keyof typeof SPEAKING_IMAGES]}
                       style={styles.image}
                       resizeMode="contain"
                     />
@@ -438,7 +357,7 @@ const handleStopRecognize = async () => {
                 ) : (
                   question.ImagePath2 && (
                     <Image
-                      source={SPEAKING_IMAGES[question.ImagePath2]}
+                      source={SPEAKING_IMAGES[question.ImagePath2 as keyof typeof SPEAKING_IMAGES]}
                       style={styles.image}
                       resizeMode="contain"
                     />
@@ -577,7 +496,7 @@ const handleStopRecognize = async () => {
             >
               <View style={styles.part4ImageWrapper}>
                 <Image
-                  source={SPEAKING_IMAGES[question.ImagePath1]}
+                  source={SPEAKING_IMAGES[question.ImagePath1 as keyof typeof SPEAKING_IMAGES]}
                   style={styles.part4Image}
                   resizeMode="contain"
                 />
@@ -610,7 +529,7 @@ const handleStopRecognize = async () => {
         </ScrollView>
       </View>
       
-      {!isRecording && recordingPath !== '' && (
+      {!isRecording && answer?.RecordingPath && (
         <View>
         <TouchableOpacity 
         style={styles.playButton}
@@ -618,7 +537,7 @@ const handleStopRecognize = async () => {
           if (isPlaying) {
             handleStopPlaying(); // Nếu đang phát, dừng phát
           } else {
-            playRecording(recordingPath); // Nếu không, phát lại
+            playRecording(answer.RecordingPath); // Nếu không, phát lại
           }
         }}
         disabled={isRecording} // Vô hiệu hóa nút nếu dang ghi am 
@@ -632,11 +551,7 @@ const handleStopRecognize = async () => {
       <TouchableOpacity 
         style={styles.playButton}
         onPress={() => {
-          setModalVisible(true)
-          console.log(contentOfSpeaking);    
-          // luu noi dung ghi am
-          //const quesid = `${testId}_${PartNumber}_${selectedContent}`;
-          //saveContent(quesid,contentOfSpeaking);   
+          setModalVisible(true)  
           }
         }  
       >
@@ -664,7 +579,7 @@ const handleStopRecognize = async () => {
             </View>
             
             <ScrollView style={styles.contentContainer}>
-              <Text style={styles.contentText}>{contentOfSpeaking}</Text>
+              <Text style={styles.contentText}>{answer.ContentOfSpeaking}</Text>
             </ScrollView>
 
             <TouchableOpacity

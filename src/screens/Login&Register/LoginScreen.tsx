@@ -18,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';
 import { loginApi } from "../../utils/api";
 import { LoginScreenProps } from "../types";
+import { useAuth } from "../../components/Context/auth.context";
 
 interface FormData {
   email: string;
@@ -93,6 +94,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({ visible, type, message, onClo
 };
 
 export function LoginScreen({ navigation }: LoginScreenProps) {
+  const { setAuth } = useAuth();
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -148,7 +150,15 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
           message: 'Đăng nhập thành công! Chào mừng bạn đến với ứng dụng.',
           EC: 0,
         });
+        setAuth({
+          userId: res.user.userId,
+          email: res.user.email,
+          name: res.user.name
+      });
+        
+        formData.password = '';
         console.log('>>>Success login ', res);
+        //console.log('>>>Check auth ',res.user )
       }
       else if (res && res.EC) {
         setAlert({
