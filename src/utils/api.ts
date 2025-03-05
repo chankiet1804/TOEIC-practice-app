@@ -31,7 +31,7 @@ interface User {
     role: string;
 }
 
-interface QuestionSP {
+interface Question {
     QuestionID : string,
     QuestionType : string,
     Content1 : string,
@@ -50,6 +50,13 @@ interface AnswerSP {
     QuestionID : string,
     RecordingPath : string,
     ContentOfSpeaking : string
+}
+
+interface AnswerWR {
+    UserID : string
+    QuestionID : string,
+    Content : string,
+    Feedback : string
 }
 
 
@@ -71,7 +78,7 @@ const getUserApi = async (): Promise<User[]> => {
     //console.log("API Response:", response);
 };
 
-const getQuestionSPApi = async (questionid:any): Promise<QuestionSP> => {
+const getQuestionSPApi = async (questionid:any): Promise<Question> => {
     const URL_API = "v1/api/question/speaking";
     return await axios.get(URL_API, { params: { QuestionID: questionid } });
 }
@@ -86,6 +93,21 @@ const saveAnswerSPApi = async (UserID:any,QuestionID:any,RecordingPath:any,Conte
     return axios.post(URL_API,{UserID,QuestionID,RecordingPath,ContentOfSpeaking})
 }
 
+const getQuestionWRApi = async (questionid:any): Promise<Question> => {
+    const URL_API = "v1/api/question/writing";
+    return await axios.get(URL_API, { params: { QuestionID: questionid } });
+}
+
+const getAnswerWRApi = async (userID:any, questionID:any) : Promise<AnswerWR> => {
+    const URL_API = "v1/api/answer/writing";
+    return await axios.get(URL_API, { params: { UserID: userID,QuestionID: questionID } });
+}
+
+const saveAnswerWRApi = async (UserID:any,QuestionID:any,Content:any,Feedback:any) => {
+    const URL_API = "v1/api/answer/create/writing";
+    return axios.post(URL_API,{UserID,QuestionID,Content,Feedback})
+}
+
 export {
-    createUserApi,loginApi,getUserApi,getQuestionSPApi,getAnswerSPApi,saveAnswerSPApi
+    createUserApi,loginApi,getUserApi,getQuestionSPApi,getAnswerSPApi,saveAnswerSPApi,getQuestionWRApi,getAnswerWRApi,saveAnswerWRApi
 }

@@ -15,6 +15,9 @@ import Foundation from '@expo/vector-icons/Foundation';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../../firebase'; 
 
+import { useAuth } from "../../../../components/Context/auth.context";
+import { getQuestionWRApi,saveAnswerWRApi,getAnswerWRApi } from '../../../../utils/api';
+
 type TestScreenWRRouteProp = RouteProp<HomeStackParamList, 'TestScreenWR'>;
 
 interface Question {
@@ -31,12 +34,33 @@ interface Question {
   ResponseTime: number;
 }
 
+interface QuestionWR {
+  QuestionID : string,
+  QuestionType : string,
+  Content1 : string | null,
+  Content2 : string | null,
+  ImagePath1 : string | null,
+  ImagePath2 : string | null,
+  Question1 : string | null,
+  Question2 : string | null,
+  PreparationTime : number,
+  ResponseTime : number,
+}
+
+interface AnswerWR {
+  UserID : string
+  QuestionID : string,
+  Content : string,
+  Feedback : string | null
+}
+
 
 
 export function TestScreenWR({ navigation }: TestScreenWRProps) {
   const route = useRoute<TestScreenWRRouteProp>();
   const { testId, PartNumber } = route.params;
-  const [question, setQuestion] = useState<Question | null>(null);
+  const [question, setQuestion] = useState<QuestionWR | null>(null);
+  const [answer,setAnswer] = useState<AnswerWR | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedContent, setSelectedContent] = useState<1 | 2 | 3>(1);
   const [dbConnection, setDbConnection] = useState<SQLite.SQLiteDatabase | null>(null);
@@ -51,84 +75,145 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
   const [outline, setOutline] = useState('');
   //const [ansWR, setWR] = useState('');
   
+  const questionID = `${testId}_${PartNumber}`;
+  const {auth} = useAuth();
   
 
+  // useEffect(() => {
+  //   const loadQuestion = async () => {
+  //     try {
+  //       const dbase = await getDBConnection();
+  //       setDbConnection(dbase);
+  //       // Format questionId: TestID_PartNumber
+  //       const questionId = `${testId}_${PartNumber}_WR`;
+  //       //const questionData = await getWRQuestionById(db, questionId);
+        
+  //       //load answer chung voi load cau hoi
+  //       const answerID = `${testId}_${PartNumber}_1_WR`; // lay ID cua cau hoi 1 
+  //       const answerWR = await getAnswerWR(dbase,answerID);
+  //       if(answerWR.length !== 0){ // neu da thay cau tra loi cua cau hoi nay roi
+  //         setSubmitted(true); // bat bien da nop bai len
+  //         if(PartNumber==='1' || PartNumber==='2'){
+  //           const ansID1= testId + '_' + PartNumber +'_1_WR';
+  //           const ansID2= testId + '_' + PartNumber +'_2_WR';
+  //           const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
+  //           const result2 = await getAnswerWR(dbase, ansID2) as { Content: string }[];
+  //           setAnswer1(result1.length > 0 ? result1[0].Content : '');
+  //           setAnswer2(result2.length > 0 ? result2[0].Content : '');           
+  //         }
+  //         else{
+  //           const ansID1= testId + '_' + PartNumber +'_1_WR';
+  //           const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
+  //           setAnswer3(result1.length > 0 ? result1[0].Content : '');
+  //         }
+  //       }
+
+  //       const q = query(
+  //         collection(db, 'questionWR'),
+  //         where('questionID', '==', questionId),
+  //         //orderBy('order', 'asc')
+  //       );
+  //       const querySnapshot = await getDocs(q);
+  //       const questionData = querySnapshot.docs.map(doc => {
+  //       const data = doc.data();
+  //       return {
+  //         QuestionID: data.questionID, // hoặc data.QuestionID nếu bạn có sẵn field này
+  //         PartID: data.PartID,
+  //         //QuestionType: data.questionType,
+  //         QuestionType : (
+  //           PartNumber === '1' ? "image" :
+  //           PartNumber === '2' ? "email" :
+  //           PartNumber === '3' ? "essay" :
+  //           null ),
+
+  //         Content1: data.content1 || null,
+  //         Content2: data.content2 || null,
+  //         ImagePath1: data.imagePath1 || null,
+  //         ImagePath2: data.imagePath2 || null,
+  //         Require1 : data.require1 || null,
+  //         Require2 : data.require2 || null,
+  //         //PreparationTime: data.preparationTime,
+  //         //ResponseTime: data.responseTime
+  //         ResponseTime : (
+  //           PartNumber === '1' ? 600 :
+  //           PartNumber === '2' ? 1200 :
+  //           PartNumber === '3' ? 1800 :
+  //           null ),
+        
+  //       } as Question;
+  //       });
+  //       if (questionData.length > 0) {
+  //         setQuestion(questionData[0]);
+  //       } else {
+  //         setQuestion(null);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error loading question:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   loadQuestion();
+  // }, [testId, PartNumber]);
+
   useEffect(() => {
-    const loadQuestion = async () => {
+    const fetchQuestion = async () => {
       try {
-        const dbase = await getDBConnection();
-        setDbConnection(dbase);
-        // Format questionId: TestID_PartNumber
-        const questionId = `${testId}_${PartNumber}_WR`;
-        //const questionData = await getWRQuestionById(db, questionId);
-        
-        //load answer chung voi load cau hoi
-        const answerID = `${testId}_${PartNumber}_1_WR`; // lay ID cua cau hoi 1 
-        const answerWR = await getAnswerWR(dbase,answerID);
-        if(answerWR.length !== 0){ // neu da thay cau tra loi cua cau hoi nay roi
-          setSubmitted(true); // bat bien da nop bai len
-          if(PartNumber==='1' || PartNumber==='2'){
-            const ansID1= testId + '_' + PartNumber +'_1_WR';
-            const ansID2= testId + '_' + PartNumber +'_2_WR';
-            const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
-            const result2 = await getAnswerWR(dbase, ansID2) as { Content: string }[];
-            setAnswer1(result1.length > 0 ? result1[0].Content : '');
-            setAnswer2(result2.length > 0 ? result2[0].Content : '');           
-          }
-          else{
-            const ansID1= testId + '_' + PartNumber +'_1_WR';
-            const result1 = await getAnswerWR(dbase, ansID1) as { Content: string }[];
-            setAnswer3(result1.length > 0 ? result1[0].Content : '');
-          }
-        }
-
-        const q = query(
-          collection(db, 'questionWR'),
-          where('questionID', '==', questionId),
-          //orderBy('order', 'asc')
-        );
-        const querySnapshot = await getDocs(q);
-        const questionData = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          QuestionID: data.questionID, // hoặc data.QuestionID nếu bạn có sẵn field này
-          PartID: data.PartID,
-          //QuestionType: data.questionType,
-          QuestionType : (
-            PartNumber === '1' ? "image" :
-            PartNumber === '2' ? "email" :
-            PartNumber === '3' ? "essay" :
-            null ),
-
-          Content1: data.content1 || null,
-          Content2: data.content2 || null,
-          ImagePath1: data.imagePath1 || null,
-          ImagePath2: data.imagePath2 || null,
-          Require1 : data.require1 || null,
-          Require2 : data.require2 || null,
-          //PreparationTime: data.preparationTime,
-          //ResponseTime: data.responseTime
-          ResponseTime : (
-            PartNumber === '1' ? 600 :
-            PartNumber === '2' ? 1200 :
-            PartNumber === '3' ? 1800 :
-            null ),
-        
-        } as Question;
-        });
-        if (questionData.length > 0) {
-          setQuestion(questionData[0]);
-        } else {
-          setQuestion(null);
-        }
+        setLoading(true);
+        const data = await getQuestionWRApi(questionID);
+        console.log("Dữ liệu cau hoi:", data);
+        setQuestion(data);
+        // const AT = await AsyncStorage.getItem("access_token");
+        // console.log(">>> Check access_token:", AT);
       } catch (error) {
-        console.error('Error loading question:', error);
+        console.error("Lỗi tải dữ liệu:", error);
       } finally {
         setLoading(false);
       }
     };
-    loadQuestion();
-  }, [testId, PartNumber]);
+    fetchQuestion();
+  }, []);
+
+  useEffect(() => {
+    const fetchAnswer = async () => {
+      try{
+        //setLoading(true);
+        if(PartNumber==='1' || PartNumber==='2'){
+          const answerID1 = `${questionID}_1`;
+          const answerID2 = `${questionID}_2`;
+          const ans1 = await getAnswerWRApi(auth?.userId,answerID1)
+          const ans2 = await getAnswerWRApi(auth?.userId,answerID2)
+          if(ans1?.Content && ans2?.Content){
+            console.log("Dữ liệu cau tra loi:", ans1, ans2);
+            setAnswer1(ans1.Content);
+            setAnswer2(ans2.Content);
+            setSubmitted(true); // neu da co cau tra loi thi bat bien submitted
+          }
+          else{
+            console.log("Khong co du lieu cau tra loi")
+          }
+        }
+        else { // partNumber = 3
+          const answerID = `${questionID}_1`;
+          const ans = await getAnswerWRApi(auth?.userId,answerID);
+          if(ans.Content){
+            console.log("Dữ liệu cau tra loi:", ans);
+            setAnswer3(ans.Content);
+            setSubmitted(true); // neu da co cau tra loi thi bat bien submitted
+          }
+          else{
+            console.log("Khong co du lieu cau tra loi")
+          }
+        }
+        
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnswer();
+  },[]);
 
   if (loading) {
       return (
@@ -158,12 +243,14 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
         Alert.alert('Thông báo','Vui lòng điền đầy đủ câu trả lời!');
       }else{
         Alert.alert('Thành công', 'Bài làm của bạn đã được hệ thống ghi nhận');   
-        const ID1 = testId + '_' + PartNumber +'_1_WR';   
-        const ID2 = testId + '_' + PartNumber +'_2_WR';  
-        if (dbConnection) {
-              await saveAnswerWriting(dbConnection,ID1,answer1);
-              await saveAnswerWriting(dbConnection,ID2,answer2);
-            }
+        const ID1 = testId + '_' + PartNumber +'_1';   
+        const ID2 = testId + '_' + PartNumber +'_2';  
+        await saveAnswerWRApi(auth?.userId,ID1,answer1,null); // hien tai de feedback la null
+        await saveAnswerWRApi(auth?.userId,ID2,answer2,null); // hien tai de feedback la null
+        // if (dbConnection) {
+        //       await saveAnswerWriting(dbConnection,ID1,answer1);
+        //       await saveAnswerWriting(dbConnection,ID2,answer2);
+        //     }
             //console.log('Recording saved successfully:', fileName);
         setSubmitted(true);
       }
@@ -175,10 +262,11 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
       }
       else{
         Alert.alert('Thành công', 'Bài làm của bạn đã được hệ thống ghi nhận');
-        const ID1 = testId + '_' + PartNumber +'_1_WR';  
-        if (dbConnection) {
-              await saveAnswerWriting(dbConnection,ID1,answer3);
-            }
+        const ID1 = testId + '_' + PartNumber +'_1';  
+        // if (dbConnection) {
+        //       await saveAnswerWriting(dbConnection,ID1,answer3);
+        //     }
+        await saveAnswerWRApi(auth?.userId,ID1,answer3,null); // hien tai de feedback la null
         setSubmitted(true);
       }
     }
@@ -245,7 +333,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                 {selectedContent === 1 ? (
                   question.ImagePath1 && (
                     <Image
-                      source={WRITING_IMAGES[question.ImagePath1]}
+                      source={WRITING_IMAGES[question.ImagePath1 as keyof typeof WRITING_IMAGES]}
                       style={styles.image}
                       resizeMode="contain"
                     />
@@ -253,7 +341,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                 ) : (
                   question.ImagePath2 && (
                     <Image
-                      source={WRITING_IMAGES[question.ImagePath2]}
+                      source={WRITING_IMAGES[question.ImagePath2 as keyof typeof WRITING_IMAGES]}
                       style={styles.image}
                       resizeMode="contain"
                     />
@@ -278,10 +366,10 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     style={styles.tryAgainButton}
                     onPress={() => {
                       setSubmitted(false);
-                      const quesID1 = testId+'_'+PartNumber+'_'+'1_WR';
-                      const quesID2 = testId+'_'+PartNumber+'_'+'2_WR';
-                      deletefeed(quesID1);
-                      deletefeed(quesID2);
+                      // const quesID1 = testId+'_'+PartNumber+'_'+'1';
+                      // const quesID2 = testId+'_'+PartNumber+'_'+'2';
+                      // await saveAnswerWRApi(auth?.userId,quesID1,answer3,null);
+                      // deletefeed(quesID2);
                     }}
                   >
                   <Text style={styles.tryAgainButtonText}>Làm lại bài</Text>
@@ -297,8 +385,8 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     else{
                       navigation.navigate("ResultScreen",{
                         answers: [
-                        {questionID: testId+'_'+PartNumber+'_1_WR', answerContent: answer1},
-                        {questionID: testId+'_'+PartNumber+'_2_WR', answerContent: answer2}
+                        {questionID: testId+'_'+PartNumber+'_1', answerContent: answer1},
+                        {questionID: testId+'_'+PartNumber+'_2', answerContent: answer2}
                         ]
                       });
                     }
@@ -358,8 +446,8 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
               <View style={styles.questionItem}>
                 <Text style={styles.questionNumber}>{selectedContent}</Text>
                 <Text style={styles.questionText}>
-                  {selectedContent === 1 ? question.Require1 : 
-                   question.Require2 }
+                  {selectedContent === 1 ? question.Question1 : 
+                   question.Question2 }
                 </Text>
               </View>
 
@@ -381,10 +469,10 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     style={styles.tryAgainButton}
                     onPress={() => {
                       setSubmitted(false)
-                      const quesID1 = testId+'_'+PartNumber+'_'+'1_WR';
-                      const quesID2 = testId+'_'+PartNumber+'_'+'2_WR';
-                      deletefeed(quesID1);
-                      deletefeed(quesID2);
+                      // const quesID1 = testId+'_'+PartNumber+'_'+'1_WR';
+                      // const quesID2 = testId+'_'+PartNumber+'_'+'2_WR';
+                      // deletefeed(quesID1);
+                      // deletefeed(quesID2);
                     }}
                   >
                   <Text style={styles.tryAgainButtonText}>Làm lại bài</Text>
@@ -475,8 +563,8 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     style={styles.tryAgainButton}
                     onPress={() => {
                       setSubmitted(false)
-                      const quesID1 = testId+'_'+PartNumber+'_'+'1_WR';                     
-                      deletefeed(quesID1);                     
+                      // const quesID1 = testId+'_'+PartNumber+'_'+'1_WR';                     
+                      // deletefeed(quesID1);                     
                     }}
                   >
                   <Text style={styles.tryAgainButtonText}>Làm lại bài</Text>

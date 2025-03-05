@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import * as SQLite from 'expo-sqlite';
+//import * as SQLite from 'expo-sqlite';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image,Modal } from 'react-native';
 import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
@@ -102,7 +102,7 @@ export function TestScreen({ navigation }: any) {
   useEffect(() => {
     const fetchAnswer = async () => {
       try{
-        setLoading(true);
+        //setLoading(true);
         const answerID = `${questionID}_${selectedContent}`
         const data = await getAnswerSPApi(auth?.userId,answerID)
         if(data){

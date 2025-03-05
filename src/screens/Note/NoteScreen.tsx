@@ -3,17 +3,17 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaBox } from "../../components";
 import { ActivityIndicator } from "react-native";
-import { getAnswerSPApi } from "../../utils/api";
+import { getAnswerWRApi } from "../../utils/api";
 import { useAuth } from "../../components/Context/auth.context";
 
-interface AnswerSP {
+interface AnswerWR {
+  UserID : string,
   QuestionID : string,
-  RecordingPath : string,
-  ContentOfSpeaking : string
+  Content : string
 }
 
 export function NoteScreen() {
-  const [answer, setAnswer] = useState<AnswerSP>();
+  const [answer, setAnswer] = useState<AnswerWR>();
   const [loading, setLoading] = useState(true);
   const {auth} = useAuth();
 
@@ -21,9 +21,10 @@ export function NoteScreen() {
     const fetchData = async () => {
       try {
         
-        const data = await getAnswerSPApi(auth?.userId,"1_1_1");
+        const data = await getAnswerWRApi(auth?.userId,"1_1_1");
         console.log("Dữ liệu cau tra loi:", data);
-        setAnswer(data);
+        //setAnswer(data);
+        setAnswer(data)
         // const AT = await AsyncStorage.getItem("access_token");
         // console.log(">>> Check access_token:", AT);
       } catch (error) {
@@ -50,8 +51,8 @@ export function NoteScreen() {
       <View style={styles.container}>
         <Text style={styles.title}>Question</Text>
         <Text>{answer?.QuestionID}</Text>
-        <Text>{answer?.RecordingPath}</Text>
-        <Text>{answer?.ContentOfSpeaking}</Text>
+        <Text>{answer?.UserID}</Text>
+        <Text>{answer?.Content}</Text>
         <Text>{auth?.userId}</Text>
         <Text>{auth?.name}</Text>
         <Text>{auth?.email}</Text>
