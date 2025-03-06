@@ -14,27 +14,9 @@ interface AnswerWR {
 
 export function NoteScreen() {
   const [answer, setAnswer] = useState<AnswerWR>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const {auth} = useAuth();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        
-        const data = await getAnswerWRApi(auth?.userId,"1_1_1");
-        console.log("Dữ liệu cau tra loi:", data);
-        //setAnswer(data);
-        setAnswer(data)
-        // const AT = await AsyncStorage.getItem("access_token");
-        // console.log(">>> Check access_token:", AT);
-      } catch (error) {
-        console.error("Lỗi tải dữ liệu:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   if (loading) {
     return (
@@ -49,13 +31,7 @@ export function NoteScreen() {
   return (
     <SafeAreaBox>
       <View style={styles.container}>
-        <Text style={styles.title}>Question</Text>
-        <Text>{answer?.QuestionID}</Text>
-        <Text>{answer?.UserID}</Text>
-        <Text>{answer?.Content}</Text>
-        <Text>{auth?.userId}</Text>
-        <Text>{auth?.name}</Text>
-        <Text>{auth?.email}</Text>
+        <Text style={styles.title}>Note screen</Text>
       </View>
     </SafeAreaBox>
   );
@@ -70,24 +46,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
-  },
-  item: {
-    padding: 10,
-    marginVertical: 5,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  email: {
-    fontSize: 14,
-    color: "gray",
-  },
-  role: {
-    fontSize: 14,
-    fontStyle: "italic",
   },
   centered: {
     flex: 1,

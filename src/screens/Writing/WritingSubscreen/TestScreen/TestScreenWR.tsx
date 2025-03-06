@@ -60,7 +60,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
   const route = useRoute<TestScreenWRRouteProp>();
   const { testId, PartNumber } = route.params;
   const [question, setQuestion] = useState<QuestionWR | null>(null);
-  const [answer,setAnswer] = useState<AnswerWR | null>(null);
+  //const [answer,setAnswer] = useState<AnswerWR | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedContent, setSelectedContent] = useState<1 | 2 | 3>(1);
   const [dbConnection, setDbConnection] = useState<SQLite.SQLiteDatabase | null>(null);
@@ -184,7 +184,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
           const ans1 = await getAnswerWRApi(auth?.userId,answerID1)
           const ans2 = await getAnswerWRApi(auth?.userId,answerID2)
           if(ans1?.Content && ans2?.Content){
-            console.log("Dữ liệu cau tra loi:", ans1, ans2);
+            //console.log("Dữ liệu cau tra loi:", ans1, ans2);
             setAnswer1(ans1.Content);
             setAnswer2(ans2.Content);
             setSubmitted(true); // neu da co cau tra loi thi bat bien submitted
@@ -197,7 +197,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
           const answerID = `${questionID}_1`;
           const ans = await getAnswerWRApi(auth?.userId,answerID);
           if(ans.Content){
-            console.log("Dữ liệu cau tra loi:", ans);
+            //console.log("Dữ liệu cau tra loi:", ans);
             setAnswer3(ans.Content);
             setSubmitted(true); // neu da co cau tra loi thi bat bien submitted
           }

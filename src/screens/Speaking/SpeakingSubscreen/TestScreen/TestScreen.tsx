@@ -106,7 +106,7 @@ export function TestScreen({ navigation }: any) {
         const answerID = `${questionID}_${selectedContent}`
         const data = await getAnswerSPApi(auth?.userId,answerID)
         if(data){
-          console.log("Dữ liệu cau tra loi:", data);
+          //console.log("Dữ liệu cau tra loi:", data);
           setAnswer(data);
         }
         else{

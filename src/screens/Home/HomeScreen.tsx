@@ -14,11 +14,10 @@ const { width } = Dimensions.get("window");
 
 export function HomeScreen({ navigation }: HomeScreenProps) {
   return (
-    <SafeAreaBox>
-      <ScrollView scrollEnabled={false}>
+    <SafeAreaBox>    
+      <WelcomeCard />
+        <ScrollView scrollEnabled={true}>
         <View style={homeScreen.rootContainer}>
-          <WelcomeCard />
-
           <Text style={homeScreen.sectionTitle}>Skills</Text>
           <TouchableOpacity
             style={homeScreen.card}
@@ -101,13 +100,15 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
 
 function WelcomeCard() {
   return (
-    <View style={welcomeCard.root}>
-      <Text style={welcomeCard.heading}>
-        Welcome to the TOEIC Practice App!
-      </Text>
-      <Text style={welcomeCard.text}>
-        Let's achieve your TOEIC goals together!
-      </Text>
+    <View style={homeScreen.rootContainer}> 
+      <View style={welcomeCard.root}>
+        <Text style={welcomeCard.heading}>
+          Welcome to the TOEIC Practice App!
+        </Text>
+        <Text style={welcomeCard.text}>
+          Let's achieve your TOEIC goals together!
+        </Text>
+      </View>
     </View>
   );
 }

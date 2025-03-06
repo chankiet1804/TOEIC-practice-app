@@ -1,5 +1,6 @@
 import { ResultScreenProps } from "../types";
 // import { SafeAreaBox } from "../../components";
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -8,7 +9,8 @@ import {
   ActivityIndicator,
   ScrollView,
   Alert,
-  TouchableOpacity
+  TouchableOpacity,
+  SafeAreaView
 } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { RouteProp } from '@react-navigation/native';
@@ -316,197 +318,347 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
         );
     }
 
-    return (
-      <View style={styles.container}>
-        <ScrollView >
-          {/* <Text style={styles.title}>Kết quả đánh giá</Text> */}
+//     return (
+//       <View style={styles.container}>
+//         <ScrollView >
+//           {/* <Text style={styles.title}>Kết quả đánh giá</Text> */}
           
-          {answers.map((answer, index) => (
-            <View key={index} style={styles.resultCard}>
-              <Text style={styles.partTitle}>Câu hỏi {answer.questionID}</Text>
+//           {answers.map((answer, index) => (
+//             <View key={index} style={styles.resultCard}>
+//               <Text style={styles.partTitle}>Câu hỏi {answer.questionID}</Text>
     
-              {/* <View style={styles.scoreContainer}>
-                <Text style={styles.scoreLabel}>Điểm số:</Text>
-                <Text style={styles.scoreValue}>100/10</Text>
-              </View> */}
+//               {/* <View style={styles.scoreContainer}>
+//                 <Text style={styles.scoreLabel}>Điểm số:</Text>
+//                 <Text style={styles.scoreValue}>100/10</Text>
+//               </View> */}
 
-              <View style={styles.feedbackContainer}>
-                <Text style={styles.feedbackLabel}>Câu trả lời của bạn:</Text>
-                <Text style={styles.feedbackContent}>
-                  {answers[index].answerContent}
-                </Text>
-              </View>
+//               <View style={styles.feedbackContainer}>
+//                 <Text style={styles.feedbackLabel}>Câu trả lời của bạn:</Text>
+//                 <Text style={styles.feedbackContent}>
+//                   {answers[index].answerContent}
+//                 </Text>
+//               </View>
     
-              <View style={styles.feedbackContainer}>
-                <Text style={styles.feedbackLabel}>Nhận xét:</Text>
-                <Text style={styles.feedbackContent}>
-                  {/* {results[index]?.feedback} */}
-                  {/* {index === 0 ? feedbacks.get(answers[0].questionID) : feedbacks.get(answers[1].questionID)} */}
-                  {
-                    haveFeedback
-                    ? (index === 0
-                        ? feedbacks.get(answers[0].questionID)
-                        : feedbacks.get(answers[1].questionID))
-                    : "Chưa có nhận xét"
-                  }
-                </Text>
-              </View>
-              {suggestionList.size>0 &&(
-              <View style={styles.suggestionsContainer}>
-                <Text style={styles.suggestionsLabel}>Gợi ý cải thiện:</Text>
-                <Text style={styles.suggestionsContent}>
-                  {/* {index === 0 ? suggestion?.Suggestion1 : suggestion?.Suggestion2} */}
-                  {index === 0 ? suggestionList.get(answers[0].questionID) : suggestionList.get(answers[1].questionID)}
-                </Text>
-              </View>
-              )}
+//               <View style={styles.feedbackContainer}>
+//                 <Text style={styles.feedbackLabel}>Nhận xét:</Text>
+//                 <Text style={styles.feedbackContent}>
+//                   {/* {results[index]?.feedback} */}
+//                   {/* {index === 0 ? feedbacks.get(answers[0].questionID) : feedbacks.get(answers[1].questionID)} */}
+//                   {
+//                     haveFeedback
+//                     ? (index === 0
+//                         ? feedbacks.get(answers[0].questionID)
+//                         : feedbacks.get(answers[1].questionID))
+//                     : "Chưa có nhận xét"
+//                   }
+//                 </Text>
+//               </View>
+//               {suggestionList.size>0 &&(
+//               <View style={styles.suggestionsContainer}>
+//                 <Text style={styles.suggestionsLabel}>Gợi ý cải thiện:</Text>
+//                 <Text style={styles.suggestionsContent}>
+//                   {/* {index === 0 ? suggestion?.Suggestion1 : suggestion?.Suggestion2} */}
+//                   {index === 0 ? suggestionList.get(answers[0].questionID) : suggestionList.get(answers[1].questionID)}
+//                 </Text>
+//               </View>
+//               )}
+//             </View>
+//           ))}
+//         </ScrollView>
+//         {!haveFeedback&&(
+//         <TouchableOpacity
+//           style={styles.submitButton}
+//           onPress={() => {
+//             if(1){
+//               evaluateAllAnswers();
+//             }
+//           }}
+//         >
+//           <Text style={styles.submitButtonText}>Xem nhận xét</Text>      
+//         </TouchableOpacity>
+//         )}
+//       </View>
+//     );
+// };
+
+return (
+  <SafeAreaView style={styles.container}>
+
+    <ScrollView 
+      contentContainerStyle={styles.scrollViewContent}
+      showsVerticalScrollIndicator={false}
+    >
+      {answers.map((answer, index) => (
+        <View key={index} style={styles.resultCard}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="document-text-outline" size={24} color="#4A90E2" />
+            <Text style={styles.partTitle}>Câu hỏi {answer.questionID}</Text>
+          </View>
+
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionLabel}>Câu trả lời của bạn:</Text>
+            <Text style={styles.sectionContent}>
+              {answer.answerContent}
+            </Text>
+          </View>
+
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionLabel}>Nhận xét:</Text>
+            <Text style={styles.sectionContent}>
+              {haveFeedback
+                ? (index === 0
+                    ? feedbacks.get(answers[0].questionID)
+                    : feedbacks.get(answers[1].questionID))
+                : "Chưa có nhận xét"}
+            </Text>
+          </View>
+
+          {suggestionList.size > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionLabel}>Gợi ý cải thiện:</Text>
+              <Text style={styles.sectionContent}>
+                {index === 0 
+                  ? suggestionList.get(answers[0].questionID) 
+                  : suggestionList.get(answers[1].questionID)}
+              </Text>
             </View>
-          ))}
-        </ScrollView>
-        {!haveFeedback&&(
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={() => {
-            if(1){
-              evaluateAllAnswers();
-            }
-          }}
-        >
-          <Text style={styles.submitButtonText}>Xem nhận xét</Text>      
-        </TouchableOpacity>
-        )}
-      </View>
-    );
+          )}
+        </View>
+      ))}
+    </ScrollView>
+
+    {!haveFeedback && (
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={evaluateAllAnswers}
+      >
+        <Text style={styles.submitButtonText}>Xem nhận xét</Text>
+      </TouchableOpacity>
+    )}
+  </SafeAreaView>
+);
 };
 
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#f5f5f5',
-      padding: 16,
-    },
-    loadingContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#fff',
-    },
-    loadingText: {
-      marginTop: 16,
-      fontSize: 16,
-      color: '#666',
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      marginBottom: 20,
-      textAlign: 'center',
-    },
-    resultCard: {
-      backgroundColor: '#fff',
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 16,
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-    partTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 12,
-      color: '#333',
-    },
-    timeSpentContainer: {
-      flexDirection: 'row',
-      marginBottom: 8,
-    },
-    timeSpentLabel: {
-      fontSize: 14,
-      color: '#666',
-      flex: 1,
-    },
-    timeSpentValue: {
-      fontSize: 14,
-      color: '#333',
-      fontWeight: '500',
-    },
-    scoreContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 12,
-      backgroundColor: '#f8f9fa',
-      padding: 8,
-      borderRadius: 8,
-    },
-    scoreLabel: {
-      fontSize: 16,
-      color: '#666',
-      flex: 1,
-    },
-    scoreValue: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: '#007AFF',
-    },
-    feedbackContainer: {
-      marginBottom: 12,
-      backgroundColor: '#f8f9fa',
-      padding: 12,
-      borderRadius: 8,
-    },
-    feedbackLabel: {
-      fontSize: 14,
-      color: '#666',
-      marginBottom: 4,
-    },
-    feedbackContent: {
-      fontSize: 14,
-      color: '#333',
-      lineHeight: 20,
-    },
-    suggestionsContainer: {
-      backgroundColor: '#f8f9fa',
-      padding: 12,
-      borderRadius: 8,
-    },
-    suggestionsLabel: {
-      fontSize: 14,
-      color: '#666',
-      marginBottom: 4,
-    },
-    suggestionsContent: {
-      fontSize: 14,
-      color: '#333',
-      lineHeight: 20,
-    },
-    submitButton: {
-      backgroundColor: '#60A5FA',
-      paddingVertical: 15,
-      paddingHorizontal: 25,
-      borderRadius: 12,
-      marginTop: 20,
-      alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 3,
-      elevation: 2,
-      marginBottom: 20,
-    },
-    
-    submitButtonText: {
-      color: '#fff',
-      fontSize: 18,
-      fontWeight: 'bold',
-      textTransform: 'uppercase',
-      letterSpacing: 1,
-    },
-  });
-  
 
+// const styles = StyleSheet.create({
+//     container: {
+//       flex: 1,
+//       backgroundColor: '#f5f5f5',
+//       padding: 16,
+//     },
+//     loadingContainer: {
+//       flex: 1,
+//       justifyContent: 'center',
+//       alignItems: 'center',
+//       backgroundColor: '#fff',
+//     },
+//     loadingText: {
+//       marginTop: 16,
+//       fontSize: 16,
+//       color: '#666',
+//     },
+//     title: {
+//       fontSize: 24,
+//       fontWeight: 'bold',
+//       marginBottom: 20,
+//       textAlign: 'center',
+//     },
+//     resultCard: {
+//       backgroundColor: '#fff',
+//       borderRadius: 12,
+//       padding: 16,
+//       marginBottom: 16,
+//       shadowColor: '#000',
+//       shadowOffset: {
+//         width: 0,
+//         height: 2,
+//       },
+//       shadowOpacity: 0.1,
+//       shadowRadius: 4,
+//       elevation: 3,
+//     },
+//     partTitle: {
+//       fontSize: 18,
+//       fontWeight: 'bold',
+//       marginBottom: 12,
+//       color: '#333',
+//     },
+//     timeSpentContainer: {
+//       flexDirection: 'row',
+//       marginBottom: 8,
+//     },
+//     timeSpentLabel: {
+//       fontSize: 14,
+//       color: '#666',
+//       flex: 1,
+//     },
+//     timeSpentValue: {
+//       fontSize: 14,
+//       color: '#333',
+//       fontWeight: '500',
+//     },
+//     scoreContainer: {
+//       flexDirection: 'row',
+//       alignItems: 'center',
+//       marginBottom: 12,
+//       backgroundColor: '#f8f9fa',
+//       padding: 8,
+//       borderRadius: 8,
+//     },
+//     scoreLabel: {
+//       fontSize: 16,
+//       color: '#666',
+//       flex: 1,
+//     },
+//     scoreValue: {
+//       fontSize: 20,
+//       fontWeight: 'bold',
+//       color: '#007AFF',
+//     },
+//     feedbackContainer: {
+//       marginBottom: 12,
+//       backgroundColor: '#f8f9fa',
+//       padding: 12,
+//       borderRadius: 8,
+//     },
+//     feedbackLabel: {
+//       fontSize: 14,
+//       color: '#666',
+//       marginBottom: 4,
+//     },
+//     feedbackContent: {
+//       fontSize: 14,
+//       color: '#333',
+//       lineHeight: 20,
+//     },
+//     suggestionsContainer: {
+//       backgroundColor: '#f8f9fa',
+//       padding: 12,
+//       borderRadius: 8,
+//     },
+//     suggestionsLabel: {
+//       fontSize: 14,
+//       color: '#666',
+//       marginBottom: 4,
+//     },
+//     suggestionsContent: {
+//       fontSize: 14,
+//       color: '#333',
+//       lineHeight: 20,
+//     },
+//     submitButton: {
+//       backgroundColor: '#60A5FA',
+//       paddingVertical: 15,
+//       paddingHorizontal: 25,
+//       borderRadius: 12,
+//       marginTop: 20,
+//       alignItems: 'center',
+//       shadowColor: '#000',
+//       shadowOffset: { width: 0, height: 2 },
+//       shadowOpacity: 0.2,
+//       shadowRadius: 3,
+//       elevation: 2,
+//       marginBottom: 20,
+//     },
+    
+//     submitButtonText: {
+//       color: '#fff',
+//       fontSize: 18,
+//       fontWeight: 'bold',
+//       textTransform: 'uppercase',
+//       letterSpacing: 1,
+//     },
+//   });
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#E9F0F7', // Soft blue background instead of gradient
+  },
+  headerContainer: {
+    backgroundColor: '#4A90E2', // Blue header background
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: 'white',
+  },
+  scrollViewContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  resultCard: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  partTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginLeft: 10,
+  },
+  sectionContainer: {
+    backgroundColor: '#F7F9FC',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+  },
+  sectionLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+    fontWeight: '500',
+  },
+  sectionContent: {
+    fontSize: 15,
+    color: '#333',
+    lineHeight: 22,
+  },
+  submitButton: {
+    backgroundColor: '#4A90E2',
+    paddingVertical: 15,
+    marginHorizontal: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#666',
+  },
+});
