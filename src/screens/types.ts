@@ -45,11 +45,15 @@ export type HomeStackParamList = {
   
   NoteScreen: undefined;
   SettingsScreen: undefined;
-  ResultScreen: {
-    answers: {
-      questionID: string;
-      answerContent: string;
-    }[];
+  // ResultScreen: {
+  //   answers: {
+  //     questionID: string;
+  //     answerContent: string;
+  //   }[];
+  // };
+  ResultScreen:{
+    testId: number;
+    PartNumber: string;
   };
   LoginScreen: undefined;
   RegisterScreen: undefined;

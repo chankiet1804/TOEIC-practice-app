@@ -43,6 +43,8 @@ interface Question {
     Question3 : string,
     PreparationTime : number,
     ResponseTime : number,
+    Suggestion1 : string,
+    Suggestion2 : string
 }
 
 interface AnswerSP {

@@ -20,19 +20,6 @@ import { getQuestionWRApi,saveAnswerWRApi,getAnswerWRApi } from '../../../../uti
 
 type TestScreenWRRouteProp = RouteProp<HomeStackParamList, 'TestScreenWR'>;
 
-interface Question {
-  QuestionID: string;
-  PartID: string;
-  QuestionType: string;
-  Content1: string | null;
-  Content2: string | null;
-  ImagePath1: keyof typeof WRITING_IMAGES;
-  ImagePath2: keyof typeof WRITING_IMAGES;
-  Require1: string | null;
-  Require2: string | null;
-  //PreparationTime: number;
-  ResponseTime: number;
-}
 
 interface QuestionWR {
   QuestionID : string,
@@ -45,6 +32,8 @@ interface QuestionWR {
   Question2 : string | null,
   PreparationTime : number,
   ResponseTime : number,
+  Suggestion1 : string,
+  Suggestion2 : string
 }
 
 interface AnswerWR {
@@ -272,12 +261,12 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
     }
   }
 
-  const deletefeed = async(quesID:string) => {
-    if(dbConnection){
-      await deleteFeedback(dbConnection, quesID);
-      console.log("Deleted feedback with ID: " + quesID);
-    }
-  }
+  // const deletefeed = async(quesID:string) => {
+  //   if(dbConnection){
+  //     await deleteFeedback(dbConnection, quesID);
+  //     console.log("Deleted feedback with ID: " + quesID);
+  //   }
+  // }
 
   return (
     <SafeAreaBox>
@@ -383,12 +372,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     handleFinish(1);
                     }
                     else{
-                      navigation.navigate("ResultScreen",{
-                        answers: [
-                        {questionID: testId+'_'+PartNumber+'_1', answerContent: answer1},
-                        {questionID: testId+'_'+PartNumber+'_2', answerContent: answer2}
-                        ]
-                      });
+                      navigation.navigate("ResultScreen",{testId, PartNumber});
                     }
                   }}
                 >
@@ -486,12 +470,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     handleFinish(2);
                     }
                     else{
-                      navigation.navigate("ResultScreen",{
-                        answers: [
-                        {questionID: testId+'_'+PartNumber+'_1_WR', answerContent: answer1},
-                        {questionID: testId+'_'+PartNumber+'_2_WR', answerContent: answer2}
-                        ]
-                      });
+                      navigation.navigate("ResultScreen",{testId, PartNumber});
                     }
                   }}
                 >
@@ -578,11 +557,7 @@ export function TestScreenWR({ navigation }: TestScreenWRProps) {
                     handleFinish(3);
                     }
                     else{
-                      navigation.navigate("ResultScreen",{
-                        answers: [
-                        {questionID: testId+'_'+PartNumber+'_1_WR', answerContent: answer3},                       
-                        ]
-                      });
+                      navigation.navigate("ResultScreen",{testId, PartNumber});
                     }
                   }}
                 >
