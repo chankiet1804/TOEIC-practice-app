@@ -30,6 +30,7 @@ import { WRITING_IMAGES } from '../../database/images';
 import { useAuth } from "../../components/Context/auth.context";
 import { getQuestionWRApi,getAnswerWRApi,saveAnswerWRApi } from "../../utils/api";
 
+import ViewQuestionModal from './ViewQuestionModal';
 
 type ResultRouteProp = RouteProp<HomeStackParamList, 'ResultScreen'>;
 
@@ -86,6 +87,8 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
     const questionID = `${testId}_${PartNumber}`;
     const {auth} = useAuth();
     const api = OPENAI_API_KEY as string;
+
+    const [isQuestionModalVisible, setIsQuestionModalVisible] = useState(false);
 
     const openai = new OpenAI({
         apiKey: OPENAI_API_KEY, // Lấy từ file .env
@@ -420,68 +423,6 @@ export function ResultScreen({ navigation }: ResultScreenProps) {
         );
     }
 
-//     return (
-//       <View style={styles.container}>
-//         <ScrollView >
-//           {/* <Text style={styles.title}>Kết quả đánh giá</Text> */}
-          
-//           {answers.map((answer, index) => (
-//             <View key={index} style={styles.resultCard}>
-//               <Text style={styles.partTitle}>Câu hỏi {answer.questionID}</Text>
-    
-//               {/* <View style={styles.scoreContainer}>
-//                 <Text style={styles.scoreLabel}>Điểm số:</Text>
-//                 <Text style={styles.scoreValue}>100/10</Text>
-//               </View> */}
-
-//               <View style={styles.feedbackContainer}>
-//                 <Text style={styles.feedbackLabel}>Câu trả lời của bạn:</Text>
-//                 <Text style={styles.feedbackContent}>
-//                   {answers[index].answerContent}
-//                 </Text>
-//               </View>
-    
-//               <View style={styles.feedbackContainer}>
-//                 <Text style={styles.feedbackLabel}>Nhận xét:</Text>
-//                 <Text style={styles.feedbackContent}>
-//                   {/* {results[index]?.feedback} */}
-//                   {/* {index === 0 ? feedbacks.get(answers[0].questionID) : feedbacks.get(answers[1].questionID)} */}
-//                   {
-//                     haveFeedback
-//                     ? (index === 0
-//                         ? feedbacks.get(answers[0].questionID)
-//                         : feedbacks.get(answers[1].questionID))
-//                     : "Chưa có nhận xét"
-//                   }
-//                 </Text>
-//               </View>
-//               {suggestionList.size>0 &&(
-//               <View style={styles.suggestionsContainer}>
-//                 <Text style={styles.suggestionsLabel}>Gợi ý cải thiện:</Text>
-//                 <Text style={styles.suggestionsContent}>
-//                   {/* {index === 0 ? suggestion?.Suggestion1 : suggestion?.Suggestion2} */}
-//                   {index === 0 ? suggestionList.get(answers[0].questionID) : suggestionList.get(answers[1].questionID)}
-//                 </Text>
-//               </View>
-//               )}
-//             </View>
-//           ))}
-//         </ScrollView>
-//         {!haveFeedback&&(
-//         <TouchableOpacity
-//           style={styles.submitButton}
-//           onPress={() => {
-//             if(1){
-//               evaluateAllAnswers();
-//             }
-//           }}
-//         >
-//           <Text style={styles.submitButtonText}>Xem nhận xét</Text>      
-//         </TouchableOpacity>
-//         )}
-//       </View>
-//     );
-// };
 
 return (
   <SafeAreaView style={styles.container}>
@@ -490,6 +431,7 @@ return (
       contentContainerStyle={styles.scrollViewContent}
       showsVerticalScrollIndicator={false}
     >
+    
       {(question?.QuestionType === 'image' || question?.QuestionType === 'email') && (
         <>
 
@@ -525,9 +467,22 @@ return (
 
           <View style={styles.resultCard}>
             <View style={styles.cardHeader}>
-              <Ionicons name="document-text-outline" size={24} color="#4A90E2" />
-              <Text style={styles.partTitle}>Test {testId} - Part {PartNumber} </Text>
+            <Text style={styles.partTitle}>Test {testId} - Part {PartNumber} </Text>
+            <TouchableOpacity 
+              style={styles.viewQuestionButton}
+              onPress={() => setIsQuestionModalVisible(true)}
+            >
+              <Ionicons name="eye-outline" size={20} color="#4A90E2" />
+              <Text style={styles.viewQuestionText}>Xem câu hỏi</Text>
+            </TouchableOpacity>
             </View>
+            <ViewQuestionModal
+              isVisible={isQuestionModalVisible}
+              onClose={() => setIsQuestionModalVisible(false)}
+              question={question}
+            />
+            
+
 
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionLabel}>Câu trả lời của bạn:</Text>
@@ -560,9 +515,20 @@ return (
       {question?.QuestionType === 'essay' && (
         <View style={styles.resultCard}>
           <View style={styles.cardHeader}>
-            <Ionicons name="document-text-outline" size={24} color="#4A90E2" />
-            <Text style={styles.partTitle}>Câu hỏi {question?.QuestionID}</Text>
+            <Text style={styles.partTitle}>Test {testId} - Part {PartNumber} </Text>
+            <TouchableOpacity 
+              style={styles.viewQuestionButton}
+              onPress={() => setIsQuestionModalVisible(true)}
+            >
+              <Ionicons name="eye-outline" size={20} color="#4A90E2" />
+              <Text style={styles.viewQuestionText}>Xem câu hỏi</Text>
+            </TouchableOpacity>
           </View>
+          <ViewQuestionModal
+            isVisible={isQuestionModalVisible}
+            onClose={() => setIsQuestionModalVisible(false)}
+            question={question}
+          />
 
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionLabel}>Câu trả lời của bạn:</Text>
@@ -580,7 +546,7 @@ return (
           </View>          
         </View>
       )}
-
+    
     </ScrollView>
   </SafeAreaView>
 );
@@ -752,9 +718,19 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   cardHeader: {
+    flexDirection: 'column',
+    marginBottom: 15,
+  },
+  viewQuestionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginTop:10
+  },
+  viewQuestionText:{
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+    marginLeft: 10,
   },
   partTitle: {
     fontSize: 18,

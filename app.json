@@ -7,7 +7,7 @@
     "icon": "./assets/toeic-logo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/toeic-logo.png",
+      "image": "./assets/toeic-splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,7 +19,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/toeic-logo.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.chankiet1804.quizapp"
