@@ -5,10 +5,9 @@
 A mobile app for practicing TOEIC Speaking and Writing skills, powered by AI and speech-to-text technology.
 
 ## ✨ Features
-- Practice **Speaking** with real-time speech-to-text feedback.
-- Get **AI-powered** feedback on Writing answers using OpenAI API.
-- Track user progress with a built-in SQLite database.
-- Support for **multiple users** with backend integration (Node.js + MySQL).
+- Developed the login and registration feature using JWT for user authentication.
+- Implemented speech recognition to convert user speech into text (Speaking Section).
+- Integrated OpenAI API to provide feedback on users' responses, helping them improve their answers (Writing Section).
 - **User-friendly interface** designed for an intuitive and seamless learning experience.
 
 ## 📥 Installation  
@@ -29,10 +28,10 @@ A mobile app for practicing TOEIC Speaking and Writing skills, powered by AI and
 
 ## 🛠️ Tech Stack  
 - **Frontend:** React Native, Expo, TypeScript  
-- **Backend:** Node.js, Express, MySQL  
-- **AI & APIs:** OpenAI API, expo-speech-recognition library  
-- **Database:** SQLite (local), MySQL (backend)  
-- **Version Control:** Git & GitHub 
+- **Backend:** Node.js, Express  
+- **AI & APIs:** OpenAI API, RESTful API
+- **Database:** MongoDB 
+- **Version Control:** Git & GitHub
 
 # <img src="https://img.icons8.com/fluency/48/000000/group.png" alt="Team Icon" width="25"/> Author  
 
