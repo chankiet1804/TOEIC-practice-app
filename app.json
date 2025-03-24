@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "quiz-app",
+    "name": "toeic-app",
     "slug": "quiz-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/toeic-logo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/toeic-splash.png",
+      "image": "./assets/toeic-logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -30,7 +30,8 @@
     "newArchEnabled": true,
     "plugins": [
       "expo-sqlite",
-      "expo-speech-recognition"
+      "expo-speech-recognition",
+      "@react-native-voice/voice"
     ],
     "extra": {
       "eas": {
