@@ -16,7 +16,6 @@ import * as SQLite from 'expo-sqlite';
 import { RouteProp } from '@react-navigation/native';
 import { HomeStackParamList } from '../types';
 import { useRoute } from '@react-navigation/native';
-import { getFeedback,saveFeedback,getDBConnection } from "../../database/db-service";
 
 import OpenAI from "openai";
 // import 'dotenv/config';

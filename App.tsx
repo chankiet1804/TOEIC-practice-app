@@ -13,8 +13,6 @@ import { InforTestScreen } from "./src/screens/Speaking/SpeakingSubscreen/InforT
 import { InforTestScreenWR } from "./src/screens/Writing/WritingSubscreen/InforTestScreen";
 
 import { TestScreen } from "./src/screens/Speaking/SpeakingSubscreen/TestScreen";
-import { DatabaseProvider } from "./src/database/DatabaseContext";
-import { DatabaseStateHandler } from "./src/database/DatabaseStateHandler";
 import { TestScreenWR } from "./src/screens/Writing/WritingSubscreen/TestScreen";
 import { ResultScreen } from "./src/screens/Result";
 
@@ -29,7 +27,6 @@ import { AuthWrapper } from "./src/components/Context/auth.context";
 
 import 'expo-dev-client';
 import 'react-native-gesture-handler';
-import 'firebase/firestore';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
@@ -238,13 +235,9 @@ function MainStack() {
 export default function App() {
   return (
     <AuthWrapper>
-      <DatabaseProvider>
-        <DatabaseStateHandler>
-          <NavigationContainer>
-            <MainStack />
-          </NavigationContainer>
-        </DatabaseStateHandler>
-      </DatabaseProvider>
+      <NavigationContainer>
+        <MainStack />
+      </NavigationContainer>
     </AuthWrapper>
   );
 }

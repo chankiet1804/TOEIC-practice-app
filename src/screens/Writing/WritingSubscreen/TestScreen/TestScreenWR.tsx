@@ -5,15 +5,11 @@ import { SafeAreaBox } from "../../../../components";
 import { useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from '../../../types';
 import { RouteProp } from '@react-navigation/native';
-import { getDBConnection, getWRQuestionById,getAnswerWR } from '../../../../database/db-service';
 import { CountdownTimer } from '../../../../components/CountdownTimer';
 import { WRITING_IMAGES } from '../../../../database/images';
 import { TestScreenWRProps } from '../../../types';
-import { saveAnswerWriting,deleteFeedback } from '../../../../database/db-service';
 import Foundation from '@expo/vector-icons/Foundation';
 
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../../../firebase'; 
 
 import { useAuth } from "../../../../components/Context/auth.context";
 import { getQuestionWRApi,saveAnswerWRApi,getAnswerWRApi } from '../../../../utils/api';
@@ -34,13 +30,6 @@ interface QuestionWR {
   ResponseTime : number,
   Suggestion1 : string,
   Suggestion2 : string
-}
-
-interface AnswerWR {
-  UserID : string
-  QuestionID : string,
-  Content : string,
-  Feedback : string | null
 }
 
 
